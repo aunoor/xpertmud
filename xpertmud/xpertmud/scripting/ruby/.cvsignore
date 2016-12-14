@@ -1,0 +1,12 @@
+.deps
+.libs
+Makefile
+Makefile.in
+*.lo
+*.moc.cc
+libxmrubyinterpreter_la_closure.cc
+libxmrubyinterpreter_la_closure.lo
+AutoXMRuby.cc
+libxmrubyinterpreter.la
+libxmrubyinterpreter.la.closure
+sysinit_rb.h

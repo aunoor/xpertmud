@@ -1,0 +1,24 @@
+#ifndef GUISCRIPTINGWRAPPER_H
+#define GUISCRIPTINGWRAPPER_H
+
+class GuiScriptingBindings;
+
+struct LenChar {
+  char* pointer;
+  int   length;
+};
+
+class GuiScriptingWrapper {
+public:
+  GuiScriptingWrapper(): callBack(0) {}
+  void setCallback(GuiScriptingBindings* callBack) {
+    this->callBack = callBack;
+  }
+
+___DEFINITIONS___
+
+private:
+  GuiScriptingBindings* callBack;
+};
+
+#endif

@@ -1,0 +1,122 @@
+# This is the TODO in the HEAD Branch
+
+ToDo before any Release:
+  remove extra "." from include path! (sysinit.pl)
+
+###########################################################################
+TODO Laters:
+
+Debugging:
+  remove all couts, printfs and all #include <iostream>, #include <stdio.h>
+  we could use kdebug instead
+
+TextWidget:
+ [ ] Blinking text: blinken oder kursiv (configurierbar)
+ [x] Fix redraw! we are always drawing to much!!!!!
+ [x] Per window change font dialog
+ [ ] Fix redraw! while resizing, we are not redrawing enough (italic font) (still? check this... what fonts?)
+
+TextBufferWidget:
+ [ ] Optimize Scrolling (copy region instead of a complete redraw)
+
+BookmarkEditor:
+ [ ] TODO
+
+ChangeLog, README, INSTALL, etc:
+  Anpassen/Schreiben
+
+PERL:
+  [x] bindings zum An/Ausschalten des Textmarkierens
+  [x] callback fuer mouseClickEvents bei ausgeschaltetem Copy&Paste
+  [x] bindings fuer WordWrap in TextBufferWidget
+  [ ] bindings fuer set/get MaxBufferSize (TextBufferWidget)
+
+
+KFilePlugin:
+  [ ] Set correct type for entries (INT, Multiline edit,...)
+  [ ] Add validators
+  [ ] write info back
+
+###########################################################################
+### $Log$
+### Revision 1.37  2002/08/29 18:27:03  globbi
+### new nifty QextMdi_BRANCH merge
+###
+### Revision 1.35.2.1  2002/08/27 13:59:51  globbi
+### branch updated
+###
+### Revision 1.36  2002/08/16 21:15:27  entropy
+### Minor documentation changes
+###
+### Revision 1.35  2002/04/18 20:36:52  entropy
+### updated todo
+###
+### Revision 1.34  2002/03/27 08:53:42  globbi
+### new todo
+###
+### Revision 1.33  2002/03/17 14:34:51  entropy
+### Per window font selection dialog
+###
+### Revision 1.32  2002/03/17 14:16:32  entropy
+### Fixed redrawing bug (now we are redrawing only really modified areas
+###
+### Revision 1.31  2002/03/17 14:07:10  entropy
+### Correct accelerator setting in context menus
+###
+### Revision 1.30  2001/11/09 11:03:22  entropy
+### todo
+###
+### Revision 1.29  2001/11/09 11:01:53  entropy
+### todo
+###
+### Revision 1.28  2001/11/06 17:56:36  globbi
+### done
+###
+### Revision 1.27  2001/11/06 17:44:01  entropy
+### Changelog
+###
+### Revision 1.26  2001/07/25 10:11:53  entropy
+### nuthing
+###
+### Revision 1.25  2001/07/24 14:29:55  globbi
+### todo better
+###
+### Revision 1.24  2001/07/11 17:41:43  entropy
+### Handling of recent connections improved
+###
+### Revision 1.23  2001/07/11 14:54:55  entropy
+### Removed that ColorEntry struct completly.
+###
+### Revision 1.22  2001/07/11 11:56:37  entropy
+### Removed evil hack for maximized StatusWindow on startup
+###
+### Revision 1.21  2001/07/11 11:41:25  entropy
+### Recent Connections Menu added
+###
+### Revision 1.20  2001/07/11 09:02:12  entropy
+### minor update
+###
+### Revision 1.19  2001/07/10 16:53:17  entropy
+### new TODO
+###
+### Revision 1.18  2001/07/10 08:13:11  globbi
+### new plan
+###
+### Revision 1.17  2001/07/05 15:46:59  entropy
+### next step done
+###
+### Revision 1.16  2001/07/05 15:11:24  globbi
+### up to date
+###
+### Revision 1.15  2001/07/05 13:21:47  entropy
+### fun with CVS :)
+###
+### Revision 1.14  2001/07/05 13:20:35  entropy
+### 1 step done
+###
+### Revision 1.13  2001/07/05 11:16:42  entropy
+### Flicker Fix
+###
+### Revision 1.12  2001/07/05 09:34:07  entropy
+### Nothing
+###########################################################################

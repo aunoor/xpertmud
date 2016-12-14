@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD><TITLE>Xpertmud - The eXtensible PERl scripTable MUDclient</TITLE></HEAD>
+<BODY LEFTMARGIN="0" TOPMARGIN="0" RIGHTMARGIN="0" BOTTOMMARGIN="0" MARGINWIDTH="0" MARGINHEIGHT="0" TEXT="#FFFFFF" LINK="#FFFFFF" VLINK="#AAAAAA" ALINK="#FFFF00">
+<BASEFONT FACE="Arial,Verdana,Helvetica,sans-serif">
+<TABLE WIDTH="100%" BORDER="0" CELLSPACING="0" CELLPADDING="0">
+  <TR>
+    <TD ROWSPAN="2" WIDTH="68"><A HREF="index.shtml"><IMG SRC="images/logo.gif" BORDER="0" WIDTH="68" HEIGHT="64" ALT="xpertmud" title="xpertmud"></A></TD>
+    <TD COLSPAN="7" WIDTH="100%" BACKGROUND="images/titleback.gif"><IMAGE SRC="images/title.gif" WIDTH="489" HEIGHT="27"></TD>
+  </TR>
+  <TR>
+    <TD WIDTH="62"><A HREF="news.shtml"><IMAGE SRC="images/news.gif" BORDER="0" ALT="News" WIDTH="62" HEIGHT="37"></A></TD>
+    <TD WIDTH="57"><A HREF="http://sourceforge.net/tracker/?group_id=29649&atid=397050" TARGET="_blank"><IMAGE SRC="images/bugs.gif" BORDER=0 ALT="Bugs" WIDTH="57" HEIGHT="37"></A></TD>
+    <TD WIDTH="57"><A HREF="/doc/" TARGET="_blank"><IMAGE SRC="images/docs.gif" BORDER=0 ALT="Docs" WIDTH="57" HEIGHT="37"></A></TD>
+    <TD WIDTH="103"><A HREF="http://sourceforge.net/forum/?group_id=29649" TARGET="_blank"><IMAGE SRC="images/discussion.gif" BORDER=0 ALT="Forum" WIDTH="103" HEIGHT="37"></A></TD>
+    <TD WIDTH="93"><A HREF="download.shtml"><IMAGE SRC="images/download.gif" BORDER=0 ALT="Download" WIDTH="93" HEIGHT="37"></A></TD>
+    <TD WIDTH="117"><A HREF="http://sourceforge.net/projects/xpertmud/" TARGET=_blank><IMAGE SRC="images/sourceforge.gif" BORDER=0 ALT="Project Page" WIDTH="117" HEIGHT="37"></A></TD>
+    <TD WIDTH=100% BACKGROUND="images/menuback.gif" ALIGN="RIGHT"><A href="http://sourceforge.net/" TARGET=_blank><IMG src="http://sourceforge.net/sflogo.php?group_id=29649" width="88" height="31" border="0" alt="SourceForge Logo"></A></TD>
+  </TR>
+</TABLE>
+<TABLE WIDTH="100%" BORDER="0" CELLSPACING="0" CELLPADDING="0">
+<TR>
+   <TD WIDTH="6" BACKGROUND="images/w_leftback.png"><IMG SRC="images/spacer.gif" WIDTH="6" HEIGHT="1" ALT=""></TD>
+   <TD WIDTH="100%" BGCOLOR="#DDDDDD">

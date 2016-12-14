@@ -1,0 +1,14 @@
+For those of you who don't have root access to a machine
+but want to have a local copy of xpertmud to play with
+nontheless, install with:
+
+./configure --prefix=/your/home/dir/.kde[3]
+
+Be careful to specify the absolute pathname.
+The executable will be installed in ~/.kde/bin.
+Now all you need to do is to set $PATH correctly
+to start mudding..
+
+Attention: The standard scripts are now
+in your personal directory, so make a save copy
+of them before playing around.

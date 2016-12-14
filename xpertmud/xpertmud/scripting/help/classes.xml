@@ -1,0 +1,906 @@
+<?xml version="1.0"?>
+<help lang="en" id="xm-classes" name="Xpertmud Online Help - Classes">
+  <module name="XM">
+    <description>
+The functions in this module provide an interface to the C++ program. 
+    </description>
+    <function name="ansiToRaw">
+      <arg name="text" />
+      <description>
+Returns the string without ansi control sequences (e.g. ansi color codes etc.). Use this for more easy parsing of colored text from the server.
+See "Step-by-Step: Triggers On Colored Text" for further help.
+      </description>
+    </function>
+    <function name="ansiToColored">
+      <arg name="text" />
+      <description>
+Returns the string without ansi controll sequences, but still containing color information. The returned string is of the form "FBCFBCFBC..." where F is the foreground color, B is the background color and C is the actual character.
+See "Step-by-Step: Triggers On Colored Text" for further help.
+      </description>
+      <example><alt>
+<py>	prs(XM.ansiToColored("test"))</py>
+<pe>	prs(XM::ansiToColored("test"))</pe>
+	</alt></example>
+    </function>
+    <function name="echoMode">
+      <arg name="state" />
+      <description>
+Set the clients echo mode. If echo mode is on, characters typed on the keyboard are shown in the input line. If echo mode is off, an "*" appears for each character typed.
+      </description>
+      <example><alt>
+<pe>	XM::echoMode(0);</pe>
+<py>	XM.echoMode(0)</py>
+	</alt></example>
+    </function>
+    <function name="mdiHeight">
+      <description>
+Returns the mdi window's height. Use this to resize your windows so that all space is used perfectly. See XMWindow<pe>::</pe><py>.</py>hideCaption() to learn how to get even more space.
+See "Step-by-Step: Window Positions" for further help.
+      </description>
+    </function>
+    <function name="mdiWidth">
+      <description>
+Returns the mdi window's width. Use this to resize your windows so that all space is used perfectly. See XMWindow<pe>::</pe><py>.</py>hideCaption() to learn how to get even more space.
+See "Step-by-Step: Window Positions" for further help.
+      </description>
+    </function>
+    <function name="playAudio">
+      <arg name="audiofile" />
+      <description>
+Make xpertmud play an audio file via kde/qt's audio system.
+      </description>
+
+      <example><alt>
+<pe>	XM::playAudio("/home/me/myfile.wav");</pe>
+<py>	XM.playAudio("/home/me/myfile.wav")</py>
+	</alt></example>
+    </function>
+    <function name="resetStatusMsg">
+      <description>
+Set the status message to a client default value.
+      </description>
+
+      <example><alt>
+<pe>	XM::resetStatusMsg();</pe>
+<py>	XM.resetStatusMsg()</py>
+	</alt></example>
+    </function>
+    <function name="send">
+      <arg name="text" />
+      <arg name="id" default="0" />
+      <description>
+Send a string to the server. Usually there should be a newline at the end of the string. The id specifies the connection you want to send to (see XM<pe>::</pe><py>.</py>open).
+      </description>
+      
+      <example><alt>
+<pe>	XM::send("slay evil bear\n");
+	XM::send("sending to connection 42\n", 42);</pe>
+<py>	XM.send("slay evil bear\n")
+	XM.send("sending to connection 42\n", 42)</py>
+	</alt></example>
+    </function>
+    <function name="setStatusMsg">
+      <arg name="message" />
+      <description>
+Set the text shown in the client's status line. The C++ part of the client sometimes sets this message, for example while trying to open a connection.
+      </description>
+      
+      <example><alt>
+<pe>	XM::setStatusMsg("Retrieved opponent info");</pe>
+<py>	XM.setStatusMsg("Retrieved opponent info")</py>
+	</alt></example>
+    </function>
+    <function name="showError">
+      <arg name="errorMessage" />
+      <description>
+Show an error information in the status window.
+      </description>
+
+      <example>	# Do something which could cause
+  	# some error
+<alt>
+<pe>	if(@_) { XM::showError(@_); }</pe>
+<py>	XM.showError("This is MyOwn Error!\n")</py>
+	</alt></example>
+    </function>
+  </module>
+  <class name="XMWindow">
+    <description>
+This is the base class for all scriptable window classes.
+    </description>
+
+    <function name="close">
+      <description>
+Close and destroy a window. On destruction a window is closed automagically.
+      </description>
+
+      <example><alt>
+<pe>	$win->close();</pe>
+<py>	win.close()</py></alt>
+	# is equivalent to
+<alt>
+<pe>	$win = undef;</pe>
+<py>	win = None</py></alt>
+	# if <pe>$</pe>win is the only reference to 
+	# the window and you don't use <pe>$</pe>win
+ 	# afterwards
+<alt>
+<pe>	$win2 = $win;</pe>
+<py>	win2 = win</py></alt>
+	# now there's the difference
+	# 1. possibility
+<alt>
+<pe>	$win->close();
+	statusWindow()->print($win2->isValid());</pe>
+<py>	win.close()
+	statusWindow().write(str(win2.isValid()))</py></alt>
+	# will show false
+
+	# 2. possibility
+<alt>
+<pe>	$win = undef;
+	statusWindow()->print($win2->isValid());</pe>
+<py>	win = None
+	statusWindow().write(str(win2.isValid()))</py></alt>
+	# will show true</example>
+    </function>
+    <function name="getPositionX">
+      <description>
+Get the x coordinate of the window's position. 
+See also XMWindow<pe>::</pe><py>.</py>move.
+      </description>
+
+      <example><alt>
+<pe>	$x = $win->getPositionX();</pe>
+<py>	x = win.getPositionX()</py>
+	</alt></example>
+    </function>
+    <function name="getPositionY">
+      <description>
+Get the y coordinate of the window's position.
+See also XMWindow<pe>::</pe><py>.</py>move.
+      </description>
+
+      <example><alt>
+<pe>	$y = $win->getPositionY();</pe>
+<py>	y = win.getPositionX()</py>
+	</alt></example>
+    </function>
+    <function name="getSizeX">
+      <description>
+Get the window's width.
+See also XMWindow<pe>::</pe><py>.</py>resize.
+      </description>
+
+      <example><alt>
+<pe>	$width = $win->getSizeX();</pe>
+<py>	width = win.getSizeX()</py>
+	</alt></example>
+    </function>
+    <function name="getSizeY">
+      <description>
+Get the window's height.
+See also XMWindow<pe>::</pe><py>.</py>resize.
+      </description>
+
+      <example><alt>
+<pe>	$height = $win->getSizeY();</pe>
+<py>	height = win.getSizeY()</py>
+	</alt></example>
+    </function>
+    <function name="hide">
+      <description>
+Used to hide a window from the screen. Use show to revert the effect.
+      </description>
+    </function>
+    <function name="hideCaption">
+      <description>
+Hide the window's caption bar if not maximized. The caption bar contains the window's name and some buttons (minimize / maximize / close). This is extremely useful to save some space if you show multiple windows at once.
+      </description>
+
+      <example><alt>
+<pe>	$win->resize(250, 250);</pe>
+<pe>	$win->hideCaption();</pe>
+<py>	win.resize(250, 250)</py>
+<py>	win.hideCaption()</py></alt>
+	# now you have much space for other windows</example>
+    </function>
+    <function name="isValid">
+      <description>
+True if this window has not been closed. 
+See XMWindow<pe>::</pe><py>.</py>close for more info.
+      </description>
+    </function>
+    <function name="lower">
+      <description>
+Lower a window to the background, so other windows behind it will become visible.
+      </description>
+
+      <example><alt>
+<pe>	$win->lower();</pe>
+<py>	win.lower()</py>
+	</alt></example>
+    </function>
+    <function name="maximize">
+      <description>
+Maximize a window.
+      </description>
+
+      <example><alt>
+<pe>	$win->maximize();</pe>
+<py>	win.maximize()</py>
+	</alt></example>
+    </function>
+    <function name="minimize">
+      <description>
+Minimize a window.
+      </description>
+
+      <example><alt>
+<pe>	$win->minimize();</pe>
+<py>	win.minimize()</py>
+	</alt></example>
+    </function>
+    <function name="move">
+      <arg name="x" />
+      <arg name="y" />
+      <description>
+Move the window's left upper corner to the point (x, y) relative to the MDI Widget. x and y are pixel values.
+      </description>
+
+      <example><alt>
+<pe>	$win->move(0, 0);</pe>
+<py>	win.move(0, 0)</py>
+	</alt></example>
+    </function>
+    <function name="raise">
+      <description>
+Raise this window to the top, so it will become visible if other windows are in front of it.
+      </description>
+
+      <example><alt>
+<pe>	$win->raise();</pe>
+<py>	win.raise()</py>
+	</alt></example>
+    </function>
+    <function name="resize">
+      <arg name="width" />
+      <arg name="height" />
+      <description>
+Resize the window to width and height. The variables are given in pixels.
+      </description>
+
+      <example><alt>
+<pe>	$win->resize(300, 100);</pe>
+<py>	win.resize(300, 100)</py>
+	</alt></example>
+    </function>
+    <function name="setTitle">
+      <arg name="title" />
+      <description>
+Set the windows caption to title.
+      </description>
+
+      <example><alt>
+<pe>	$win->setTitle("A nice Window");</pe>
+<py>	win.setTitle("A nice Window")</py>
+	</alt></example>
+    </function>
+    <function name="show">
+      <description>
+Show the window if it's hidden. On creation windows are hidden by default.
+      </description>
+
+      <example><alt>
+<pe>	$win->show();</pe>
+<py>	win.show()</py>
+	</alt></example>
+    </function>
+    <function name="showCaption">
+      <description>
+Show the window's caption bar if not maximized. The caption bar contains the window's name and some buttons (minimize / maximize / close).
+      </description>
+
+      <example><alt>
+<pe>	$win->showCaption();</pe>
+<py>	win.showCaption()</py>
+	</alt></example>
+    </function>
+  </class>
+  <class name="XMTextWindow">
+    <description>
+(Direct child class of XMWindow)
+
+This is a standard text window class used for the output of status information. It's basically just a big character buffer.
+    </description>
+
+    <example><alt>
+<pe>	$win = new XMTextWindow(); # it's still hidden
+	$win->move(0, 0);
+	$win->resizeChars(30, 100);
+	$win->show();
+	$win->setCursor(14, 0);
+	$win->print("Some nice heading\n");</pe>
+<py>	win = XMTextWindow() # it's still hidden
+	win.move(0, 0)
+	win.resizeChars(30, 100)
+	win.show()
+	win.setCursor(14, 0)
+	win.write("Some nice heading\n")</py>
+      </alt></example>
+
+    <function name="clear">
+      <description>
+Guess what?
+      </description>
+
+      <example><alt>
+<pe>	$win->clear();</pe>
+<py>	win.clear()</py>
+	</alt></example>
+    </function>
+    <function name="clearEOL">
+      <description>
+Clear from the current cursor position to the end of the line.
+      </description>
+
+      <example><alt>
+<pe>	$win->setCursor(13, 14);
+	$win->clearEOL();</pe>
+<py>	win.setCursor(13, 14)
+	win.clearEOL()</py>
+	</alt></example>
+    </function>
+    <function name="clearBOL">
+      <description>
+Clear from the current cursor position to the beginning of the line.
+      </description>
+    </function>
+    <function name="clearEOS">
+      <description>
+Clear from the current cursor position to the end of the screen.
+      </description>
+    </function>
+    <function name="clearBOS">
+      <description>
+Clear from the current cursor position to the beginning of the screen
+      </description>
+    </function>
+    <function name="clearLine">
+      <description>
+Clear the current line (the one the cursor is in).
+      </description>
+
+      <example><alt>
+<pe>	$win->setCursor(0, 25);
+	$win->clearLine();</pe>
+<py>	win.setCursor(0, 24)
+	win.clearLine()</py>
+	</alt></example>
+    </function>
+    <function name="disableMouseEvents">
+      <description>
+Disable mouse events in this window. Selecting text won't work in this window if the script get's the mouse events.
+      </description>
+    </function>
+    <function name="enableMouseEvents">
+      <description>
+Enable mouse events in this window. Selecting text won't work in this window if the script get's the mouse events.
+      </description>
+    </function>
+    <function name="getCharAt">
+      <arg name="x" />
+      <arg name="y" />
+      <description>
+Return the character you can see at position (x, y) inside the window.
+      </description>
+
+      <example><alt>
+<pe>	$char = $win->getCharAt(2, 5);</pe>
+<py>	aChar = win.getCharAt(2, 5)</py>
+	</alt></example>
+    </function>
+    <function name="getColumns">
+      <description>
+Get the window's width in columns, e.g. how many characters fit into a line.
+      </description>
+
+      <example><alt>
+<pe>	$width = $win->getColumns();</pe>
+<py>	width = win.getColumns()</py>
+	</alt></example>
+    </function>
+    <function name="getCursorPos">
+      <description>
+Returns the cursor position (x, y).
+      </description>
+
+      <example><alt>
+<pe>	($x, $y) = $win->getCursorPos();</pe>
+<py>	(x, y) = win.getCursorPos()</py>
+	</alt></example>
+    </function>
+    <function name="getCursorX">
+      <description>
+Get the x-coordinate of the current cursor position.
+      </description>
+
+      <example><alt>
+<pe>	$x = $win->getCursorX();</pe>
+<py>	x = win.getCursorX()</py>
+	</alt></example>
+    </function>
+    <function name="getCursorY">
+      <description>
+Get the y-coordinate of the current cursor position.
+      </description>
+
+      <example><alt>
+<pe>	$y = $win->getCursorY();</pe>
+<py>	y = win.getCursorY()</py>
+	</alt></example>
+    </function>
+    <function name="getFGColorAt">
+      <arg name="x" />
+      <arg name="y" />
+      <description>
+Get the foreground color at position x, y.
+      </description>
+
+      <example><alt>
+<pe>	$c = $win->getFGColorAt(10, 5)</pe>
+<py>	c = win.getFGColorAt(10, 5)</py>
+	</alt></example>
+    </function>
+    <function name="getBGColorAt">
+      <arg name="x" />
+      <arg name="y" />
+      <description>
+Get the background color at position x, y.
+      </description>
+
+      <example><alt>
+<pe>	$c = $win->getBGColorAt(10, 5)</pe>
+<py>	c = win.getBGColorAt(10, 5)</py>
+	</alt></example>
+    </function>
+    <function name="getLines">
+      <description>
+Get the window's height in lines, e.g. how many characters fit into a row.
+      </description>
+
+      <example><alt>
+<pe>	$height = $win->getLines()</pe>
+<py>	height = win.getLines()</py>
+	</alt></example>
+    </function>
+    <function name="newline">
+      <description>
+The same as <pe>$</pe>win<pe>-></pe><py>.</py>print("\n") would do on a XMTextBufferWindow. XMTextWindows don't evaluate \n, so you have to use newline() instead.
+      </description>
+
+      <example><alt>
+<pe>	$win->print("Hallo");
+	$win->newline();</pe>
+<py>	win.write("Hallo")
+	win.newline()</py>
+	</alt></example>
+    </function>
+    <function name="printRaw" restriction="pe">
+      <arg name="text" />
+      <description>
+Print some text to the window. ANSI control sequences are not processed, use print for text directly from the mud server.
+      </description>
+      
+      <example>	$win->printRaw("Some raw text")</example>
+    </function>
+    <function name="writeRaw" restriction="py">
+      <arg name="text" />
+      <description>
+Print some text to the window. ANSI control sequences are not processed, use write for text directly from the mud server.
+      </description>
+      
+      <example>	win.writeRaw("Some raw text")</example>
+    </function>
+    <function name="print" restriction="pe">
+      <arg name="text" />
+      <description>
+Print ANSI formatted text to the window. You can simply pass anything coming from the server.  Pay attention when using regexps on ANSI formatted text!
+      </description>
+
+      <example>	$win->print($textFromServer);</example>
+    </function>
+
+    <function name="write" restriction="py">
+      <arg name="text" />
+      <description>
+Print ANSI formatted text to the window. You can simply pass anything coming from the server.  Pay attention when using regexps on ANSI formatted text!
+      </description>
+
+      <example>	win.write(textFromServer)</example>
+    </function>
+
+
+    <function name="registerMouseDownEvent">
+      <arg name="function" />
+      <description>
+If the widget gets mouse events (see enableMouseEvents()), the function is called whenever a mouse down event occurs. The function gets the coordinates of the mouse event as parameters.
+      </description>
+      
+      <example><alt>
+<pe>	$win->registerMouseDownEvent(sub {
+	  my $x = shift;
+	  my $y = shift;
+	  statusWindow()->print($x.", ".$y);
+	});</pe>
+<py>	def mdEvent(x, y):
+	  statusWindow().print(str(x) + ", " + str(y))
+
+	win.registerMouseDownEvent(mdEvent)</py>
+	</alt></example>
+    </function>
+    <function name="registerMouseDragEvent">
+      <arg name="function" />
+      <description>
+If the widget gets mouse events (see enableMouseEvents()), the function is called whenever a mouse drag event occurs. The function gets the coordinates of the mouse event as parameters.
+      </description>
+
+      <example><alt>
+<pe>	$win->registerMouseDragEvent(sub {
+	  my $x = shift;
+	  my $y = shift;
+	  statusWindow()->print($x.", ".$y);
+	});</pe>
+<py>	def mdEvent(x, y):
+	  statusWindow().print(str(x) + ", " + str(y))
+
+	win.registerMouseDragEvent(mdEvent)</py>
+	</alt></example>
+    </function>
+    <function name="registerMouseUpEvent">
+      <arg name="function" />
+      <description>
+If the widget gets mouse events (see enableMouseEvents()), the function is called whenever a mouse up event occurs. The function gets the coordinates of the mouse event as parameters.
+      </description>
+      
+      <example><alt>
+<pe>	$win->registerMouseUpEvent(sub {
+	  my $x = shift;
+	  my $y = shift;
+	  statusWindow()->print($x.", ".$y);
+	});</pe>
+<py>	def muEvent(x, y):
+	  statusWindow().print(str(x) + ", " + str(y))
+
+	win.registerMouseUpEvent(muEvent)</py>
+	</alt></example>
+    </function>
+    <function name="resetAttributes">
+      <description>
+Reset all ANSI attributes (color and state).
+      </description>
+
+      <example><alt>
+<pe>	$win->setBold(1);
+	$win->setBGColor(RED);
+	$win->print("bold and red");
+	$win->resetAttributes();
+	$win->print("just plain");</pe>
+<py>	win.setBold(1)
+	win.setBGColor(RED)
+	win.write("bold and red")
+	win.resetAttributes()
+	win.write("just plain")</py>
+	</alt></example>
+    </function>
+    <function name="resizeChars">
+      <arg name="width" />
+      <arg name="height" />
+      <description>
+Resize the window so that exactly width characters fit in a line and height characters in a row.
+      </description>
+
+      <example><alt>
+<pe>	$win->resizeChars(23, 42);</pe>
+<py>	win.resizeChars(23, 42)</py>
+	</alt></example>
+    </function>
+    <function name="scrollColumns">
+      <arg name="num" />
+      <description>
+Scroll the window's content by num columns. A positive value means scrolling right, a negative scrolling to the left.
+      </description>
+
+      <example><alt>
+<pe>	$win->scrollColumns(3);</pe>
+<py>	win.scrollColumns(3)</py>
+	</alt></example>
+    </function>
+    <function name="scrollLines">
+      <arg name="num" />
+      <description>
+Scroll the window's content by num lines. A positive value means scrolling down (like the page down key), a negative scrolling up.
+      </description>
+      
+      <example><alt>
+<pe>	$win->scrollLines(-3);</pe>
+<py>	win.scrollLines(-3)</py>
+	</alt></example>
+    </function>
+    <function name="setBold">
+      <arg name="state" />
+      <description>
+Set the default printing style to bold, if state is true, otherwise to unbold.
+      </description>
+
+      <example><alt>
+<pe>	$win->setBold(1);</pe>
+<py>	win.setBold(1)</py>
+	</alt></example>
+    </function>
+    <function name="setBlinking">
+      <arg name="state" />
+      <description>
+THIS IS CURRENTLY _NOT_ SUPPORTED!!!!!!! Set the default printing style to blinking, if state is true, otherwise to unblinking.
+      </description>
+
+      <example><alt>
+<pe>	$win->setBlinking(1);</pe>
+<py>	win.setBlinking(1)</py>
+	</alt></example>
+    </function>
+    <function name="setCursor">
+      <arg name="x" />
+      <arg name="y" />
+      <description>
+Set the cursor to position (x, y) inside the window.
+      </description>
+
+      <example><alt>
+<pe>	$win->setCursor(4, 4);</pe>
+<py>	win.setCursor(4, 4)</py>
+	</alt></example>
+    </function>
+    <function name="setDefaultBGColor">
+      <arg name="color" />
+      <description>
+Sets the background color which will be drawn if all attributes are set to default values.
+      </description>
+      <example><alt>
+<pe>	$win->resetAttributes();
+	$win->setDefaultBGColor(BLUE);
+	$win->print("Blue\n");</pe>
+<py>	win.resetAttributes()
+	win.setDefaultBGColor(BLUE)
+	win.write("Blue\n")</py>
+	</alt></example>
+    </function>
+    <function name="setDefaultFGColor">
+      <arg name="color" />
+      <description>
+Sets the foreground color which will be drawn if all attributes are set to default values.
+      </description>
+      <example><alt>
+<pe>	$win->resetAttributes();
+	$win->setDefaultFGColor(BLUE);
+	$win->print("Blue\n");</pe>
+<py>	win.resetAttributes()
+	win.setDefaultFGColor(BLUE)
+	win.write("Blue\n")</py>
+	</alt></example>
+    </function>
+    <function name="setFont">
+      <arg name="name" />
+      <arg name="size" />
+      <description>
+Set the window's font to name and size.
+      </description>
+
+      <example><alt>
+<pe>	$win->setFont("fixed", 15); # somehow large...</pe>
+<py>	win.setFont("fixed", 15) # somehow large</py>
+	</alt></example>
+    </function>
+    <function name="setIntensive">
+      <arg name="state" />
+      <description>
+Set the default printing style to intensive, if state is true, otherwise to unintensive.
+      </description>
+
+      <example><alt>
+<pe>	$win->setIntensive(1);</pe>
+<py>	win.setIntensive(1)</py>
+	</alt></example>
+    </function>
+    <function name="setReverse">
+      <arg name="state" />
+      <description>
+Set the default printing style to reverse, if state is true, otherwise to unreverse.
+      </description>
+
+      <example><alt>
+<pe>	$win->setReverse(1);</pe>
+<py>	win.setReverse(1)</py>
+	</alt></example>
+    </function>
+    <function name="setUnderline">
+      <arg name="state" />
+      <description>
+Set the default printing style to underline, if state is true, otherwise to ununderline.
+      </description>
+
+      <example><alt>
+<pe>	$win->setUnderline(1);</pe>
+<py>	win.setUnderline(1)</py>
+	</alt></example>
+    </function>
+    <function name="setBGColor">
+      <arg name="color" />
+      <description>
+Set the window's background color to a color from 0 to 7. There are also color constants BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN and WHITE.
+      </description>
+
+      <example><alt>
+<pe>	$win->setBGColor(RED); # is equal to
+	$win->setBGColor(1);</pe>
+<py>	win.setBGColor(RED) # is equal to
+	win.setBGColor(1)</py>
+	</alt></example>
+    </function>
+    <function name="setFGColor">
+      <arg name="color" />
+      <description>
+Set the window's foreground color to a color from 0 to 7. There are also color constants BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN and WHITE.
+      </description>
+
+      <example><alt>
+<pe>	$win->setFGColor(RED); # is equal to
+	$win->setFGColor(1);</pe>
+<py>	win.setFGColor(RED) # is equal to
+	win.setFGColor(1)</py>
+	</alt></example>
+    </function>
+  </class>
+  <class name="XMTextBufferWindow">
+    <description>
+(Direct child class of XMTextWindow)
+
+The XMTextBufferWindow is just a XMTextWindow with a scrollback buffer. So there's no new functionality, just some functions behave different, but just as you would expect it from a usual telnet widget.
+    </description>
+
+    <example><alt>
+<pe>	$win = new XMTextBufferWindow(); # it's still hidden
+	$win->move(0, 0);
+	$win->resizeChars(30, 10);
+	$win->show();
+	$win->setCursor(14, 9);</pe>
+<py>	win = XMTextBufferWindow() # it's still hidden
+	win.move(0, 0)
+	win.resizeChars(30, 10)
+	win.show()
+	win.setCursor(14, 9)</py>
+</alt>
+	# this statement will cause the window to scroll
+	# down one line automagically. A scrollbar will
+	# appear at the widget's right side...
+<alt>
+<pe>	$win->print("Some nice heading\n");</pe>
+<py>	win.write("Some nice heading\n")</py>
+</alt>	
+	# the next statement will cause the window
+	# to scroll to the beginning of the buffer.
+	# Unlinke XMTextWindow no new lines are
+	# inserted. You can only scroll within the
+	# filled area.
+<alt>
+<pe>	$win->scrollLines(-42);</pe>
+<py>	win.scrollLines(-42)</py>
+      </alt></example>
+
+      <function name="getWordWrapColumn">
+	<description>
+Get the column where word wrapping occurs. Negative values are counted from the right corner of the window.
+	</description>
+      </function>
+
+      <function name="setWordWrapColumn">
+	<arg name="x" />
+	<description>
+Set the column where word wrapping should occur. Negative values are counted from the right corner of the window. Setting the WordWrapColumn to zero disables word wrapping.
+	</description>
+	
+	<example><alt>
+<pe>	statusWindow->setWordWrapColumn(80)</pe>
+<py>	statusWindow().setWordWrapColumn(80)</py></alt>
+	# wrap at 80, even if the window is smaller.
+<alt>
+<pe>	statusWindow->setWordWrapColumn(-1)</pe>
+<py>	statusWindow().setWordWrapColumn(-1)</py></alt>
+	# (the default) wrap at the right border</example>
+      </function>
+  </class>
+  <class name="XMConnection">
+    <description>
+An XMConnection object can be used to control an xpertmud connection via the script. Each connection to the outside world gets an unique id (see the bookmark editor, there you can specify some default connections). You can open new connections at runtime via the XMConnection constructor, or you can access already open connections via the toplevel 'connection' function.
+    </description>
+
+    <example><alt>
+<pe>	$c = new XMConnection("localhost", 23);</pe>
+<py>    c = XMConnection("localhost", 23)</py></alt>
+	# now you've got a new connection.
+	# if you wish to access the default connection
+	# which has id 0, use
+<alt>
+<pe>	connection(0)->send("say hello\n");</pe>
+<py>    connection(0).send("say hello\n")</py>
+</alt>
+	# to send something.
+	# As a shortcut for connection 0, you
+	# can just use
+<alt>
+<pe>	XM::send("say hello\n");</pe>
+<py>    XM.send("say hello\n")</py>
+    </alt></example>
+
+    <function name="XMConnection">
+      <arg name="host" />
+      <arg name="port" />
+      <arg name="onConnect" default="''" />
+      <description>
+Creates a new connection object with the next free id and connects to the specified host on the specified port, sending <pe>$</pe>onConnect after the connection was established.
+      </description>
+    </function>
+    <function name="open">
+      <arg name="host" />
+      <arg name="port" />
+      <arg name="onConnect" default="''" />
+      <description>
+Reuse the existing connection to connect to a new host on a new port. Use this for example, if you have some fallback mechanism for your mud server.
+      </description>
+    </function>
+    <function name="close">
+      <description>
+Close the connection.
+      </description>
+    </function>
+    <function name="setInputEncoding">
+      <arg name="enc" />
+      <description>
+Set the encoding xpertmud assumes when receiving text from the mud server to <pe>$</pe>enc. The encoding is specified as a string that describes the encoding, such as "utf8" or "ISO8859-1" (latin1). The default encoding is latin1. Xpertmud automatically changes to utf8 if the mud server tells xpertmud it's using unicode, but otherwise you have to set your encoding manually. You can use any encoding that Qt understands, look for example at http://doc.trolltech.com/3.3/qtextcodec.html.
+      </description>
+    </function>
+    <function name="setOutputEncoding">
+      <arg name="enc" />
+      <description>
+As with setInputEncoding you can set the stream's encoding, but for the text xpertmud sends to the server. This is mostly not required, but if your mud server can handle it, xpertmud gives you the possibility to use your local encoding or even unicode.
+      </description>
+    </function>
+  </class>
+  <class name="XMInputLine">
+    <description>
+The XMInputLine class let's you control xpertmud's input lines via the scripting engine. You can add new input lines via the menu and you can receive the current input line via the toplevel function 'focusedInputLine'. This allows you to implement tab completion and other nice features from your script.
+    </description>
+    <function name="getCursorX">
+      <description>
+Returns the X position of the cursor in the current paragraph of the input line. Be aware that the input line can have multiple paragraphs, each of which can be multiple lines.
+      </description>
+    </function>
+    <function name="getCursorY">
+      <description>
+Returns the Y position (current paragraph) of the cursor in the input line. Paragraphs can stretch over multiple visible lines (via line breaks), but there is never a newline inside a paragraph.
+      </description>
+    </function>
+    <function name="setCursorX">
+      <arg name="x" />
+      <description>
+Set the cursor in the current paragraph to <pe>$</pe>x.
+      </description>
+    </function>
+    <function name="setCursorY">
+      <arg name="y" />
+      <description>
+Set current paragraph to <pe>$</pe>y.
+      </description>
+    </function>
+  </class>
+</help>

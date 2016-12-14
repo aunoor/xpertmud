@@ -1,0 +1,224 @@
+#MIN_CONFIG(3.0)
+# -------------------
+# Run COMMAND, save the exit status in ac_status, and log it.
+# (This has been adapted from Autoconf's _AC_RUN_LOG macro.)
+AC_DEFUN([LC_RUN_LOG],
+[{ echo "$as_me:$LINENO: $1" >&AS_MESSAGE_LOG_FD
+   ($1) >&AS_MESSAGE_LOG_FD 2>&AS_MESSAGE_LOG_FD
+   ac_status=$?
+   echo "$as_me:$LINENO: \$? = $ac_status" >&AS_MESSAGE_LOG_FD
+   (exit $ac_status); }])
+
+AC_DEFUN([LC_RUN_OUT],
+[{ echo "$as_me:$LINENO: $1" >&AS_MESSAGE_LOG_FD
+   lc_run_var=` ( ( $1; ac_status=$?; echo "##presep##"$ac_status ) | ( echo -n '##sep##'; cat - ) ) 2>&1`
+   echo "lc_run_var: ${lc_run_var}" >&AS_MESSAGE_LOG_FD
+   ac_status=$?
+   $3=`echo $lc_run_var | $SED -e 's/##sep##.*//'`
+   $lc_run_stdout=`echo $lc_run_var | $SED -e 's/^.*##sep##//'`
+   $2=`echo $lc_run_stdout | $SED -e 's/##presep##.*//'`
+   $ac_status=`echo $lc_run_stdout | $SED -e 's/^.*##presep##//'`
+   echo "$as_me:$LINENO: \$? = $ac_status" >&AS_MESSAGE_LOG_FD
+   (exit $ac_status); }])
+
+
+
+CXXFLAGS="${CXXFLAGS} -Wall -pedantic -Wno-long-long -g -DKDE_NO_COMPAT -DQT_NO_COMPAT"
+
+AM_INIT_AUTOMAKE(xpertmud,3.2alpha1)
+
+ifdef([AC_HELP_STRING],,[
+AC_DEFUN([AC_HELP_STRING], [  $1       $2])
+])
+
+dnl PERL support
+dnl ************
+
+
+AC_ARG_ENABLE(perl, 
+	AC_HELP_STRING([--enable-perl],[enable perl scripting support]), 
+	PERL="$enable_perl")
+
+case "x$enable_perl" in
+	"xyes")
+	AC_PATH_PROGS(PERL,perl5 perl,no)
+        ;;
+	"x")
+	AC_PATH_PROGS(PERL,perl5 perl,no)
+        ;;
+        "xno")
+	AC_MSG_CHECKING(for perl)
+	AC_MSG_RESULT(disabled)
+	WITH_PERL=""
+        ;;
+        *)
+	AC_PATH_PROGS(PERL,$enable_perl,no)
+        ;;
+esac
+
+if test "x$enable_perl" != "xno" -a "x$PERL" != "xno"; then
+	AC_MSG_CHECKING(for perl version)
+	$PERL -e 'require 5.004' > /dev/null 2>&1
+	if test $? -ne 0 ; then
+	AC_MSG_RESULT(version < 5.004 disabling)
+                PERL="no"
+		WITH_PERL=""
+	else		
+   		perl_version=`$PERL -e 'print $]'`
+	  	AC_MSG_RESULT($perl_version)
+	     	PERL_CPPFLAGS=`$PERL -MExtUtils::Embed -e perl_inc`
+	   	PERL_LDFLAGS=`$PERL -MExtUtils::Embed -e ldopts | $PERL -pe 's/-l(gdbm|ndbm|posix|db)\b//g'`
+		WITH_PERL="perl"
+	fi
+fi
+
+AM_CONDITIONAL([WITH_PERL], [test x"$WITH_PERL" != x])
+AC_SUBST(PERL)
+AC_SUBST(PERL_CPPFLAGS)
+AC_SUBST(PERL_LDFLAGS)
+
+dnl PYTHON support
+dnl **************
+
+AC_ARG_ENABLE(python, 
+	AC_HELP_STRING([--enable-python],[enable python scripting support]),
+	PYTHON="$enable_python")
+
+dnl TODO: check if xpertmud still compiles with python 1.x, if not: remove them below
+
+case "x$enable_python" in
+	"xyes")
+	AC_PATH_PROGS(PYTHON,python python2.2 python2.0 python1.6,no)
+        ;;
+        "x")
+	AC_PATH_PROGS(PYTHON,python python2.2 python2.0 python1.6,no)
+        ;;
+        "xno")
+	AC_MSG_CHECKING(for python)
+	AC_MSG_RESULT(disabled)
+	WITH_PYTHON=""
+        ;;
+        *)
+	AC_PATH_PROGS(PYTHON,$enable_python,no)
+        ;;
+esac
+
+if test "x$enable_python" != "xno" -a "x$PYTHON" != "xno"; then
+	dnl python {cpp,ld}flags
+	WITH_PYTHON="python"
+	AC_MSG_CHECKING([for python compiler flags])
+	changequote(, )dnl
+	PYTHON_CPPFLAGS=`$PYTHON -c '
+import sys
+print "-I%s/include/python%s" % (sys.prefix, sys.version[:3])' || echo -n error`
+	changequote([, ])dnl
+        AC_MSG_RESULT([$PYTHON_CPPFLAGS])
+        if test "x$PYTHON_CPPFLAGS" == "xerror"; then
+		AC_MSG_WARN([could not determine python compiler flags, disabling python support])
+	   	PYTHON_CPPFLAGS=""
+	   	WITH_PYTHON=""
+        else
+		AC_MSG_CHECKING([for python linker flags])
+		changequote(, )dnl
+		PYTHON_LDFLAGS=`$PYTHON -c '
+import sys
+import distutils.sysconfig
+s = "-L%s/lib/python%s/config -lpython%s " % (sys.prefix, sys.version[:3], sys.version[:3])
+s += distutils.sysconfig.get_config_var("LINKFORSHARED")
+print s' 2>>/dev/null || echo -n error`
+		changequote([, ])dnl
+	        AC_MSG_RESULT([$PYTHON_LDFLAGS])
+        	if test "x$PYTHON_LDFLAGS" == "xerror"; then
+ 	   		AC_MSG_WARN([could not determine python linker flags, disabling python support])
+	   		PYTHON_LDFLAGS=""
+	   		WITH_PYTHON=""
+		fi
+	fi
+else
+	WITH_PYTHON=""
+fi
+
+AM_CONDITIONAL([WITH_PYTHON], [test x"$WITH_PYTHON" != x])
+AC_SUBST(PYTHON_CPPFLAGS)
+AC_SUBST(PYTHON_LDFLAGS)
+
+
+dnl --------------------------------------------
+dnl       determine location of RUBY (auto)
+dnl --------------------------------------------
+
+AC_ARG_WITH(stackbase,
+	AC_HELP_STRING([--with-stackbase=<value>],[pointer to the stackbase]),
+[
+  if test "x$with_stackbase" != "x" -a "x$with_stackbase" != "xno" ; then
+AC_DEFINE_UNQUOTED(STACKBASE, $with_stackbase, [Pointer to STACKBASE])
+  fi
+ ])
+
+
+AC_ARG_ENABLE(ruby,
+        AC_HELP_STRING([--enable-ruby],[enable ruby scripting support]),
+        RUBY="$enable_ruby")
+
+
+case "x$enable_ruby" in
+        "xyes")
+        AC_PATH_PROGS(RUBY,ruby,no)
+        ;;
+        "x")
+        AC_PATH_PROGS(RUBY,ruby,no)
+        ;;
+        "xno")
+	AC_MSG_CHECKING(for ruby)
+	AC_MSG_RESULT(disabled)
+	WITH_RUBY=""
+        ;;
+        *)
+	AC_PATH_PROGS(RUBY,$enable_ruby,no)
+        ;;
+esac
+
+dnl determine location of ruby
+if test "x$enable_ruby" != "xno" -a "x$RUBY" != "xno"; then
+	dnl determine if the installed Ruby is suitable for us
+	if test -x $RUBY; then 
+	   if `$RUBY -e 'exit 1 if VERSION >= "1.6.8"'` ; then
+	      AC_MSG_ERROR(Your Ruby is too old! At least Ruby-1.6.8 is required)
+	      WITH_RUBY=""
+	   else
+	      WITH_RUBY="ruby"
+	   fi
+	fi
+
+	if test "x$WITH_RUBY" != "x"; then
+	   dnl locate "ruby.h", "intern.h"
+	   AC_MSG_CHECKING(for ruby compiler flags)
+	   ruby_h_dir=`$RUBY -r mkmf -e 'print Config::CONFIG[["archdir"]]' 2>>/dev/null`
+	   RUBY_CPPFLAGS="-I$ruby_h_dir"
+	   AC_MSG_RESULT([$RUBY_CPPFLAGS])
+	   if test "x$ruby_h_dir" == "x"; then
+	      AC_MSG_WARN([could not determine ruby compiler flags, disabling ruby support])
+	      RUBY_CPPFLAGS=""
+	      WITH_RUBY=""
+	   fi
+	fi
+
+	if test "x$WITH_RUBY" != "x"; then
+	   dnl locate libruby-static.a + extra libraries (libcrypt)
+	   AC_MSG_CHECKING(for ruby linker flags)
+	   ruby_lib=`$RUBY -r mkmf -e 'c=Config::CONFIG; libs=c[["libdir"]]+"/"+c[["LIBRUBY"]]+" "+c[["LIBS"]]; print libs' 2>>/dev/null`
+	   RUBY_LIBS=$ruby_lib
+	   AC_MSG_RESULT([$RUBY_LIBS])
+	   if test "x$ruby_lib" == "x"; then
+	      AC_MSG_WARN([could not determine ruby linker flags, disabling ruby support])
+	      RUBY_LIBS=""
+	      WITH_RUBY=""
+	   fi
+	fi
+fi
+
+
+AM_CONDITIONAL([WITH_RUBY], [test x"$WITH_RUBY" != x])
+AC_SUBST(RUBY_CPPFLAGS)
+AC_SUBST(RUBY_LIBS)
+

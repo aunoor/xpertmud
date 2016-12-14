@@ -1,0 +1,6 @@
+LIBRARY      "libxmpythoninterpreter"
+DESCRIPTION  'libxmpythoninterpreter Windows Dynamic Link Library'
+
+EXPORTS
+	init_libxmpythoninterpreter
+    ; Explicit exports can go here

@@ -1,0 +1,6 @@
+LIBRARY      "xmud_example"
+DESCRIPTION  'xmud_example Windows Dynamic Link Library'
+
+EXPORTS
+	init_xmud_example
+    ; Explicit exports can go here

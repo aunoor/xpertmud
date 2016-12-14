@@ -1,0 +1,37 @@
+
+Here an little explanation on how to compile xpertmud on Linux using the
+Source/quirks originally designed for windows, that is, without KDE but with
+the compat dir.
+
+might be usefull for debugging the compat stuff, and should contain the same
+bugs as the windows version (given the QT lib really behaves the same on
+windows/linux)
+
+start with a fresh checkout.
+
+> qmake xpertmud.pro
+> make
+> make INSTALL_ROOT=/tmp/xmud_test/ install
+
+> cd xpertmud/scripting/perl
+> make -f Makefile.am srcdir=. PERL=perl generated
+( if this step fails/shows error messages, 
+> chmod +x pl2h.pl createCallbacks.pl
+> rm Auto* sysinit_plf.h
+and retry )
+
+> PERL=perl qmake libxmperlinterpreter.pro
+> make INSTALL_ROOT=/tmp/xmud_test/ install
+
+At this point, you should have an working xpertmud with perl.
+to try it:
+> cd /tmp/xmud_test
+> ./xpertmud-qt
+
+Now compile the hud plugin:
+> cd ../../plugins/battletech/
+> qmake xmud_battletech.pro
+> make
+> make INSTALL_ROOT=/tmp/xmud_test/ install
+
+and you should be ready to run.

@@ -1,0 +1,132 @@
+1. GOAL
+
+Building an automapper working with every muds past, present and future. The automapper will need to be adaptable to the user's needs
+
+
+
+2. LAYOUT
+
+The mapper is separated in four main components each of them having their own role :
+
+- the backend providing functions to retrieve and store maps datas
+
+- the gui allowing the user to vizualize, create and modify manually the maps
+
+- the mud part, define each muds specifics, provide triggers, aliases, variables and arrays needed to determine when a player move (successfully or not) and to capture room descriptions, exits and name.
+
+- the last part glue everything together, it keeps current position  and upon events from the mud part or the gui decide of the appropriate actions to do.
+
+(globbi: Nice!)
+
+3. BACKENDS
+
+We consider a map is divided in several zones and a zone is composed of several rooms.
+All the backend provides the same functions :
+
+RoomInfos getRoom(RoomId) : retrieve informations about a room
+
+RoomId newRoom(RoomInfos) : add a new room, return this room's Id
+
+updateRoom(RoomId, RoomInfos) : update informations about a room
+
+deleteRoom(RoomId) : remove a room
+
+ZoneId newZone(ZoneInfos) : add a new zone
+
+delZone(ZoneId) : remove a zone
+
+ZoneInfos getZone(ZoneId) : retrieve zone informations
+
+updateZone(ZoneId, ZoneInfos) : update a zone's informations
+
+MapId newMap(mapInfos) : create a new map
+
+delMap(mapId) : delete a map
+
+updateMap(mapId, mapInfos) : change some of the map informations
+
+
+4. MUD PART
+
+a buffer for the room description
+
+three arrays containing regexps :
+ - one with regexps matching lines that need to be ignored
+ - one with regexps matching lines meaning the move failed
+ - one with regexps matching lines meaning the move succeeded
+
+they are used to create appropriate triggers
+along with a trigger capturing and feeding the room raw description
+
+one array with directions as key and keys as value
+ - this array is used to create the KeyBindings
+ - and to create aliases activating the triggers mentionned above each tiem the player move
+
+a- When a player move, one alias is executed, activating the capture process. 
+b- Line matching regexps in the 'ignore' array are ignored
+c- Lines sent by the mud are captured then concatenated in a buffer
+d- If a line matches one of the 'failed move' regexp, the buffer is emptied and the capture is ended (ending the capture mean desactivating the trigger and reactivating the aliases)
+e- If it is a success, the room description is then analysed to split it in room name, room description and room exits parts. it is then sent to the core part of the mapper.
+
+At a later time I'll provide a feature that will queue movements. right now I only disable movement until the whole process is finished (meaning that hitting several direction bindkeys won't screw up things)
+
+It is very adaptable since with these three lists of regexps we can adapt to every mud.
+
+
+
+5. GUI
+
+The GUI is split into four parts :
+ - to the top a menu bar
+ - to the extrem left, a vertical toolbar
+ - next to is a list selection box, listing every zones present in the current map
+ - then come the map itself (based on QCanvas family subclasses)
+
+
+
+6. Glue
+
+This part react from the events coming from the Mud part or the GUI part of the mapper.
+Right now I am considering that data will only be saved when we change of zone or of map or if we close the mapper.
+But we could save the changes each time something is updated
+(maybe too much ressource costly ?)
+(globbi: make it user configurable... like set a cache size...(?))
+
+mapper starts	init the backend if needed
+		retrieve the map infos
+		tell the gui what zones there are
+		retrieve the current zone infos
+		tell the gui what zone is selected
+		retrieve each current zone's rooms infos
+		tell the gui to draw each rooms
+		tell the gui what zone is active
+		tell the gui what mode the mapper is in
+(globbi: don't know if you plan it this way anyways, I'm more for
+an active gui, which gets it's stuff from the backend, this sounds
+like everything in the gui is controlled remotely... don't know...)
+
+moving		- retrieve current room infos
+		- check if the corresponding exit exists
+		and if the room description correspond 
+		to the room the map is telling us 
+		we are supposed to go
+		- if the exit exists and the rooms are 
+		different
+		  => warning message or update ?
+		- if the exit exists and both room 
+		descriptions are identical
+		  => update current room id
+		  => tell the gui to change the current room
+		- if the exit does not exist or 
+		has not been explored
+		  => create the new room
+		  => tell the gui to draw a new room
+		  => update this room's coordinates
+
+
+(globbi: I like this :-) Now, how much to put into the scripting part?
+I'd say as little as possible, because we've got 3 (three!) scripting
+languages by now :-)
+Oh, and I don't know if I told you, but it would be nice if you'd try
+to stick to stuff that still works with qt2.3, because in win32 there's
+no newer free qt right now...)

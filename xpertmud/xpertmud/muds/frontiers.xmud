@@ -1,0 +1,16 @@
+<?xml version = '1.0'?>
+<!DOCTYPE xpertmudBookmark>
+<xpertmudBookmark version="3.0alpha1" >
+ <Connection id="0" >
+  <Host>btmux.com</Host>
+  <Port>5555</Port>
+  <Script><![CDATA[connect USERNAME PASSWORD
+]]></Script>
+ </Connection>
+ <Name>Frontiers</Name>
+ <Comments><![CDATA[http://btmux.com
+]]></Comments>
+ <Interpreter reset="true" startup="true" >perl</Interpreter>
+ <GlobalScript><![CDATA[#parse "xperthud.pl"
+]]></GlobalScript>
+</xpertmudBookmark>

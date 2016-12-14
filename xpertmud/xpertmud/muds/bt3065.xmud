@@ -1,0 +1,16 @@
+<?xml version = '1.0'?>
+<!DOCTYPE xpertmudBookmark>
+<xpertmudBookmark version="3.0alpha1" >
+ <Connection id="0" >
+  <Host>btech.betterbox.net</Host>
+  <Port>3065</Port>
+  <Script><![CDATA[connect USERNAME PASSWORD
+]]></Script>
+ </Connection>
+ <Name>BattleTech 3065</Name>
+ <Comments><![CDATA[http://btech.betterbox.net/
+]]></Comments>
+ <Interpreter reset="true" startup="true" >python</Interpreter>
+ <GlobalScript><![CDATA[%parse btcockpit.py
+]]></GlobalScript>
+</xpertmudBookmark>

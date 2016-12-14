@@ -1,0 +1,1001 @@
+from __future__ import nested_scopes
+
+import XM
+import sys
+import types
+import re
+import traceback
+import weakref
+
+from xmlparser import * #FIXED
+from helplayout import * #FIXED
+
+helpNode = XMXmlNode("xmhelp")
+helpAll = None
+
+def recreateHelpAll():
+    global helpAll
+    helpAll = XMXmlNode("help")
+    helpAll.setAttribute("name", "Xpertmud Online Help")
+    for node in helpNode.getSubNodes():
+        if node.getTagName() == 'help':
+            for inner in node.getSubNodes():
+                helpAll.addChild(inner)
+
+def addHelp(nodes):
+    sys.stderr.write("addHelp()\n")
+    for node in nodes:
+        sys.stderr.write("node\n")
+        for nodeIn in helpNode.getSubNodes():
+            if node.getAttribute('id') == nodeIn.getAttribute('id'):
+                helpNode.removeChild(nodeIn)
+        helpNode.addChild(node)
+    recreateHelpAll()
+        
+
+def parseHelp(file):
+    found = 0
+    for dir in [ '.' ] + sys.path:
+        try:
+            helpParserDTD = helpdtd()
+            helpParser = XMXmlParser(helpParserDTD)
+            f = open(dir + "/" + file)
+            found = 1
+            line = f.readline()
+            while line != "":
+                helpParser.parse(unicode(line))
+                line = f.readline()
+            addHelp(helpParser.getNodes())
+            break
+        except IOError:
+            pass
+        
+    if(not found):
+        XM.showError('File not found: "%s"\n' % file)
+
+parseHelp("functions.xml")
+parseHelp("topics.xml")
+parseHelp("classes.xml")    
+
+isEcho = 1
+localEcho = 1
+
+triggers = []
+aliases = []
+keyBindings = []
+timers = []
+delayed = []
+
+mtime = 0
+
+BLACK = 0
+RED = 1
+GREEN = 2
+YELLOW = 3
+BLUE = 4
+MAGENTA = 5
+CYAN = 6
+WHITE = 7
+
+class Callable:
+    def __init__(self, anycallable):
+        self.__call__ = anycallable
+        
+def setLocalEcho(state):
+    global localEcho
+    localEcho = state
+
+def showKeyNames():
+    addKeyBinding('#SHOWKEYS', '^(.*)$',
+                  lambda m: ((statusWindow().setFGColor(2) or 1) and
+                             (statusWindow().write(m.group(1)+"\n") or 1) and
+                             (statusWindow().resetAttributes() or 1) and
+                             ((re.match('........ X', m.group(1)) and
+                               delKeyBinding('^#SHOWKEYS$')) or 1) and
+                             0)
+                  or 1, 1)
+    statusWindow().write("Key name mode active, press \"x\" to\n get back to normal mode\n")
+
+def addIncludeDir(dir):
+    sys.path.append(dir)
+
+def prs(text):
+    statusWindow().write(text)
+
+psw = prs
+
+def connection(id=0):
+    return XMConnection.getByID(id)
+
+def sendText(text, id=0):
+    connection(id).send(text)
+
+def activeWindow():
+    return XMTextWindow(XM.getActiveWindow())
+
+def focusedInputLine():
+    return XMInputLine.getByID(XM.getFocusedInputLine())
+                  
+def statusWindow():
+    global __statusWindow
+    if(not globals().has_key('__statusWindow')):
+        __statusWindow = XMTextBufferWindow(0)
+    return __statusWindow
+
+############################################################
+# Trigger functions
+############################################################
+def addTrigger(name, regExp, toExp, flag=0, active=1):
+    global triggers
+
+    desc = "%s: " % name
+    if callable(toExp):
+        desc += "/%s/ -> function(): ..." % regExp
+    else:
+        desc += "s/%s/%s/g" % (regExp, str(toExp))
+
+    def subRef(text): 
+        (text, repCount) = re.compile(regExp).subn(toExp, text)
+        if(repCount > 0):
+#            statusWindow().write("\"%s\"\n" % text)
+            if text != None and re.compile(r'^$').match(text):
+                text = None
+            return ( flag, text )
+        else:
+            return ( 0, text )
+            
+    triggers =  [[ name, desc, subRef, active ]] + triggers
+
+
+def delTrigger(regExp):
+    global triggers
+    l = len(triggers)
+    
+    def triggerFilter(a):
+        return ( re.compile(regExp).search(a[0]) == None )
+    triggers = filter(triggerFilter, triggers)
+    
+    diff = l - len(triggers)
+    return diff
+
+
+def setTriggerState(regExp, active):
+    count = 0
+    def triggerMap(a): 
+        if(re.compile(regExp).search(a[0]) != None):
+            ++count
+            a[3] = active
+    
+    map(triggerMap, triggers)
+    return count
+
+
+def listTriggers():
+    statusWindow().setIntensive(1)
+    statusWindow().write("Trigger list:\n")
+    statusWindow().setIntensive(0)
+    for trigger in triggers:
+        [ name, desc, subRef, active ] = trigger
+        
+        statusWindow().write(desc)
+        if(active):
+            statusWindow().setFGColor(GREEN)
+            statusWindow().write(" *ACTIVE*\n")
+        else:
+            statusWindow().setFGColor(RED)
+            statusWindow().write(" *INACTIVE*\n")
+        statusWindow().resetAttributes()
+
+    statusWindow().write("\n")
+
+
+def executeTriggers(text):
+    for trigger in triggers:
+        [ name, desc, subRef, active ] = trigger
+        doBreak = 0
+        if active and text != None:
+            ( doBreak, text ) = subRef(text)
+            
+        if(doBreak):
+            break
+  
+    return text
+
+############################################################
+# Alias functions
+############################################################
+def addAlias(name, regExp, toExp, flag=0, active=1):
+    global aliases
+
+    desc = "%s: " % name
+    if callable(toExp):
+        desc += "/%s/ -> function(): ..." % regExp
+    else:
+        desc += "s/%s/%s/g" % (regExp, str(toExp))
+
+    def subRef(text): 
+        (text, repCount) = re.compile(regExp).subn(toExp, text)
+        if(repCount > 0):
+            return ( flag, text )
+        else:
+            return ( 0, text )
+            
+    aliases =  [[ name, desc, subRef, active ]] + aliases
+
+
+def delAlias(regExp):
+    global aliases
+    l = len(aliases)
+    
+    def aliasFilter(a):
+        return ( re.compile(regExp).search(a[0]) == None )
+    aliases = filter(aliasFilter, aliases)
+    
+    diff = l - len(aliases)
+    return diff
+
+
+def setAliasState(regExp, active):
+    count = 0
+    def aliasMap(a): 
+        if(re.compile(regExp).search(a[0]) != None):
+            ++count
+            a[3] = active
+    
+    map(aliasMap, aliases)
+    return count
+
+
+def listAliases():
+    statusWindow().setIntensive(1)
+    statusWindow().write("Alias list:\n")
+    statusWindow().setIntensive(0)
+    for alias in aliases:
+        [ name, desc, subRef, active ] = alias
+        
+        statusWindow().write(desc)
+        if(active):
+            statusWindow().setFGColor(GREEN)
+            statusWindow().write(" *ACTIVE*\n")
+        else:
+            statusWindow().setFGColor(RED)
+            statusWindow().write(" *INACTIVE*\n")
+        statusWindow().resetAttributes()
+    statusWindow().write("\n")
+
+
+def executeAliases(text):
+    for alias in aliases:
+        [ name, desc, subRef, active ] = alias
+        doBreak = 0
+        if(active):
+            ( doBreak, text ) = subRef(text)
+            
+        if(doBreak):
+            break
+  
+    return text
+
+############################################################
+# KeyBinding functions
+############################################################
+def addKeyBinding(name, onKey, action, active=1):
+    global keyBindings
+
+    desc = "%s: " % name
+    if callable(action):
+        desc += "/%s/ -> function(): ..." % onKey
+    else:
+        desc += "/%s/ -> \"%s\"" % (onKey, action)
+
+    if(not callable(action)):
+        def subRef(match):
+            wrap_onTextEntered(action)
+    else:
+        subRef = action
+            
+    keyBindings =  [[ name, desc, onKey, subRef, active ]] + keyBindings
+
+
+def delKeyBinding(regExp):
+    global keyBindings
+    l = len(keyBindings)
+    
+    def keyBindingFilter(a):
+        return ( re.compile(regExp).search(a[0]) == None )
+    keyBindings = filter(keyBindingFilter, keyBindings)
+    
+    diff = l - len(keyBindings)
+    return diff
+
+
+def setKeyBindingState(regExp, active):
+    count = 0
+    def keyBindingMap(a): 
+        if(re.compile(regExp).search(a[0]) != None):
+            ++count
+            a[4] = active
+    
+    map(keyBindingMap, keyBindings)
+    return count
+
+
+def listKeyBindings():
+    statusWindow().setIntensive(1)
+    statusWindow().write("Key binding list:\n")
+    statusWindow().setIntensive(0)
+    for keyBinding in keyBindings:
+        [ name, desc, onKey, subRef, active ] = keyBinding
+        
+        statusWindow().write(desc)
+        if(active):
+            statusWindow().setFGColor(GREEN)
+            statusWindow().write(" *ACTIVE*\n")
+        else:
+            statusWindow().setFGColor(RED)
+            statusWindow().write(" *INACTIVE*\n")
+        statusWindow().resetAttributes()
+    statusWindow().write("\n")
+
+
+def executeKeyBindings(key):
+    for keyBinding in keyBindings:
+        [ name, desc, onKey, subRef, active ] = keyBinding
+        if(active):
+            match = re.compile(onKey).match(key)
+            if(match):
+                subRef(match)
+                return 1
+  
+    return 0
+
+############################################################
+# Timer functions
+############################################################
+def addTimer(name, inc, action, active=1):
+    global timers
+
+    desc = ("%s: +" % (name)) + str(inc) + " -> "
+
+    if(not callable(action)):
+        desc += "\"" + action + "\""
+        def subRef():
+            wrap_onTextEntered(action)
+    else:
+        subRef = action
+        desc += "function(): ..."
+            
+    timers =  [[ name, desc, inc, subRef, active, 0 ]] + timers
+
+
+def delTimer(regExp):
+    global timers
+    l = len(timers)
+    
+    def timerFilter(a):
+        return ( re.compile(regExp).search(a[0]) == None )
+    timers = filter(timerFilter, timers)
+    
+    diff = l - len(timers)
+    return diff
+
+
+def setTimerState(regExp, active):
+    count = 0
+    def timerMap(a): 
+        if(re.compile(regExp).search(a[0]) != None):
+            ++count
+            a[4] = active
+    
+    map(timerMap, timers)
+    return count
+
+def setTimerInc(regExp, newInc):
+    count = 0
+    def timerMap(a): 
+        if(re.compile(regExp).search(a[0]) != None):
+            ++count
+            a[2] = newInc
+            a[1] = ("%s: +" % (a[0])) + str(newInc) + " -> "
+            a[1] += str(a[3])
+            
+    map(timerMap, timers)
+    return count
+
+
+def listTimers():
+    statusWindow().setIntensive(1)
+    statusWindow().write("Timer list:\n")
+    statusWindow().setIntensive(0)
+    for timer in timers:
+        [ name, desc, inc, subRef, active, last ] = timer
+        
+        statusWindow().write(desc)
+        if(active):
+            statusWindow().setFGColor(GREEN)
+            statusWindow().write(" *ACTIVE*\n")
+        else:
+            statusWindow().setFGColor(RED)
+            statusWindow().write(" *INACTIVE*\n")
+        statusWindow().resetAttributes()
+        
+    statusWindow().write("\n")
+
+
+# ?????? mtime correct ? time was never defined and will never be defined
+def getTime():
+    return mtime
+
+def parse(file):
+    found = 0
+    for dir in [ '.' ] + sys.path:
+        try:
+            execfile(dir + "/" + file, globals(), globals())
+            found = 1
+            break
+        except IOError:
+            pass
+        
+    if(not found):
+        XM.showError('File not found: "%s"\n' % file)
+
+
+############################################################
+# Delayed functions
+############################################################
+def addDelayed(name, delay, action):
+    global delayed
+
+    desc = ("%s: +" % (name)) + str(delay) + " -> "
+
+    if(not callable(action)):
+        desc += "\"" + action + "\""
+        def subRef():
+            wrap_onTextEntered(action)
+    else:
+        subRef = action
+        desc += "function(): ..."
+            
+    delayed =  [[ name, desc, delay+getTime(), subRef ]] + delayed
+
+
+def delDelayed(regExp):
+    global delayed
+    l = len(delayed)
+    
+    def delayedFilter(a):
+        return ( re.compile(regExp).search(a[0]) == None )
+    delayed= filter(delayedFilter, delayed)
+    
+    diff = l - len(delayed)
+    return diff
+
+def setDelayed(regExp,delay):
+    global delayed
+    count = 0
+    delay
+    def delayMap(a): 
+        if(re.compile(regExp).search(a[0]) != None):
+            ++count
+            a[2] = delay+getTime()
+            a[1] = ("%s: +" % (a[0])) + str(delay) + " -> "
+            a[1] += "\"" + str(a[3]) + "\""
+    
+    map(delayMap, delayed)
+    return count
+    
+
+def listDelayed():
+    global delayed
+    statusWindow().setIntensive(1)
+    statusWindow().write("Delayed action list:\n")
+    statusWindow().setIntensive(0)
+    for dela in delayed:
+        a = dela
+        
+        statusWindow().write( ("%s: +" % (a[0])) + str(a[2]-getTime()) + " -> "
+                              "\"" + str(a[3]) + "\"" + "\n")
+    statusWindow().resetAttributes()
+    statusWindow().write("\n")
+
+
+############################################################
+# Help
+############################################################
+layoutGenerator = helplayout('plain')
+def layout(node, subHelpText):
+    layoutGenerator.setSubHelpText(subHelpText)
+    return layoutGenerator.generate(node)
+
+seperator = '.'
+def help(topic = ''):
+    subHelpText = 'Use %help "'
+    if topic != '':
+        subHelpText += topic + seperator
+    subHelpText += '<subtopic>" for help on a specific subtopic'
+    if topic == '':
+        statusWindow().write(layout(helpAll, subHelpText))
+        return
+    search = topic
+    finished = 0
+    node = helpAll
+    found = 0
+    while not finished:
+        if search.find(seperator) != -1:
+            head = search[:search.find(seperator)]
+            tail = search[search.find(seperator)+1:]
+        else:
+            head = search
+            tail = ''
+        found = 0
+        for child in node.getSubNodes():
+#            if child.hasAttribute('name'):
+#                prs("Checking " + child.getAttribute('name') + " against " + head + "\n")
+            if (child.hasAttribute('name') and
+                child.getAttribute('name') == head):
+                search = tail
+                node = child
+                if tail == '':
+                    helpMsg = layout(node, subHelpText)
+                    if helpMsg != u'':
+                        found = 1
+                        statusWindow().write(helpMsg)
+                    finished = 1
+                else:
+                    found = 1
+                break
+        if not found:
+            finished = 1
+    if not found:
+        statusWindow().write("Couldn't find help on \"" + topic + "\"\n")
+
+
+                
+                   
+
+
+############################################################
+# Callbacks
+############################################################
+
+def sysinitInitialize():
+    addAlias("Eval", r'(?s)^.*$', __scripting, 1)
+    addAlias("Compose", r'^.*$', __compose, 0)
+    addAlias('Easy-Input', r'^%.*$', __onEasyInput, 1)
+    
+    addKeyBinding('Scroll-Up', '........ PgUp',
+                  lambda m: ((statusWindow().scrollLines(
+                               -statusWindow().getLines()+2) and 0) or 1))
+    addKeyBinding('Scroll-Down', '........ PgDown',
+                  lambda m: ((statusWindow().scrollLines(
+                               statusWindow().getLines()-2) and 0) or 1))
+
+    statusWindow().write("""
+    
+Welcome to xpertmud
+*******************
+
+type \"#help()\" or \"%help\"
+for further information.
+The # operator: \"#help(\"#\")\", or \"%help #\"
+The % operator: \"#help(\"%\")\", or \"%help %\"
+
+""")
+
+def onTimer():
+    global mtime
+    global delayed
+    if(mtime == 0.0):
+        sysinitInitialize()
+        
+    mtime += 0.25
+
+    for timer in timers:
+        [ name, desc, inc, action, active, lastCall ] = timer
+        if(active and (lastCall + inc < mtime)):
+            timer[5] = mtime
+            action()
+
+    for dela in delayed:
+        [name, desc, delay, subRef ] = dela
+        if(delay <= mtime):
+            subRef()
+    ndela = []
+    for dela in delayed:
+        if(dela[2] > mtime):
+            ndela = ndela + [dela]
+    delayed = ndela
+            
+
+aliasPreprocessing = 0
+def onTextEntered(text):
+    if(callable(aliasPreprocessing)):
+        text = aliasPreprocessing(text)
+    
+    text = executeAliases(text)
+    
+    if(text != None):
+        XM.Connection_send(0, text + "\r\n")
+        if isEcho and localEcho:
+            statusWindow().setFGColor(CYAN)
+            statusWindow().write(text + "\n")
+            statusWindow().resetAttributes()
+
+keyPreprocessing = 0
+def onKeyPressed(key, ascii):
+    if(callable(keyPreprocessing)):
+        ( key, ascii ) = keyPreprocessing(key, ascii)
+    
+    if(key != ""):
+        if(executeKeyBindings(key)):
+            return 1
+        
+        if(isEcho):
+            return 0
+        else:
+            sendKey(key, ascii)
+            return 1
+    return 0
+
+def onConnectionEstablished(id=0):
+    statusWindow().write("Connection %d established.\n" % id)
+
+def onConnectionDropped(id=0):
+    statusWindow().write("Connection %d dropped.\n" % id)
+
+writeAtOnceRegExp = r'.?'
+dontWriteAtOnceRegExp = r'^$'
+def setWriteRegExps(waoRegExp, dwaoRegExp):
+    global writeAtOnceRegExp
+    global dontWriteAtOnceRegExp
+    writeAtOnceRegExp = waoRegExp or writeAtOnceRegExp
+    dontWriteAtOnceRegExp = dwaoRegExp or dontWriteAtOnceRegExp
+
+def resetWriteRegExps():
+    global writeAtOnceRegExp
+    global dontWriteAtOnceRegExp
+    writeAtOnceRegExp = r'.?'
+    dontWriteAtOnceRegExp = r'^$'
+    
+triggerPreprocessing = 0
+onLineReceived = 0
+linePart = ""
+resetWriteRegExps()
+def onTextReceived(text, id=0):
+    global linePart
+
+    if(callable(triggerPreprocessing)):
+        text = triggerPreprocessing(text)
+
+    toProcess = linePart + text
+    if(toProcess != None and toProcess != ""):
+        for line in toProcess.splitlines(1):
+            linePart = ""
+            (line, count) = re.compile(r'\r?\n$').subn(r'\n', line)
+            if(count > 0):
+                if(callable(onLineReceived)):
+                    line = onLineReceived(line)
+
+                line = executeTriggers(line)
+
+                if(line != None and line != ""):
+                    statusWindow().write(line)
+            else:
+                if((re.compile(writeAtOnceRegExp).search(line) != None) and
+                   (re.compile(dontWriteAtOnceRegExp).search(line) == None)):
+                    line = executeTriggers(line)
+                    if(line != None and line != ""):
+                        statusWindow().write(line)
+                else:
+                    linePart = line
+
+def onEcho(state, id=0):
+    global isEcho
+    isEcho = state
+    XM.echoMode(state)
+
+def wrap_onEcho(state, id=0):
+    try:
+        if(callable(onEcho)):
+            onEcho(state, id)
+    except:
+        dumpError(sys.exc_info())
+    
+def wrap_onTextEntered(text):
+    try:
+        if(callable(onTextEntered)):
+            onTextEntered(text)
+    except:
+        dumpError(sys.exc_info())
+
+def wrap_onTimer():
+    try:
+        if(callable(onTimer)):
+            onTimer()
+    except:
+        dumpError(sys.exc_info())
+
+def wrap_onKeyPressed(key, ascii):
+    try:
+        if(callable(onKeyPressed)):
+            return onKeyPressed(key, ascii)
+    except:
+        dumpError(sys.exc_info())
+    return 0
+
+def wrap_onTextReceived(line, id=0):
+    try:
+        if(callable(onTextReceived)):
+            onTextReceived(line,id)
+    except:
+        dumpError(sys.exc_info())
+
+def wrap_onConnectionEstablished(id):
+    try:
+        if(callable(onConnectionEstablished)):
+            onConnectionEstablished(id)
+    except:
+        dumpError(sys.exc_info())
+
+def wrap_onConnectionDropped(id):
+    try:
+        if(callable(onConnectionDropped)):
+            onConnectionDropped(id)
+    except:
+        dumpError(sys.exc_info())
+
+def wrap_mouseDown(id, x, y):
+    win = getWindow(id)
+    if win != None:
+        win.onMouseDown(x, y)
+
+def wrap_mouseDrag(id, x, y):
+    win = getWindow(id)
+    if win != None:
+        win.onMouseDrag(x, y)
+
+def wrap_mouseUp(id, x, y):
+    win = getWindow(id)
+    if win != None:
+        win.onMouseUp(x, y)
+
+def wrap_pluginCall(id, function, args):
+    win = getWindow(id)
+    if win != None:
+        return win.pluginCall(function, args)
+
+def sendKey(key, ascii):
+    if(ascii != None and re.compile(r'^.$').match(ascii) != None):
+        XM.Connection_send(0, ascii)
+
+allWindows = {}
+def getWindow(id):
+    if allWindows.has_key(id):
+        return allWindows[id]
+    else:
+        return None
+
+class XMWindow:
+    def __del__(self):
+        self.close()
+
+    def register(self):
+        allWindows[self.__id] = weakref.proxy(self)
+    
+    def setID(self, id):
+        self.__id = id
+
+    def getID(self):
+        return self.__id
+
+___XMWINDOW___METHODS___
+
+class XMTextWindow (XMWindow):
+    def __init__(self, id = None):
+        if(id != None and type(id) != str):
+            self.setID(id)
+        else:
+            self.setID(XM.TextWindow_initialize())
+            if(id != None):
+                self.setTitle(id)
+        self.initTextWindow()
+
+    def initTextWindow(self):
+        self.onMouseDownFuncs = []
+        self.onMouseDragFuncs = []
+        self.onMouseUpFuncs = []
+        self.register()
+
+    def getCursorPos(self):
+        return (self.getCursorX(), self.getCursorY())
+
+    def getSizeChars(self):
+        return (self.getColumns(), self.getLines())
+
+    def registerMouseDownEvent(self, func):
+        self.onMouseDownFuncs += [ func ]
+
+    def registerMouseDragEvent(self, func):
+        self.onMouseDragFuncs += [ func ]
+
+    def registerMouseUpEvent(self, func):
+        self.onMouseUpFuncs += [ func ]
+
+    def onMouseDown(self, x, y):
+        for func in self.onMouseDownFuncs:
+            func(x, y)
+            
+    def onMouseDrag(self, x, y):
+        for func in self.onMouseDragFuncs:
+            func(x, y)
+
+    def onMouseUp(self, x, y):
+        for func in self.onMouseUpFuncs:
+            func(x, y)
+
+___XMTEXTWINDOW___METHODS___
+
+class XMTextBufferWindow (XMTextWindow):
+    def __init__(self, id = None):
+        if(id != None and type(id) != str):
+            self.setID(id)
+        else:
+            self.setID(XM.TextBufferWindow_initialize())
+            if(id != None):
+                self.setTitle(id)
+        self.initTextWindow()
+
+___XMTEXTBUFFERWINDOW___METHODS___
+
+class XMPlugin (XMWindow):
+    def __init__(self, lib, cls, title):
+        id = XM.Plugin_initialize(lib, cls)
+        if id < 0:
+            return None
+        print id
+        self.setID(id)
+        print self.getID()
+        self.setTitle(title)
+        self.register()
+
+    def pluginCall(self, functions, args):
+        return None
+
+___XMPLUGIN___METHODS___
+
+class XMConnection:
+    __private = 0
+    __instances = {}
+
+    def __init__(self, host, port=0, onConnect=""):
+        if XMConnection.__private == 0:
+            self.id = XM.Connection_initialize(host, port, onConnect)
+            XMConnection.__instances[id] = self
+        else:
+            self.id = host
+
+    def getID(self):
+        return self.id
+
+    def getByID(id):
+        if not XMConnection.__instances.has_key(id):
+            XMConnection.__private = 1
+            XMConnection.__instances[id] = XMConnection(id)
+            XMConnection.__private = 0
+        return XMConnection.__instances[id]
+
+    getByID = Callable(getByID)
+
+___XMCONNECTION___METHODS___
+
+class XMInputLine:
+    __private = 0
+    __instances = {}
+
+    def __init__(self, id):
+        if XMInputLine.__private == 0:
+            raise "Private Constructor Error!"
+        self.id = id
+
+    def getID(self):
+        return self.id
+
+    def getByID(id):
+        if not XMInputLine.__instances.has_key(id):
+            XMInputLine.__private = 1
+            XMInputLine.__instances[id] = XMInputLine(id)
+            XMInputLine.__private = 0
+        return XMInputLine.__instances[id]
+            
+    getByID = Callable(getByID)
+        
+
+___XMINPUTLINE___METHODS___
+
+def dumpError(excInfo):
+    """ Write a nice error
+    message; TODO: Nice output!
+    """
+    errStr = "Traceback (most recent call last):\n"
+    for line in traceback.format_tb(excInfo[2]):
+            errStr += line
+            
+    excName = re.sub(r'exceptions\.', r'', str(excInfo[0]))
+    errStr += excName + ": " + str(excInfo[1]) + "\n"
+    
+    print errStr
+    XM.showError(errStr)
+
+class RegState:
+    def perlSub(self, regExp, toExp, string):
+        self.match = re.search(regExp, string)
+        (self.string, self.count) = re.subn(regExp, toExp, string)
+        return (self.count > 0)
+
+reS = RegState()
+
+def __scripting(match):
+    if(re.compile(r'^#[^#]').match(match.string)):
+        exec match.string[1:] in globals()
+        return ""
+    else:
+        return match.string
+
+composeBuffer = ""
+def __compose(match):
+    global composeBuffer
+    if(re.compile(r'^##$').match(match.string)):
+        composeBuffer += "\n"
+        print "execing %s" % composeBuffer
+        exec composeBuffer in globals()
+        composeBuffer = ""
+        return ""
+    elif(re.compile(r'^##').match(match.string)):
+        composeBuffer += match.string[2:] + "\n"
+        statusWindow().setFGColor(BLUE)
+        statusWindow().write("> " + match.string[2:] + "\n")
+        statusWindow().resetAttributes()
+        return ""
+    else:
+        return match.string
+
+def __onEasyInput(match):
+    command = ""
+    str = match.string[1:]
+    r = re.compile(r'^\s*([^\s]+)\s*')
+    m = r.match(str)
+    if m != None:
+        command += m.group(1) + "("
+        str = r.sub('', str)
+
+    r = re.compile(r'(?ix)^'
+                   r'(("([^"\\]|(\\")|(\\[^"]))*") |' # " ... " pairs
+                   r'(r?\'([^\'\\]|(\\\')|(\\[^\']))*\') |' # r?' ... ' pairs
+                   r'([^"][^ ]*))\s*') # wordswithoutspaces
+    m = r.match(str)
+    if m != None:
+        print m.groups()
+        print m.group(1)
+        print m.group(2)
+        if (m.group(2) != None) or (m.group(6) != None):
+            command += m.group(1)
+        else:
+            command += '"' + m.group(1) + '"'
+        str = r.sub('', str)
+        m = r.match(str)
+    
+    while m != None:
+        print m.groups()
+        command += ', '
+        if (m.group(2) != None) or (m.group(6) != None):
+            command += m.group(1)
+        else:
+            command += '"' + m.group(1) + '"'
+        str = r.sub('', str)
+        m = r.match(str)
+
+    command += ")\n"
+    print "execing %s" % command
+    exec command in globals()
+    
+    

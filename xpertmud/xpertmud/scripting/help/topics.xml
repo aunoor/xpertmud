@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<help lang="en" id="xm-topics" name="Xpertmud Online Help - Topics">
+  <topic name="Step-by-Step">
+    <description>
+Some step by step tutorials for specific tasks. You can follow them by just copying each line into your input line. (Don't forget to put a '#' at the beginning of each line)
+    </description>
+    <topic name="Triggers On Colored Text">
+      <description>
+	<para>
+Most muds give you colored output. The colors are just characters in your string, so you have to be careful. Let's assume the Mud sends something like:
+	  <code><cr><cB>Tower of Doom:</cB></cr> Exits: <cg>N W SW</cg> Doooooomy</code>
+	</para>
+	<para>
+Now we want to parse the room description and all exits. A regexp like "^([\w\s]+): (\w\s)+(\w+)" won't work because of the color codes hiding inside the text.
+If you don't need color information at all, you can use the above regexp on XM<pe>::</pe><py>.</py>ansiToRaw(<pe>$</pe>text).
+	  <code><alt>
+	      <pe>	sub rawParser {
+	  if(XM::ansiToRaw($1) =~ /^([\w\s]+): (\w\s)+(\w+)/) {
+	    statusWindow()->print("Triggered!\n");
+	  }
+	}
+	addTrigger("RawParser", qw/^(.*)$/, rawParser);</pe>
+              <py>	def rawParser(m):
+	  if re.match(r'^([\w\s]+): (\w\s)+(\w+)', XM.ansiToRaw(m.group(0))):
+	    statusWindow().write("Triggered!\n");
+	addTrigger("RawParser", r'^(.*)$', rawParser)</py>
+	    </alt></code>
+	</para>
+	<para>
+If you need to distinguish between colors, use XM<pe>::</pe><py>.</py>ansiToColored(<pe>$</pe>text). This 
+	</para>
+      </description>
+    </topic>
+    <topic name="Window Positions">
+      <description>
+	<para>
+Firstly, let us create some windows
+	  <code><alt>
+	      <pe>	$a = new XMTextWindow("First");
+	$b = new XMTextWindow("Second");</pe>
+	      <py>	a = XMTextWindow("First")
+	b = XMTextWindow("Second")</py>
+	    </alt></code>
+	</para>
+	<para>
+Now resize the status window to 80 chars width, the height doesn't matter, we'll take care of that later
+	  <code><alt>
+	      <pe>	statusWindow()->resizeChars(80, 10);</pe>
+	      <py>	statusWindow().resizeChars(80, 10)</py>
+	    </alt></code>
+	</para>
+	<para>
+Resize the status window to 80 chars width and full height
+	  <code><alt>
+	      <pe>	statusWindow()->resize(statusWindow()->getSizeX(), XM::mdiHeight());</pe>
+	      <py>	statusWindow().resize(statusWindow().getSizeX(), XM.mdiHeight())</py>
+	    </alt></code>
+	</para>
+	<para>
+Move the first window to the right of the status window
+	  <code><alt>
+	      <pe>	$a->move(statusWindow()->getSizeX(), 0);</pe>
+	      <py>	a.move(statusWindow().getSizeX(), 0)</py>
+	    </alt></code>
+	</para>
+	<para>
+Resize the first window to use the full width of the mdi window and half the mdi window's height
+	  <code><alt>
+	      <pe>	$a->resize(XM::mdiWidth()-statusWindow()->getSizeX(), XM::mdiHeight()/2);
+	$a->show();</pe>
+	      <py>	a.resize(XM.mdiWidth()-statusWindow().getSizeX(), XM.mdiHeight()/2)
+	a.show()</py>
+	    </alt></code>
+	</para>
+	<para>
+Let's get a second window in the empty space without the caption.
+	  <code><alt>
+	      <pe>	$b->hideCaption();
+	$b->move(statusWindow()->getSizeX(), $a->getSizeY());
+	$b->resize($a->getSizeX(), XM::mdiHeight()-$a->getSizeY());
+	$b->show();
+	$b->print("Done.");</pe>
+	      <py>	b.hideCaption()
+	b.move(statusWindow().getSizeX(), a.getSizeY())
+	b.resize(a.getSizeX(), XM.mdiHeight()-a.getSizeY())
+	b.show()
+	b.write("Done.")</py>
+	    </alt></code>
+	</para>
+      </description>
+    </topic>
+  </topic>
+</help>
+
+

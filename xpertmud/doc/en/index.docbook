@@ -1,0 +1,401 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.1-Based Variant V1.0//EN" "dtd/kdex.dtd" [
+  <!ENTITY xpertmud "Xpertmud"> <!-- Bugfix??? -->
+  <!ENTITY kappname "&xpertmud;">
+  <!ENTITY % addindex "IGNORE">
+  <!ENTITY % English "INCLUDE"> <!-- change language only here -->
+  <!ENTITY python-devel SYSTEM "python-devel.docbook">
+  <!ENTITY perl-devel SYSTEM "perl-devel.docbook">
+]>
+<book lang="&language;">
+
+<bookinfo>
+<title>The &xpertmud; Handbook</title>
+
+<authorgroup>
+<author>
+<firstname>Ernst</firstname>
+<surname>Bachmann</surname>
+<affiliation>
+<address><email>e.bachmann@xebec.de</email></address>
+</affiliation>
+</author>
+<author>
+<firstname>Manuel</firstname>
+<surname>Klimek</surname>
+<affiliation>
+<address><email>manuel.klimek@web.de</email></address>
+</affiliation>
+</author>
+</authorgroup>
+
+<!--
+<copyright>
+<year>2001</year>
+<year>2002</year>
+<year>2003</year>
+<year>2004</year>
+<holdergroup>
+<holder>Ernst Bachmann</holder>
+<holder>Manuel Klimek</holder>
+<holder>many more</holder>
+</holdergroup>
+</copyright>
+-->
+<legalnotice>&FDLNotice;</legalnotice>
+
+<date>2004-08-29</date>
+<releaseinfo>3.2alpha1</releaseinfo>
+
+<abstract>
+<para>
+&xpertmud; - the eXtensible PERl scripTable MUD client.
+</para>
+</abstract>
+
+<keywordset>
+<keyword>KDE</keyword>
+<keyword>Xpertmud</keyword>
+<keyword>Perl</keyword>
+<keyword>MUD Client</keyword>
+<keyword>Telnet</keyword>
+<keyword>Scripting</keyword>
+</keywordset>
+
+</bookinfo>
+
+<chapter id="introduction">
+<title>Introduction</title>
+<para>
+&xpertmud; is an extensible perl scriptable MUD client. Basically it's
+just a scriptable telnet, but most people would use it for mudding.
+It supports multiple windows (which are perl-scriptable, yeah), 
+and if you know perl you can do triggers, aliases, whatever you want
+for every bit of text that comes from or goes to the server will
+be processed by your perl script (or some standard per script).
+</para>
+</chapter>
+
+<chapter id="using-xpertmud">
+<title>Using Xpertmud</title>
+<para>
+After starting &xpertmud; you'll see a fancy menu bar, some nice tool bar
+and a status bar at the bottom of the window. The connection entry
+gives you the possibility to open a connection dialog, close the connection
+or quit your client. The window menu allows you to toggle between multiple
+open windows. Within settings you can configure the visibility of 
+your tool- and statusbar, change your toolbar configuration or open
+the general configuration dialog. From within help you'll get some
+information about the client and you'll be able to start this page. So
+you probably already know about help.
+</para>
+
+<sect1 id="connection-dialog">
+<title>The Connect Dialog</title>
+<para>
+The connect dialog allows you to open a connection to some telnet
+server. You can choose your connection from the dropdown list. If
+you want an empty entry to insert some new connection settings
+just hit the New button, to get rid of some entry press Delete.
+</para>
+<para>
+The text in the name field will be shown in the dropdown, so set
+it to some name you can identify the mud with.
+</para>
+<para>
+Host is the named host you'll connect to.
+</para>
+<para>
+Port is the port on the host the client should connect to.
+</para>
+<para>
+In the Script section you can enter text line for line, just
+like you would type it in the input line. You'll use this to
+load some mud specific script and log in automagically. 
+See <link linkend="input-line">The
+Input Line</link> for further instructions.
+</para>
+</sect1>
+
+<sect1 id="configure-dialog">
+<title>The Configure Dialog</title>
+<para>
+Within the configure dialog you can change the default ansi color
+table the client will use. If you changed too much, just hit
+default which will give you some basically sound settings.
+</para>
+</sect1>
+<sect1 id="input-line">
+<title>The Input Line</title>
+<para>
+The input line is the most important widget for user interactivity.
+Each line you enter will be parsed by you perl script (see the
+developer's guides) and results
+in some action. The client's standard is that lines that begin with
+a '#' will be evaluated by the perl interpreter and all other lines
+just sent to the server you're connected to.
+</para>
+</sect1>
+</chapter>
+
+&perl-devel;
+&python-devel;
+
+<!--
+<para> 
+Reading this documentation you probably figured out what
+&xpertmud; really is: Some gui perl-bindings usefull for
+your very personal mud client. This chapter will show you
+how to get the very last out of this client. Happy hacking...
+</para>
+
+<sect1 id="files">
+<title>Looking for files</title>
+<para>
+The @INC variable of the perl interpreter contains the
+standard system includes as well as 
+$KDEHOME/share/apps/xpertmud/perl and $KDEDIR/share/apps/xpertmud/perl.
+$KDEDIR is the standard kde directory (usually /usr/ or /opt/kde2)
+and $KDEHOME your personal kde directory (usally ~/.kde or ~/.kde2).
+If you've got two scripts with the same name in both directories,
+the one in your home directory will be found first. Of course you
+can change @INC using the # directive or in your own scripts.
+The standard scripts are a good place for learning the perl bindings,
+so copy them to your home dir and change them to match your own requirements.
+</para>
+</sect1>
+
+<sect1 id="doing-files">
+<title>Doing files</title>
+<para>
+If you want to test your scripts you probably don't want to reconnect
+to the server everytime you changed something. To achive this you
+can use the perl 'do' command. Perl will give quite a lot of warnings
+when redefining functions, but the output will basically be what you
+meant. For example, if you changed something within the bt3030.pl script
+just type #do 'bt3030.pl' at the input line and the script will be
+reloaded. If you care about parsing errors within your script
+(which you probably do :) then there's a parse command that basically
+tests the $@ variable after executing the do command and writing
+an error message if there was something wrong. So the recommended
+way to test your scripts is #parse 'bt3030.pl'.
+</para>
+</sect1>
+<sect1 id="api-intro">
+<title>API Introduction</title>
+<para>
+Everytime an event occurs a perl function is called. This is done
+by a function reference which you can change to point to your
+own piece of code. There are basically four events:
+<itemizedlist>
+<listitem><para>$onTimer gets no parameter and is called 4 times a second.
+</para></listitem>
+<listitem><para>$onTextEntered gets the text entered at the input line and
+is called whenever enter is pressed. If you overwrite this, you have to
+implement evaluation of perl code for lines starting with # by yourself.
+</para></listitem>
+<listitem><para>$onKeyPressed gets a string containing the currently
+pressed modifiers and the key's name as argument and is called everytime
+a key is pressed. Returns true if it reacted on the key, false otherwise.
+</para></listitem>
+<listitem><para>$onLineReceived get a string containing a line
+that came from the server. Ansi-Escape codes are still in there so
+be carefull with your regexps (espacially ^ can't be used if there's
+colored text at the beginning of the line). If you reimplement this,
+make sure that all interesting output will be written to some window.
+</para></listitem>
+</itemizedlist>
+You can overwrite one of the hooks simply by specifying
+$onHook = sub { my $some = shift; blah blah ... };
+</para>
+<para>
+Now all you have to know is how to generate windows and how
+to put text into these windows before you can do anything you'll
+ever want (hopefully :).
+There are basically two types of output windows: 
+</para>
+<para>
+The first is the
+TextWindow, which is just a box that shows (colored) text. This
+text will be deleted if it's no longer visible in the window (for example
+if you resize your window). So this kind of window is usefull for
+showing static data like hit points, spells, something like that.
+</para>
+<para>
+The second type is the TextBufferWindow, which is basically a
+TextWindow, but has got some scollback buffer. This widget is
+for displaying running text, like the usual telnet output.
+</para>
+<para>
+Until the complete API documentation is finished, here's some
+example that shows how to use these window classes. For further
+information look into the standard scripts.
+<programlisting>
+############################################################
+# The text window:
+############################################################
+
+my $win = new XM::TextWindow();
+$win-&gt;close();
+
+$win-&gt;setTitle("My Title");
+$win-&gt;setFont("fixed", $fontsize);
+
+# resize the window so that it contains 80 columns and 25 lines
+$win-&gt;resizeChars(80, 25); 
+
+$win-&gt;getLines(); # get number of visible lines;
+$win-&gt;getColumns(); # get number of visible columns;
+
+$win-&gt;hide();
+$win-&gt;show();
+
+$win-&gt;move($x, $y); # in pixels, absolute
+$win-&gt;getPositionX();
+$win-&gt;getPositionY();
+($x, $y) = $win-&gt;getPosition();
+
+# Get the real geometry in pixels containing the title bar and border
+$win-&gt;getSizeY();
+$win-&gt;getSizeX();
+
+$win-&gt;maximize();
+$win-&gt;minimize();
+
+$win-&gt;setCursor($column, $line);
+$win-&gt;newline();
+$win-&gt;getCursorX();
+$win-&gt;getCursorY();
+
+$win-&gt;setFGColor(BLACK); # or RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE
+$win-&gt;setBGColor(BLACK); # or RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE
+$win-&gt;setIntensive(1); # or 0, set to intense, see ansi color values for further info
+$win-&gt;setUnderline(1); # or 0
+$win-&gt;setBlinking(1); # or 0, wont work at the moment.
+$win-&gt;setReverse(1); # or 0, not supported
+$win-&gt;resetAttributes();
+
+###
+# usually you add text like this:
+
+$win-&gt;setCursor($where, $ever);
+$win-&gt;setFGColor($someColor);
+$win-&gt;print("text");
+$win-&gt;newline();
+$win-&gt;resetAttributes();
+
+# now the next text added will find the standard attributes
+# the same applies for the TextBufferWindow
+###
+
+# print text at the actual cursor position.
+$win-&gt;print("text without color codes");
+$win-&gt;printANSI($text); # $text may contain ansi escape codes
+
+# clear from the actual position to the end of the line
+$win-&gt;clearEOL();
+$win-&gt;clearLine();
+$win-&gt;clear();
+
+$win-&gt;getCharAt($column, $line);
+
+
+############################################################
+# The text buffer window:
+# has all the functions of the TextWindow and...
+############################################################
+
+$bwin = new XM::TextBufferWindow();
+
+# newline is _not_ added automatically
+$bwin-&gt;print("\nsome text without ansi escape sequences");
+$bwin-&gt;printANSI($text); # $text may contain ansi escape codes
+
+# if $lines is &lt; 0 scroll up, else down.
+$bwin-&gt;scrollLines($lines);
+
+# to put text into the standard output window, there's
+# the statusWindow() function, so just use
+statusWindow()-&gt;printANSI($textFromServer);
+
+# to show what the server has sent.
+</programlisting>
+</para>
+</sect1>
+-->
+
+<chapter id="credits">
+
+<title>Credits and License</title>
+
+<para>
+&xpertmud;
+</para>
+<para>
+Program copyright 1997-2004 by Ernst Bachmann and Manuel Klimek
+</para>
+<para>
+
+&underFDL;               <!-- FDL: do not remove -->
+&underGPL;        	 <!-- GPL License -->
+
+</para>
+</chapter>
+<appendix id="installation">
+<title>Installation</title>
+
+<sect1 id="getting-xpertmud">
+<title>How to obtain Xpertmud</title>
+
+<para>
+&xpertmud; can be found at it's sourceforge page
+<ulink url="http://sourceforge.net/projects/xpertmud/">http://sourceforge.net/projects/xpertmud/</ulink>.</para>
+</sect1>
+
+<sect1 id="requirements">
+<title>Requirements</title>
+
+<para>
+In order to successfully use &xpertmud;, you need KDE 3.x. libperl is required
+in order to run &xpertmud;. &xpertmud; uses about 5 megs of
+memory to run, but this may vary depending on your platform and
+configuration.
+</para>
+
+<para>
+All required libraries as well as &xpertmud; itself can be found
+on <ulink url="http://xpertmud.sourceforge.net">The &xpertmud; home page</ulink>.
+</para>
+
+</sect1>
+
+<sect1 id="compilation">
+<title>Compilation and installation</title>
+
+<para>
+In order to compile and install &xpertmud; on your system, type the following in the base
+directory of the &xpertmud; distribution:
+<screen width="40">
+<prompt>%</prompt> <userinput>./configure</userinput>
+<prompt>%</prompt> <userinput>make</userinput>
+<prompt>%</prompt> <userinput>make install</userinput>
+</screen>
+</para>
+
+<para>Since &xpertmud; uses autoconf and automake you should have not trouble compiling it.
+Refer to the INSTALL file in the distribution base directory for further information.
+</para>
+
+</sect1>
+
+</appendix>
+
+&documentation.index;
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes: nil
+sgml-general-insert-case: lower
+End:
+-->

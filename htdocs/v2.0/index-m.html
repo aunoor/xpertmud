@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="stylesheet" type="text/css" href="general.css" />
+<!-- TITLE --><title></title>
+<meta name="description" content="A cross-platform (Linux+KDE/Win32) perl and python scriptable mud client. Featuring a nice and stable plugin API and an example plugin for the btech MUX." />
+<meta name="keywords" content="mud,mux,client,linux,kde,windows,win32,telnet,scripting,scriptable,perl,python,plugin" />
+</head>
+
+<body>
+<!-- UPPER -->
+
+<div class="window">
+<div class="window-title">About</div>
+<div class="window-content">
+<p>Xpertmud is an extensible 
+<a href="http://www.perl.org/">perl</a>, 
+<a href="http://www.python.org/">python</a> and
+<a href="http://www.ruby-lang.org/">ruby</a> 
+scriptable MUD client. 
+It is based on <a href="http://www.trolltech.com">Qt</a> and
+<a href="http://www.kde.org">KDE</a>. There's a native Linux/KDE version
+as well as a native Windows/Win32 build. This enables you to use the
+same script on your Linux box at home and on your Windows box at work...</p>
+<p>It supports multiple windows (which are scriptable), and you can 
+use triggers, aliases or whatever you want on every bit of text that 
+comes from or goes to the server. There's a stable and intuitive plugin API,
+so you can extend the client with Qt-based C++ code. A sample plugin for
+the btech MUX is included.</p>
+</div>
+</div>
+
+<div class="window">
+<div class="window-title">News</div>
+<div class="window-content">
+
+<div class="news-item">
+<div class="news-headline">
+2004-0i3-30 Text Widget rewrite!
+</div>
+<div class="news-content">
+<p>
+Well, I finally got to do the much needed Text Widget rewrite.
+Some features are still missing, as the splitscreen and copy-n-paste
+but that will follow soon. The speed so far looks very promising and 
+I hope to get to the rest of the features soon. I also rewrote the 
+ANSI-Parser due to a change in the class relations. It seems to work
+perfectly, but it still needs some testing. If you want to take a look
+at it, checkout the CVS.
+
+Peter 
+</div>
+</div>
+
+<div class="news-item">
+<div class="news-headline">
+2004-02-23 Xpertmud made it into <a href="www.gentoo.org">Gentoo Linux</a>!
+</div>
+<div class="news-content">
+<p>
+Installing xpertmud from source is now as easy as "emerge xpertmud",
+the ebuild honors the "python" and "ruby" USE flags, so you don't have 
+to install any unwanted language.
+</div>
+</div>
+
+
+<div class="news-item">
+<div class="news-headline">
+2004-02-06 Xpertmud 3.1preview1
+</div>
+<div class="news-content">
+<p>Well, it already has been a year, so we decided to make a CVS 
+snapshot available for download. The release is named 3.1preview1, 
+and, unfortunately, there are still lots of known and unknown bugs
+in it :(. (This one even ain't alpha quality...)</p>
+<p>Workarrounds for the most common issues are presented in the 
+Release Notes.</p>
+</div>
+</div>
+
+<div class="news-item">
+<div class="news-headline">
+2003-10-03 Xpertmud Install Walkthrough on SuSE 8.2
+</div>
+<div class="news-content">
+<p>Ben just postet a nice <a href="http://www.anberoka.com/xpertmud/">Xpertmud
+install tutorial</a> for SuSE 8.2. Thank's a lot, ben :-) We're
+looking forward to your scripting stuff...</p>
+</div>
+</div>
+
+
+<div class="news-item">
+<div class="news-headline">
+2003-01-23 Xpertmud 3.0beta1
+</div>
+<div class="news-content">
+<p>Before starting to code major changes, we decided that another
+bugfix version of xpertmud should be out. The beta1 fixes various
+bugs (like crashes when connecting to some mud servers and ANSI
+color issues). And it should also fix some build problems that
+were reported. So if you've had problems with the alpha, we
+<b>strongly encourage you</b> to try this version.</p>
+<p>Oh, and a little tip: If you got an error with python when
+building xpertmud, tell configure where your python 2 binary
+is. On some redhat versions, for example, it's 
+--enable-python=/usr/bin/python2.2. Python version less than 2.0
+will not work.</p>
+</div>
+</div>
+
+<div class="news-item">
+<div class="news-headline">
+2003-01-22 Things are moving on...
+</div>
+<div class="news-content">
+<p>There's a bunch of new <a href="screenshots.html">screenshots</a>. And
+we're just starting with a complete efficient rewrite of the ANSI Widgets.
+So CVS HEAD may be broken for some time from now on. If you want to
+get the last stable state use cvs up -d -r UNBROKEN.</p>
+</div>
+</div>
+
+<div class="news-item">
+<div class="news-headline">
+2003-01-07 I've got a vision...
+</div>
+<div class="news-content">
+<p>Reading some news about Qt/XEmacs and other scriptable editors
+I realized that the Xpertmud codebase offers all the technology
+to write the next generation scriptable editor. A vi and xemacs
+substitue. If you are a developer and like to share visions,
+read the <a href="vision.html">Vision document</a>. If you don't
+know the design Xpertmud offers, read the
+<a href="xpertmud-design.html">Xpertmud Design Overview</a> first.</p>
+<p>If you have anything to say, please fell free to mail us, post
+in the forum or join the mailing list.</p>
+</div>
+</div>
+
+<div class="news-item">
+<div class="news-headline">
+2002-12-23 Xpertmud 3 Win32 Announcement!
+</div>
+<div class="news-content">
+In case nobody noticed :-) Xpertmud Win32 has been shipping for some
+time now. Hit the download page and get it (it's at the bottom of
+the sourceforge download page). There's a (very short) installation
+instruction included (what-you-need...), but there are a few more
+very important things to be mentioned:
+<ul>
+<li>You need python or perl. If you don't know both, I recommend python.</li>
+<li>Goto www.python.org. Download the latest python. Install it.</li>
+<li>Goto our download page. Hit Download. Get xpertmud-win32-3.0alpha2.zip.</li>
+<li>Unzip the file! Find xpertmud.exe with your file manager, start it!</li>
+<li>If the client states: library blabla cannot be found, don't panic.
+Probably it's just a wrong default language. Head into 
+Settings-Configure_Xpertmud-Scripting and set the default interpreter to
+the one you installed. Exit Xpertmud, start it again, and all should be
+fine.</li>
+<li>Browse the online docs. #help or %help will help!</li>
+<li>Head into File-Edit_Bookmark, select Start_Interpreter from the
+scripting tab, then choose your interpreter. In the Connections
+tab hit add, enter your mud's connection (23 is the telnet port),
+and hit OK. Then File-Save. Save it. Before anything happens *grin*.
+Now hit Connection-Connect and ... MUD!</li>
+<li><b>If you've got feedback or questions, ask us(!!!)</b></li>
+</ul>
+</div>
+</div>
+
+<div class="news-item">
+<div class="news-headline">
+2002-10-24 Xpertmud 3 Alpha2 Release
+</div>
+<div class="news-content">
+<p>This second alpha release features a enhanced btech plugin
+as well as some bugfixes in the overall behaviour.
+If you're playing the btech mux, update to this release is
+strongly recommended.</p>
+<p><b>Changes:</b></p>
+<p>BTech plugin:</p>
+<ul>
+<li>TextParser (Python-Only) for the 3065 mux</li>
+<li>Weapon-Widget</li>
+<li>Speed-Widget (more usefull than I thought :-)</li>
+<li>Enhanced Contacts Widget</li>
+</ul>
+<p>Core:</p>
+<ul>
+<li>slightly modified input line behaviour :-P</li>
+<li>Pressing Alt doesn't give Focus to MenuBar</li>
+<li>Temporary workaround for scripting bugs:<br />
+   Changing scriptinterpreter on the fly not possible (!)</li>
+</ul>
+</div>
+</div>
+
+<div class="news-item">
+<div class="news-headline">
+2002-09-08 Xpertmud 3 Alpha Release
+</div>
+<div class="news-content">
+<p>Good news, this is the first kde3-enabled release. There's
+no new documentation yet, and it still has some bugs, but
+while playing it's stable enough to go on many, many hours
+without problems (The bugs are mainly when switching scripting
+engines and while shutting down).</p>
+<p>There's the new plugin engine, containing a simple example
+plugin and the new battletech plugin we're currently working on.
+Then there's the new scripting mouse api, which you can learn
+by looking into battletech.pl and searching for "registerMouse".
+And last but not least the key event layout slightly changed
+to be able to stay compatible with the upcoming Win32 versions.
+</p>
+<p>Look on the <a href="download.html">download page</a>
+to get your mud experience. And go on muddin'.</p>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- LOWER -->
+</body>
+</html>

@@ -1,0 +1,12 @@
+<Files Entries*>
+  Order allow,deny
+  Deny from all
+</Files>
+<Files Repository*>
+  Order allow,deny
+  Deny from all
+</Files>
+<Files Root*>
+  Order allow,deny
+  Deny from all
+</Files>

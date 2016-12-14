@@ -1,0 +1,16 @@
+Begin3
+Title:          Xpertmud 
+Version:        0.1
+Entered-date:   2001-07-03
+Description:    a PERL-Scriptable MUD-Client for KDE
+Keywords:       MUD MUX BattleTech Perl KDE 
+Author:         Ernst Bachmann <e.bachmann@xebec.de>
+Author:		Manuel Klimek <manuel.klimek@web.de>
+Maintained-by:  Ernst Bachmann <e.bachmann@xebec.de> 
+Maintained-by:  Manuel Klimek <manuel.klimek@web.de>
+Primary-site:   	        
+Home-page:      http://xpertmud.sourceforge.net/
+Original-site:  
+Platforms:      Linux and other Unices
+Copying-policy: GNU Public License
+End

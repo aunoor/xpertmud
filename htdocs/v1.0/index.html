@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="stylesheet" type="text/css" href="general.css" />
+<title>Xpertmud - The Mud Experience</title>
+</head>
+
+<body>
+
+<table width="100%">
+<tr><td class="header" colspan="3">Xpertmud - The Mud Experience</td></tr>
+<tr><td style="vertical-align:top;">
+<div class="window">
+<div class="window-title">Project</div>
+<div class="window-content">
+<span class="selected">About/News</span><br />
+<a href="features.html">Features</a><br />
+<a href="screenshots.html">Screenshots</a><br />
+</div>
+</div>
+<div class="window">
+<div class="window-title">Download</div>
+<div class="window-content">
+<a href="download.html">Xpertmud</a><br />
+<a href="download.html#scripts">Scripts</a><br />
+<a href="download.html#plugins">Plugins</a><br />
+</div>
+</div>
+<div class="window">
+<div class="window-title">Help</div>
+<div class="window-content">
+<a href="http://sourceforge.net/forum/?group_id=29649">Forum</a><br />
+<a href="http://sourceforge.net/mail/?group_id=29649">Mailing List</a><br />
+<a href="faq.html">FAQ</a><br />
+<a href="howto.html">HOWTO</a><br />
+</div>
+</div>
+<div class="window">
+<div class="window-title">Development</div>
+<div class="window-content">
+<a href="http://sourceforge.net/projects/xpertmud/">SourceForge</a><br />
+<a href="http://sourceforge.net/cvs/?group_id=29649">CVS Access</a><br />
+</div>
+</div>
+</td>
+
+<td style="vertical-align:top;">
+<div class="window">
+<div class="window-title">About</div>
+<div class="window-content">
+Xpertmud is an extensible perl scriptable MUD client. Basically it's just a scriptable telnet, but most people would use it for mudding. It supports multiple windows (which are perl-scriptable, yeah), and if you know perl you can do triggers, aliases, whatever you want for every bit of text that comes from or goes to the server will be processed by your perl script (or some standard perl script). Xpertmud now also features basic python support.
+</div>
+</div>
+
+<div class="window">
+<div class="window-title">Release-O-Meter</div>
+<div class="window-content">
+<table class="release-o-matic"><tr>
+<th>Percentage</th><th>Last Update</th><th>Feature-O-Matic</th></tr>
+<tr class="ready">
+<td>100%</td><td>2002-08-29</td><td>New Network Core</td></tr>
+<tr class="ready">
+<td>100%</td><td>2002-08-29</td><td>Mouse Event API</td></tr>
+<tr class="ready">
+<td>100%</td><td>2002-08-29</td><td>KDE3 support</td></tr>
+<tr class="ready">
+<td>100%</td><td>2002-08-29</td><td>New Bookmark Handling 
+(including Konqueror Plugin, initial code per connection
+and the good old On-Call script)</td></tr>
+<tr class="ready">
+<td>100%</td><td>2002-08-29</td><td>Win32-O-Mania Core functionality</td></tr>
+<tr class="ready">
+<td>100%</td><td>2002-09-02</td><td>Enabled to load perl/python
+modules like Time or Gtk, which only exist as .so files</td></tr>
+<tr class="ready">
+<td>100%</td><td>2002-10-24</td><td>Nifty plugin engine</td></tr>
+<tr class="ready">
+<td>98%</td><td>2002-12-23</td><td>BTech plugin</td></tr>
+<tr class="ready">
+<td>92%</td><td>2002-12-23</td><td>Win32-O-Mania GUI functionality</td></tr>
+<tr class="sixtysome">
+<td>85%</td><td>2002-12-23</td><td>Enhance QextMdi functionality</td></tr>
+<tr class="sixtysome">
+<td>80%</td><td>2002-12-23</td><td>Multiple Connection Handling</td></tr>
+<tr class="thirtysome">
+<td>42%</td><td>2002-08-29</td><td>DCOP scripting bindings</td></tr>
+<tr class="todo">
+<td>12%</td><td>2002-12-23</td><td>Newbie-Friendly documentation</td></tr>
+</table>
+</div>
+</div>
+
+<div class="window">
+<div class="window-title">News</div>
+<div class="window-content">
+
+<div class="news-item">
+<div class="news-headline">
+2002-12-23 Xpertmud 3 Win32 Announcement!
+</div>
+<div class="news-content">
+In case nobody noticed :-) Xpertmud Win32 has been shipping for some
+time now. Hit the download page and get it (it's at the bottom of
+the sourceforge download page). There's a (very short) installation
+instruction included (what-you-need...), but there are a few more
+very important things to be mentioned:
+<ul>
+<li>You need python or perl. If you don't know both, I recommend python.</li>
+<li>Goto www.python.org. Download the latest python. Install it.</li>
+<li>Goto our download page. Hit Download. Get xpertmud-win32-3.0alpha2.zip.</li>
+<li>Unzip the file! Find xpertmud.exe with your file manager, start it!</li>
+<li>If the client states: library blabla cannot be found, don't panic.
+Probably it's just a wrong default language. Head into 
+Settings-Configure_Xpertmud-Scripting and set the default interpreter to
+the one you installed. Exit Xpertmud, start it again, and all should be
+fine.</li>
+<li>Browse the online docs. #help or %help will help!</li>
+<li>Head into File-Edit_Bookmark, select Start_Interpreter from the
+scripting tab, then choose your interpreter. In the Connections
+tab hit add, enter your mud's connection (23 is the telnet port),
+and hit OK. Then File-Save. Save it. Before anything happens *grin*.
+Now hit Connection-Connect and ... MUD!</li>
+<li><b>If you've got feedback or questions, ask us(!!!)</b></li>
+</ul>
+</div>
+</div>
+
+<div class="news-item">
+<div class="news-headline">
+2002-10-24 Xpertmud 3 Alpha2 Release
+</div>
+<div class="news-content">
+<p>This second alpha release features a enhanced btech plugin
+as well as some bugfixes in the overall behaviour.
+If you're playing the btech mux, update to this release is
+strongly recommended.</p>
+<p><b>Changes:</b></p>
+<p>BTech plugin:</p>
+<ul>
+<li>TextParser (Python-Only) for the 3065 mux</li>
+<li>Weapon-Widget</li>
+<li>Speed-Widget (more usefull than I thought :-)</li>
+<li>Enhanced Contacts Widget</li>
+</ul>
+<p>Core:</p>
+<ul>
+<li>slightly modified input line behaviour :-P</li>
+<li>Pressing Alt doesn't give Focus to MenuBar</li>
+<li>Temporary workaround for scripting bugs:<br />
+   Changing scriptinterpreter on the fly not possible (!)</li>
+</ul>
+</div>
+</div>
+
+<div class="news-item">
+<div class="news-headline">
+2002-09-08 Xpertmud 3 Alpha Release
+</div>
+<div class="news-content">
+<p>Good news, this is the first kde3-enabled release. There's
+no new documentation yet, and it still has some bugs, but
+while playing it's stable enough to go on many, many hours
+without problems (The bugs are mainly when switching scripting
+engines and while shutting down).</p>
+<p>There's the new plugin engine, containing a simple example
+plugin and the new battletech plugin we're currently working on.
+Then there's the new scripting mouse api, which you can learn
+by looking into battletech.pl and searching for "registerMouse".
+And last but not least the key event layout slightly changed
+to be able to stay compatible with the upcoming Win32 versions.
+</p>
+<p>Look on the <a href="download.html">download page</a>
+to get your mud experience. And go on muddin'.</p>
+</div>
+</div>
+
+<div class="news-item">
+<div class="news-headline">
+2002-07-19 New Connection Handling Style
+</div>
+<div class="news-content">
+At the moment we're working towards xpertmud 3beta1, which
+will feature basic dcop scripting facilities and
+an enhanced connection handling interface via standard
+load/save dialogs and connection files. There's also
+a <b>Win32 port</b> in cvs, which is not yet fully functional,
+but very promising (in fact it was rather easy to do).
+</div>
+</div>
+
+<div class="news-item">
+<div class="news-headline">
+2002-03-27 kde3 support in latest cvs
+</div>
+<div class="news-content">
+You can now compile xpertmud for kde2 or kde3. Just ensure that the correct configure options are set. Helpful are --disable-mt for older qt versions, --with-qt-dir to point to the correct version of qt and the $KDEDIR variable which should point to the correct kde prefix (on SuSE /opt/kde2 or /opt/kde3).
+
+Sad as it is, there won't be a 2.0final version of xpertmud, we'll continue with a new series of beta versions (3.0beta1,2,3...)
+</div>
+</div>
+
+</div>
+</div>
+
+</td><td style="vertical-align:top;">
+<div class="window">
+<div class="window-title">Mud Resources</div>
+<div class="window-content">
+<a href="http://www.mudconnector.com/">The Mud Connector</a><br />
+<a href="http://www.kmud.de/">Kmud</a><br />
+<a href="http://www.kmuddy.host.sk/">KMuddy</a><br />
+<a href="http://bt-thud.sourceforge.net/">Thud</a><br />
+<a href="http://btsuite.sourceforge.net/">BTSuite</a><br />
+<a href="http://btech.sourceforge.net/">3030 MUX Code</a><br />
+<a href="http://btech.ecst.csuchico.edu/~mux/">3030 Training</a><br />
+<a href="http://btech.betterbox.net/">3065 MUX</a><br />
+</div>
+</div>
+<div class="sflogo">
+<a href="http://sourceforge.net">
+<img src="http://sourceforge.net/sflogo.php?group_id=29649&amp;type=5" width="140" height="55" style="border:0;" alt="SourceForge Logo" />
+</a>
+</div>
+</td></tr>
+</table>
+
+</body>
+
+</html>

@@ -1,0 +1,6 @@
+LIBRARY      "xmud_battletech"
+DESCRIPTION  'xmud_battletech Windows Dynamic Link Library'
+
+EXPORTS
+	init_xmud_battletech
+    ; Explicit exports can go here

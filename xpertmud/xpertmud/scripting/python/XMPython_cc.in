@@ -1,0 +1,360 @@
+// -*- c++ -*-
+/**
+ * Code fragments stolen from the mcl project. I didn't
+ * find out who wrote the stuff, cause they don't write
+ * any names into their filez. (like we do in some of ours :)
+ */
+
+#include "XMPython.h"
+
+#define NO_MULTILINE_STRING 1
+#ifndef NO_MULTILINE_STRING
+#include "sysinit_py.h"
+#else
+#include "sysinit_pyf.h"
+#endif
+
+#include "../GuiScriptingBindings.h"
+
+#include <kglobal.h>
+#include <kstandarddirs.h>
+#include <qtextcodec.h>
+
+
+// TODO: remove
+#include <iostream>
+using std::cout;
+using std::endl;
+
+static GuiScriptingBindings *currentCallBack;
+
+extern "C" {
+
+___IMPLEMENTATIONS___
+
+  static PyMethodDef XM_Methods[] = {
+___DEFINITIONS___
+    {NULL, NULL, 0, NULL}
+  };
+  
+  
+}
+
+
+
+XMPython::XMPython(QObject* parent,
+		   const char* name):
+  XMScripting(parent,name),callBack(NULL) {
+  qDebug("XPPython::XMPython");
+}
+
+XMPython::~XMPython() {
+  qDebug("XPPython::XMPython");
+  currentCallBack = callBack;
+  //  cleanup python resources
+  if(Py_IsInitialized()) {
+    cout << "Finalizing Python" << endl;
+    Py_Finalize();
+    cout << "Finished." << endl;
+  }
+}
+
+void XMPython::setCallback(GuiScriptingBindings *cB) {
+  qDebug("Setting callback");
+
+  callBack=cB;
+
+  currentCallBack = callBack;
+
+ 
+
+  // now create all those python resources needed...
+  PyObject *module;
+
+  Py_Initialize();
+
+
+  Py_InitModule(const_cast<char*>("XM"), XM_Methods);
+
+  module = PyImport_AddModule(const_cast<char*>("__main__"));
+  globals = PyModule_GetDict(module);
+  Py_INCREF(globals);
+
+  PyObject *obj;
+#ifndef SCRIPTDEVEL
+# ifndef NO_MULTILINE_STRING
+  cout << "evaluating sysinit (multi-line string):" <<endl;
+  if((obj = PyRun_String(const_cast<char *>(SYSINIT), 
+			 Py_file_input, globals, globals))) {
+# else
+  cout << "evaluating sysinit (no multi-line string):" <<endl;
+  int i=0;
+  int sum=0;
+  while(script[i] != NULL) {
+    sum += strlen(script[i]);
+    ++i;
+  }
+  char *commandString = new char[sum+1];
+  i=0;
+  int c=0;
+  while(script[i] != NULL) {
+    int y=0;
+    while(script[i][y] != 0) {
+      commandString[c] = script[i][y];
+      ++y; ++c;
+    }
+    ++i;
+  }
+  commandString[c] = 0;
+  if((obj = PyRun_String(commandString,
+			 Py_file_input, globals, globals))) {
+# endif
+#else
+  cout << "evaluating sysinit (FLEXIBLE):" << endl;
+  if((obj = PyRun_String("import sys\nsys.path.append(\".\")\nfrom sysinit import *",
+			 Py_file_input, globals, globals))) {
+#endif
+    Py_DECREF(obj);
+  } else {
+    PyErr_Print();
+  }
+
+#ifndef SCRIPTDEVEL
+#ifdef NO_MULTILINE_STRING
+  delete[] commandString;
+#endif
+#endif
+
+  // now search for include paths
+  QStringList incPath=KGlobal::dirs()->findDirs("appdata","python");
+  
+  for (QStringList::Iterator it=incPath.begin();
+       it!=incPath.end(); ++it) {
+    
+    PyObject *obj;
+    if((obj = PyRun_String(const_cast<char *>(("sys.path.append(\""+*it+"\")").latin1()),
+			   Py_file_input, globals, globals))) {
+      Py_DECREF(obj);
+    } else {
+      PyErr_Print();
+    }
+  
+  }
+  
+
+}
+
+void XMPython::textEntered(const QString & text) {
+  currentCallBack = callBack;
+
+  PyObject *fn = PyDict_GetItemString
+    (globals, const_cast<char *>("wrap_onTextEntered"));
+  PyObject *arglist;
+  PyObject *result;
+
+  Py_UNICODE* pytext = convert(text);
+  arglist = Py_BuildValue(const_cast<char *>("(u#)"),
+			  pytext, text.length());
+  delete[] pytext;
+
+  result = PyEval_CallObject(fn, arglist);
+  Py_DECREF(arglist);
+  if(result != NULL)
+    Py_DECREF(result);
+}
+
+bool XMPython::keyPressed(const QString & key, const QString & ascii) {
+  currentCallBack = callBack;
+
+  PyObject *fn = PyDict_GetItemString
+    (globals, const_cast<char *>("wrap_onKeyPressed"));
+  PyObject *arglist;
+  PyObject *result;
+  
+  Py_UNICODE* pykey = convert(key);
+  Py_UNICODE* pyascii = convert(ascii);
+  arglist = Py_BuildValue(const_cast<char *>("(u#u#)"), 
+			  pykey, key.length(), 
+			  pyascii, ascii.length());
+  delete[] pykey;
+  delete[] pyascii;
+
+  result = PyEval_CallObject(fn, arglist);
+  Py_DECREF(arglist);
+
+  int ret = 0;
+  if(result != NULL) {
+    ret = (int)PyInt_AsLong(result);
+    Py_DECREF(result);
+  }
+
+  return ret;
+}
+
+void XMPython::textReceived(const QString & line, int id) {
+  currentCallBack = callBack;
+
+  PyObject *fn = PyDict_GetItemString
+    (globals, const_cast<char *>("wrap_onTextReceived"));
+  PyObject *arglist;
+  PyObject *result;
+  
+  Py_UNICODE* pyline = convert(line);
+  arglist = Py_BuildValue(const_cast<char *>("(u#i)"), 
+			  pyline, line.length(), id);
+  delete[] pyline;
+
+  result = PyEval_CallObject(fn, arglist);
+  Py_DECREF(arglist);
+  if(result != NULL)
+    Py_DECREF(result);
+}
+
+void XMPython::timer() {
+  currentCallBack = callBack;
+
+  PyObject *fn = PyDict_GetItemString
+    (globals, const_cast<char *>("wrap_onTimer"));
+
+  if(fn == NULL) {
+    cout << "didn't find timer" << endl;
+    return;
+  }
+
+  PyObject *result;
+  result = PyEval_CallObject(fn, NULL);
+  if(result != NULL)
+    Py_DECREF(result);
+}
+
+void XMPython::echo(bool state, int id) {
+  currentCallBack = callBack;
+
+  PyObject *fn = PyDict_GetItemString
+    (globals, const_cast<char *>("wrap_onEcho"));
+  PyObject *arglist;
+  PyObject *result;
+  
+  arglist = Py_BuildValue(const_cast<char *>("(ii)"), state, id);
+  result = PyEval_CallObject(fn, arglist);
+  Py_DECREF(arglist);
+  if(result != NULL)
+    Py_DECREF(result);
+}
+
+void XMPython::connectionEstablished(int id) {
+  currentCallBack = callBack;
+
+  PyObject *fn = PyDict_GetItemString
+    (globals, const_cast<char *>("wrap_onConnectionEstablished"));
+  PyObject *arglist;
+  PyObject *result;
+  
+  arglist = Py_BuildValue(const_cast<char *>("(i)"), id);
+  result = PyEval_CallObject(fn, arglist);
+  Py_DECREF(arglist);
+  if(result != NULL)
+    Py_DECREF(result);
+}
+
+void XMPython::connectionDropped(int id) {
+  currentCallBack = callBack;
+
+  PyObject *fn = PyDict_GetItemString
+    (globals, const_cast<char *>("wrap_onConnectionDropped"));
+  PyObject *arglist;
+  PyObject *result;
+  
+  arglist = Py_BuildValue(const_cast<char *>("(i)"), id);
+  result = PyEval_CallObject(fn, arglist);
+  Py_DECREF(arglist);
+  if(result != NULL)
+    Py_DECREF(result);
+}
+
+
+void XMPython::mouseDown(int id, int x, int y) {
+  currentCallBack = callBack;
+  
+  PyObject *fn = PyDict_GetItemString
+    (globals, const_cast<char *>("wrap_mouseDown"));
+  PyObject *arglist;
+  PyObject *result;
+  
+  arglist = Py_BuildValue(const_cast<char *>("(iii)"), id, x, y);
+  result = PyEval_CallObject(fn, arglist);
+  Py_DECREF(arglist);
+  
+  if(result != NULL)
+    Py_DECREF(result);
+}
+
+void XMPython::mouseDrag(int id, int x, int y) {
+  currentCallBack = callBack;
+  
+  PyObject *fn = PyDict_GetItemString
+    (globals, const_cast<char *>("wrap_mouseDrag"));
+  PyObject *arglist;
+  PyObject *result;
+  
+  arglist = Py_BuildValue(const_cast<char *>("(iii)"), id, x, y);
+  result = PyEval_CallObject(fn, arglist);
+  Py_DECREF(arglist);
+  
+  if(result != NULL)
+    Py_DECREF(result);
+}
+
+void XMPython::mouseUp(int id, int x, int y) {
+  currentCallBack = callBack;
+  
+  PyObject *fn = PyDict_GetItemString
+    (globals, const_cast<char *>("wrap_mouseUp"));
+  PyObject *arglist;
+  PyObject *result;
+  
+  arglist = Py_BuildValue(const_cast<char *>("(iii)"), id, x, y);
+  result = PyEval_CallObject(fn, arglist);
+  Py_DECREF(arglist);
+  
+  if(result != NULL)
+    Py_DECREF(result);
+}
+
+QVariant XMPython::pluginCall(int id, int function, const QVariant & args) {
+  currentCallBack = callBack;
+
+  PyObject *fn = PyDict_GetItemString
+    (globals, const_cast<char *>("wrap_pluginCall"));
+  PyObject *arglist;
+  PyObject *result;
+  
+  QString qargs = args.toString();
+  Py_UNICODE* pyargs = convert(qargs);
+  arglist = Py_BuildValue(const_cast<char *>("(iiu#)"), 
+			  id, function, pyargs, qargs.length());
+  delete[] pyargs;
+
+  result = PyEval_CallObject(fn, arglist);
+  Py_DECREF(arglist);
+
+  char *retString;
+  QString ret = "";
+  if(result != NULL) {
+    retString = PyString_AsString(result);
+    if(retString != NULL)
+      ret = retString;
+    Py_DECREF(result);
+  }
+
+  return ret;
+}
+
+ 
+Py_UNICODE* XMPython::convert(const QString& text) {
+  Py_UNICODE* buffer = new Py_UNICODE[text.length()];
+  for(unsigned int i=0; i<text.length(); ++i) {
+    buffer[i] = text.at(i).unicode();
+  }
+  return buffer;
+}

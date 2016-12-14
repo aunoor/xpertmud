@@ -1,0 +1,56 @@
+<!--#include file="includes/common_header" -->
+
+<!--#include file="includes/box_start" -->
+<IMG ALIGN="center" SRC="images/w_news.gif">
+<FONT SIZE="+1" COLOR="#000000"><b>2002-02-09:</b> xpertmud 2.0beta3 is available</FONT>
+<!--#include file="includes/box_seperator" -->
+	<P>xpertmud 2.0beta3 fixes a few minor and one major bug:
+	Unknown ANSI codes don't lead to a complete client lockup anymore!
+	If you had that problem (GUI doesn't response, console is filled with 
+	hex codes describing the ANSI code), update now!
+
+	<P>The mouse API is in place and works, but will probably changed in one 
+	of the next releases, as it causes some problems with the Perl garbage 
+	collector (circular references ...)
+
+	<P>This release contains a new feedback dialog (Help/Send Feedback) which 
+	you can use to tell us what you think about xpertmud.
+	If you don't see that menu entry, check if you have an old "xpertmudui.rc" 
+	file in your ~/.kde dir and delete it.
+	Please take a few seconds to fill out the survey!
+	Your answer is sent through kmail, you can preview the mails contents before 
+	sending, so we won't steal your credit card info :)  
+<!--#include file="includes/box_end" -->
+
+<!--#include file="includes/box_start" -->
+<IMG ALIGN="center" SRC="images/w_news.gif">
+<FONT SIZE="+1" COLOR="#000000"><b>2002-01-31:</b> work in progress</FONT>
+<!--#include file="includes/box_seperator" -->
+	<P>We are currently working on lots of new features for xpertmud:</p>
+	<p><b>Multiline Inputbar</b>
+	<br>Possibility to input several lines at once
+	<br>Status: done</p>
+
+	<P><B>Mouse API</B>:
+	<BR>Mouse events will be passed to the scripting engine, so you can code exciting stuff like a drag-n-drop inventory list with perl/python.
+	<BR>Status: implemented, API not comletely finished
+	</p>
+	      
+	<P><B>Plugins</B>:
+	<BR>Possibility to load custom widgets as plugin and control them from your script.
+	A plugin would consist of a .so file containing one or more widgets and a set of perl/python modules to provide an interface for them.
+	This would allow new features like an AutoMapper, graphical MUXmail frontend, etc to be added without bloating the core with features not everybody needs.
+	<BR>Status: nearly finished
+	</p>
+
+	<P><B>Protocols</B>:
+	<BR>Support for additional MUD protocols like MCP, MCCP, Mud Chat Protocol or even SSL/TLS is planned.
+        </p>
+
+	<P><B>Website</B>:
+	<BR>It's about time for us to upgrade this page... Any volunteers?
+	<BR>Status: basic design done, rewrite of some parts needed
+        </p>
+<!--#include file="includes/box_end" -->
+
+<!--#include file="includes/common_footer" -->

@@ -1,0 +1,12 @@
+xpertmud
+Makefile.in
+Makefile
+.deps
+.libs
+*_meta_unload.cc
+*moc.cc
+moc_*.cpp
+*_skel.cc
+*.kidl
+*_skel.cc
+*.kidl

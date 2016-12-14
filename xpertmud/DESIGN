@@ -1,0 +1,73 @@
+We desperately need to go for a new design for
+the TextBufferWidget and TextWidget stuff.
+
+The proposal is, too split it up into reusable
+parts like this:
+
+TextBuffer:
+***********
+  A terminal emulation buffer. It's got the
+  following features
+
+  - you can draw to it via
+    print(text) 	for printing ANSI Command text and
+    printRaw(text) 	for printing raw text
+
+  - you've got many control functions, including
+    all the ansi stuff. 
+    ATTENTION: Not all (ANSI) control functions only
+      affect the text buffer. Some have to be interpreted
+      by whatever shows the text buffer. This will be
+      solved by signals. The graphical widgets which
+      show the text buffer can connect to those signals
+      and interpret them if they want. This gives for
+      example nice split-screen scrollback capability 
+      where you can still watch whats coming in _with_
+      _all_ _ansi-stuff_ enabled in the lower (new stuff)
+      window
+
+  - configurable:
+    * line wrap / no line wrap
+    * if(line wrap) word wrap / no word wrap
+    * interpret EOL / print character for EOL
+    * scroll internal, or scroll as signal to viewers \ perhaps one
+    * resize automagically on/off                     / switch? let's see
+    * -- entropy? what is different between the
+         two widgets? --
+    or do we want those as
+    one base class and two child classes which
+    overwrite some virtual functions?
+
+  - signals for example:
+    scrollLines(n)     \ see: configurable
+    scrollColumns(n)   /
+    updateRegion(x, y, width, height)
+    updateRegions(?)
+
+TextBufferView:
+***************
+  A view for a text buffer. There can be multiple views
+  per buffer... The two widgets which you can create
+  from the scripting side (TextWindow and TextBufferWindow)
+  can now be simulated by a TextBuffer/TextBufferView
+  combination. 
+
+  Has _no_ scrollbar, but can be scrolled via
+  slots (scrolling via ANSI commands and from the user
+  must be handled indepenently; imagine scrolling via
+  Page-Up/Down keys while an scroll-down event occurs.
+  ANSI Scrolls should only be enabled while at the very
+  end of the buffer... if enabled at all)
+
+  - configurable:
+    * ignore signals from buffer on/off
+    * enable/disable scrolling per ANSI slots
+    * enable/disable scrolling from Outside(TM) slots
+
+TextBufferMultiView:
+********************
+  Has at least one TextBufferView, can be split-scrollback
+  enabled. (Split-Scrollback per two TextBufferViews)
+  Has the scrollbar and scrolls the TextBufferViews
+
+  

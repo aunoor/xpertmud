@@ -1,0 +1,24 @@
+TEMPLATE	= lib
+CONFIG		= qt warn_on debug dll thread
+HEADERS		= battletech.h BattleCore.h BattleCoreWidget.h \
+		  EasyStyle.h Factory.h HUDParser.h Positions.h \
+		  BattleMapWidget.h MechInfo.h BattleWeapons.h \
+                  BattleSpeed.h TextParser.h BattleHeat.h \
+                  BattleContacts.h WeaponInfo.h \
+		  ../../../compat/klibloader.h \
+		  ../../../compat/kgenericfactory.h
+SOURCES		= battletech.cc BattleCore.cc BattleCoreWidget.cc \
+		  Factory.cc HUDParser.cc TextParser.cc \
+		  BattleMapWidget.cc BattleSpeed.cc BattleHeat.cc\
+		  Positions.cc BattleWeapons.cc  MechInfo.cc \
+                  BattleContacts.cc WeaponInfo.cc \
+		  ../../../compat/kglobal.cc
+DEFINES += QT_DLL
+DEF_FILE        = xmud_battletech.def
+DEPENDPATH	= ../../../compat ../../ ../../scripting ../../../qextmdi/include ../../../qextmdi/src
+win32:TMAKE_CXXFLAGS	= /FD /GZ /TP -GX /DEBUG /LD /GR /D"WIN32"
+INCLUDEPATH	= @STLPORT_INCLUDE@ ../../../compat
+
+#TMAKE_LFLAGS    = /NODEFAULTLIB:LIBC
+#INCLUDEPATH	= C:\STLport-4.5.3\stlport ../../../compat
+#TMAKE_LFLAGS	= /NODEFAULTLIB:LIBC /LIBPATH:C:\STLport-4.5.3\lib

@@ -1,0 +1,98 @@
+body {
+	background-color:#002244;
+}
+
+a.button {
+	text-decoration:none;
+	color:#330077;
+}
+
+a.button:hover {
+	text-decoration:none;
+	color:#6600ff;
+}
+
+.window {
+	border:solid 1px #afafaf;
+	margin-top:5px;
+	margin-bottom:5px;
+}
+
+.window-title {
+	border-bottom:solid 1px #afafaf;
+	background-color:#afafff;
+	padding:2px;
+	font-weight:bold;
+}
+
+.window-content {
+	background-color:#efefff;
+	padding-left:10px;
+	padding-right:10px;
+	padding-top:5px;
+	padding-bottom:5px;
+}
+
+.selected {
+	font-weight:bold;
+	color:#330077;
+}
+
+.header {
+	font-weight:600;
+	font-size:24px;
+	text-align:center;
+	color:#6789ab;
+}
+
+.news-headline {
+	font-size:18px;
+	font-weight:bold;
+}
+
+.news-item {
+	padding-bottom:10px;
+}
+
+.news-content {
+	padding-left:10px;
+}
+
+.sflogo {
+	border:solid 1px #afafaf;
+}
+
+.realease-o-matic {
+	spacing:5px;
+	border:none;
+}
+
+.thirtysome {
+	background-color:#ffbb88;
+}
+
+.sixtysome {
+	background-color:#ffff99;
+}
+
+.ninetysome {
+	background-color:#bbff88;
+}
+
+.ready {
+	background-color:#88ff88;
+}
+
+.todo {
+	background-color:#ff8888;
+}
+
+
+
+
+
+
+
+
+
+

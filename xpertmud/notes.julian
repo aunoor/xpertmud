@@ -1,0 +1,76 @@
+Building instructions
+
+First thing you do after loading from CVS
+
+Normal Linux Build:
+
+make -f Makefile.dist
+
+./configure --prefix=/usr/kde/3.4/ --disable-ruby
+
+Make on Linux in the Windows fashion:
+
+From Ernst
+
+> >> qmake xpertmud.pro
+> >> make
+> >> make INSTALL_ROOT=/tmp/xmud_test/ install
+> >>     
+>
+>   
+> >> cd xpertmud/scripting/perl
+> >> make -f Makefile.am srcdir=. PERL=perl generated
+> >>     
+> ( if this step fails/shows error messages, 
+>   
+> >> chmod +x pl2h.pl createCallbacks.pl
+> >> rm Auto* sysinit_plf.h
+> >>     
+> and retry )
+>
+>   
+> >> PERL=perl qmake libxmperlinterpreter.pro
+> >> make INSTALL_ROOT=/tmp/xmud_test/ install
+> >>     
+
+I also had to copy the perl directory information such as frontiers.pl to the
+perl directory in the /tmp/xmud_test directory.
+
+Then I learned:
+
+cd xpertmud/plugins/battletech
+qmake xmud_battletech.pro
+make
+make INSTALL_ROOT=/tmp/xmud_test/ install
+
+Now I have some perl specific errors.
+
+Perl ERRORS:
+
+
+
+Can't load '/usr/lib/perl5/5.8.7/i686-linux/auto/IO/IO.so' for module IO:
+/usr/lib/perl5/5.8.7/i686-linux/auto/IO/IO.so: undefined symbol: PL_sv_undef
+at
+/usr/lib/perl5/5.8.7/i686-linux/XSLoader.pm line 68.
+ at /usr/lib/perl5/5.8.7/i686-linux/IO.pm line 11
+ Compilation failed in require at /usr/lib/perl5/5.8.7/i686-linux/IO/Handle.pm
+ line 260.
+ BEGIN failed--compilation aborted at
+ /usr/lib/perl5/5.8.7/i686-linux/IO/Handle.pm
+ line 260.
+ Compilation failed in require at
+ /usr/lib/perl5/5.8.7/i686-linux/IO/Seekable.pm
+ line 101.
+ BEGIN failed--compilation aborted at
+ /usr/lib/perl5/5.8.7/i686-linux/IO/Seekable.pm line 101.
+ Compilation failed in require at /usr/lib/perl5/5.8.7/i686-linux/IO/File.pm
+ line
+ 133.
+ BEGIN failed--compilation aborted at
+ /usr/lib/perl5/5.8.7/i686-linux/IO/File.pm
+ line 133.
+ Compilation failed in require at appdata/perl/battlerecorder.pl line 5.
+ BEGIN failed--compilation aborted at appdata/perl/battlerecorder.pl line 5.
+
+ Bad file descriptor while parsing 'battlerecorder.pl'

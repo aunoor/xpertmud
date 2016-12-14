@@ -1,0 +1,41 @@
+#!/bin/bash
+#Just a little log on how I did the MacOS X binary build:
+
+#Check qt setup (QTDIR, PATH, ...)
+
+#unpack source
+
+#run this script (with bash)
+
+export PERL=/usr/bin/perl 
+export srcdir=.
+export PYTHON=/usr/bin/python
+export INSTALL_ROOT=`pwd`/macos-bin/
+
+
+cd xpertmud/scripting/perl/
+make -f Makefile.am generated
+qmake
+make install
+cd ../../../
+
+#cd xpertmud/scripting/python/
+#make -f Makefile.am generated
+#qmake
+#make install
+#cd ../../../
+
+cd xpertmud/plugins/example
+qmake
+make install
+cd ../../../
+
+cd xpertmud/plugins/battletech
+qmake
+make install
+cd ../../../
+
+qmake
+make install
+
+cd $INSTALL_ROOT

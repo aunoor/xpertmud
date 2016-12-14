@@ -1,0 +1,434 @@
+// -*- c++ -*-
+#include "PerlInterpret.h"
+
+#include <cstdio>
+// using snprintf;
+
+// perl headers
+extern "C" {
+#  include <EXTERN.h>
+#  include <perl.h>
+#  include <XSUB.h>
+}
+
+#include "AutoGuiScriptingWrapper.h"
+
+#define NO_MULTILINE_STRING 1
+#ifndef NO_MULTILINE_STRING
+#include "sysinit_pl.h"
+#else
+#include "sysinit_plf.h"
+#endif
+
+#ifdef WIN32
+#undef bool
+#define snprintf _snprintf
+#endif
+
+// Stupid perl version incompatibilities...
+#ifdef dXSTARG
+#define FIXWARN
+#else
+#define dXSTARG
+#endif
+
+// TODO: add configure test! 5.6.1 compatibility mode as default
+#undef FIXWARN
+
+// Get rid of those stupid warnings
+#ifdef FIXWARN
+#define FIXPERLWARN  if(false) { cv+=0; Perl___notused+=0; }
+#define FIXPERLWARN2  if (false) { targ+=0; }
+#else
+#define FIXPERLWARN
+#define FIXPERLWARN2
+#endif
+
+// set from PerlInterpret while interpreting perl code
+static GuiScriptingWrapper *currentCallBack;
+
+#define LOAD_ID \
+    int id = -1; \
+    if (SvROK(ST(0)) && SvTYPE(SvRV(ST(0)))==SVt_PVHV) { \
+      HV* hash=(HV*)SvRV(ST(0)); \
+      SV** sid=hv_fetch(hash,"_ID",3,0); \
+      if (sid && SvIOK(*sid)) \
+	id=SvIV(*sid); \
+      else \
+	croak("Invalid Parameter: Hash did not contain a int '_ID' key"); \
+    } else \
+      croak("Invalid Parameter: Object needs to be blessed Hashref");
+
+
+
+
+extern "C" {
+  void boot_DynaLoader (pTHX_ CV* cv);
+
+___IMPLEMENTATIONS___
+
+  // Needs Perl >= 5.6.0 (or patched 5.0)
+  // not automagically generated callback
+
+  XS(XM_weaken) {
+    dXSARGS;
+    FIXPERLWARN;
+    if (items != 1)
+      croak("Usage: XM::weaken(ref)");
+
+    if (SvROK(ST(0)))
+      sv_rvweaken(ST(0));
+    else
+      croak("Usage: XM::weaken(REF)");
+
+    dXSTARG;
+    FIXPERLWARN2;
+    XSRETURN_YES;
+  }
+
+  void xs_init(pTHX) {
+    newXS((char *)"DynaLoader::boot_DynaLoader", boot_DynaLoader, (char *)__FILE__); 
+
+___XSSES___
+
+    // ... this is a std function in python 
+    newXS((char *)"XM::weaken",
+	  XM_weaken , (char *)__FILE__); 
+  }
+}
+
+/////////////////////////////////////////////////////////////////////
+// Implementation class PerlInterpret
+
+
+PerlInterpret::PerlInterpret(GuiScriptingWrapper *callBack):
+  callBack(callBack)
+{
+  currentCallBack = callBack;
+
+  perlInt = perl_alloc();
+  
+  if (!perlInt)
+    exit(42);
+
+  PL_perl_destruct_level = 1;
+
+  perl_construct(perlInt);
+  const char *args[]={"xperlmud",
+		      "-w",
+		      "-e", ""
+  };
+  int ret = perl_parse(perlInt,xs_init,4,(char **)args,0);
+  if(!ret)
+    perl_run(perlInt);
+  else 
+    exit(23);
+
+#ifndef SCRIPTDEVEL
+# ifndef NO_MULTILINE_STRING
+  printf("evaluating sysinit (multi-line string):\n");
+  eval_pv(SYSINIT, true);
+# else
+  printf("evaluating sysinit (no multi-line string):\n");
+  int i=0;
+  int sum=0;
+  while(script[i] != NULL) {
+    sum += strlen(script[i]);
+    ++i;
+  }
+  char *commandString = new char[sum+1];
+  i=0;
+  int c=0;
+  while(script[i] != NULL) {
+    int y=0;
+    while(script[i][y] != 0) {
+      commandString[c] = script[i][y];
+      ++y; ++c;
+    }
+    ++i;
+  }
+  commandString[c] = 0;
+  eval_pv(commandString, false);
+
+  delete[] commandString;
+# endif
+#else
+  printf("evaluating sysinit (FLEXIBLE):\n");
+  eval_pv("do 'sysinit.pl';", true);
+#endif
+  //  STRLEN n_a;
+  //  printf("finished.\"%s\" %d\n", SvPV(get_sv("@", FALSE), n_a), n_a);
+}
+
+PerlInterpret::~PerlInterpret() {
+  currentCallBack = callBack;
+
+  perl_destruct(perlInt);
+  perl_free(perlInt);
+}
+
+void PerlInterpret::setCallback(GuiScriptingWrapper *cB) {
+  currentCallBack = callBack = cB;
+}
+  
+  
+void PerlInterpret::textEntered(const char * const text, int length) {
+    currentCallBack = callBack;
+
+
+  dSP;
+  
+  ENTER;
+  SAVETMPS;
+  PUSHMARK(SP);
+  SV * sv=newSVpv(text, length);
+  SvUTF8_on(sv);
+  XPUSHs(sv_2mortal(sv));
+  PUTBACK;
+
+  call_pv("::wrap_onTextEntered",G_DISCARD);
+
+  SPAGAIN;
+
+  PUTBACK;
+  FREETMPS;
+  LEAVE;
+
+}
+
+// TODO
+void PerlInterpret::addIncludeDir(const char * const inc) {
+  currentCallBack = callBack;
+  const char *args[]={inc,0};
+
+  ENTER;
+  SAVETMPS;
+  perl_call_argv("::addIncludeDir",G_DISCARD,(char **)args);
+  FREETMPS;
+  LEAVE;
+}
+
+void PerlInterpret::textReceived(const char * const text, int length, int id) {
+  currentCallBack = callBack;
+
+  dSP;
+
+  ENTER;
+  SAVETMPS;
+  PUSHMARK(SP);
+  SV * sv=newSVpv(text, length);
+  SvUTF8_on(sv);
+  XPUSHs(sv_2mortal(sv));
+  XPUSHs(sv_2mortal(newSViv(id)));
+  PUTBACK;
+
+  call_pv("::wrap_onTextReceived",G_DISCARD);
+
+  SPAGAIN;
+
+  PUTBACK;
+  FREETMPS;
+  LEAVE;
+
+}
+
+void PerlInterpret::timer() {
+  currentCallBack = callBack;
+
+  dSP;
+
+  ENTER;
+  SAVETMPS;
+  PUSHMARK(SP);
+
+  PUTBACK;
+
+  call_pv("::wrap_onTimer",G_DISCARD);
+
+  SPAGAIN;
+
+  PUTBACK;
+  FREETMPS;
+  LEAVE;
+}
+
+// TODO
+void PerlInterpret::connectionEstablished(int id) {
+  currentCallBack = callBack;
+  char ids[25];
+  snprintf(ids,sizeof(ids),"%d",id);
+  char *args[]={ids,0};
+
+  ENTER;
+  SAVETMPS;
+  perl_call_argv("::wrap_onConnectionEstablished",G_DISCARD,args);
+  FREETMPS;
+  LEAVE;
+}
+
+// TODO
+void PerlInterpret::connectionDropped(int id) {
+  currentCallBack = callBack;
+  char ids[25];
+  snprintf(ids,sizeof(ids),"%d",id);
+  char *args[]={ids,0};
+
+  ENTER;
+  SAVETMPS;
+  perl_call_argv("::wrap_onConnectionDropped",G_DISCARD,args);
+  FREETMPS;
+  LEAVE;
+}
+
+// TODO
+void PerlInterpret::echo(bool state, int id) {
+  currentCallBack = callBack;
+  char ids[25];
+  snprintf(ids,sizeof(ids),"%d",id);
+  const char *args[]={state?"1":"0",const_cast<const char *>(ids),0};
+  
+  ENTER;
+  SAVETMPS;
+  perl_call_argv("wrap_onEcho",G_DISCARD,(char **)args);
+  FREETMPS;
+  LEAVE;
+}
+
+// TODO
+bool PerlInterpret::keyPressed(const char * const key, 
+			       const char * const ascii) {
+  bool ret;
+  dSP;
+#ifdef FIXWARN
+  if (false) { Perl___notused+=0; }
+#endif
+  currentCallBack = callBack;
+  const char *args[]={key,ascii,0};
+
+  ENTER;
+  SAVETMPS;
+
+  //  PUSHMARK(SP) ;
+  //  PUTBACK;
+
+  int count = perl_call_argv("::wrap_onKeyPressed",G_SCALAR,(char **)args);
+  if(count != 1)
+     croak("Big trouble\n") ;
+  
+  SPAGAIN;
+  // dont know if this breaks anything, but the next
+  // line doesnt work with gcc 3.3 any more (braced groups)
+  //   ret = (POPi != 0);
+  SV* pop = POPs;
+  int popi = SvIV(pop);
+  ret = (popi != 0);
+
+  PUTBACK;
+  FREETMPS;
+  LEAVE;
+
+  return ret;
+}
+
+// TODO
+void PerlInterpret::mouseDown(int id,int x,int y) {
+  currentCallBack = callBack;
+
+  char ids[25];
+  char xs[25];
+  char ys[25];
+  snprintf(ids,sizeof(ids),"%d",id);
+  snprintf(xs,sizeof(xs),"%d",x);
+  snprintf(ys,sizeof(ys),"%d",y);
+
+  const char *args[]={ids,xs,ys,0};
+    
+  ENTER;
+  SAVETMPS;
+  perl_call_argv("::wrap_mouseDown",G_DISCARD,(char **)args);
+  FREETMPS;
+  LEAVE;
+}
+
+// TODO
+void PerlInterpret::mouseDrag(int id,int x,int y) {
+  currentCallBack = callBack;
+
+  char ids[25];
+  char xs[25];
+  char ys[25];
+  snprintf(ids,sizeof(ids),"%d",id);
+  snprintf(xs,sizeof(xs),"%d",x);
+  snprintf(ys,sizeof(ys),"%d",y);
+
+  const char *args[]={ids,xs,ys,0};
+    
+  ENTER;
+  SAVETMPS;
+  perl_call_argv("::wrap_mouseDrag",G_DISCARD,(char **)args);
+  FREETMPS;
+  LEAVE;
+}
+
+// TODO
+void PerlInterpret::mouseUp(int id,int x,int y) {
+  currentCallBack = callBack;
+
+  char ids[25];
+  char xs[25];
+  char ys[25];
+  snprintf(ids,sizeof(ids),"%d",id);
+  snprintf(xs,sizeof(xs),"%d",x);
+  snprintf(ys,sizeof(ys),"%d",y);
+
+  const char *args[]={ids,xs,ys,0};
+    
+  ENTER;
+  SAVETMPS;
+  perl_call_argv("::wrap_mouseUp",G_DISCARD,(char **)args);
+  FREETMPS;
+  LEAVE;
+}
+
+const char * PerlInterpret::pluginCall(int id,int function, const char * const args, int length) {
+  currentCallBack = callBack;
+  dSP;
+
+  ENTER;
+  SAVETMPS;
+  PUSHMARK(SP);
+  XPUSHs(sv_2mortal(newSViv(id)));
+  XPUSHs(sv_2mortal(newSViv(function)));
+  if (args) {
+      SV * sv=newSVpv(args,length);
+      SvUTF8_on(sv);
+      XPUSHs(sv_2mortal(sv));
+  } else {
+      XPUSHs(&PL_sv_undef);
+  }
+  PUTBACK;
+
+  int count = call_pv("::wrap_pluginCall",G_SCALAR);
+
+  SPAGAIN;
+
+  if (count != 1)
+    croak("Big trouble\n") ;
+
+  char * retval=NULL;
+  SV * rval=POPs;
+  if (SvPOK(rval)) {
+      STRLEN len;
+      char *retval_temp = SvPV(rval,len);
+
+      char * retval=new char[len+1];
+      strncpy(retval,retval_temp,len);
+      retval[len]=0;
+  }
+  PUTBACK;
+  FREETMPS;
+  LEAVE;
+  return retval;
+}
+
+

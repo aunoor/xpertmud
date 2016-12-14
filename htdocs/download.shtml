@@ -1,0 +1,19 @@
+<!--#include file="includes/common_header" -->
+
+<!--#include file="includes/box_start" -->
+<IMG SRC="images/w_download.gif">
+<!--#include file="includes/box_seperator" -->
+	<B>Download xpertmud:</B>
+	<P>You can download the latest version of the source code and RPMS for RedHat and SuSE
+      <A HREF="http://sourceforge.net/project/showfiles.php?group_id=29649" TARGET="_blank">here</A>.
+	<P><B>Scripts:</B>
+    	<P>If the documentations won't help you along, maybe these files do:<br>
+	<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/xpertmud/xpertmud/xpertmud/scripting/perl/sysinit.pl?rev=1.10">sysinit.pl</a> (Parsed on startup of the perl plugin)<br>
+    	<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/xpertmud/xpertmud/xpertmud/scripting/python/sysinit.py?rev=1.10">sysinit.py</a> (Parsed on startup of the python plugin)<br>
+	<br>
+    	Example Script: (also included in the dist)<br>
+    	<a href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/xpertmud/xpertmud/xpertmud/scripting/perl/bt3030.pl?rev=1.4">bt3030.pl</a> (Example script for battletech muds, this caused the screenshots ;-)<br>
+    	<br>
+<!--#include file="includes/box_end" -->
+
+<!--#include file="includes/common_footer" -->

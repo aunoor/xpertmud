@@ -1,0 +1,621 @@
+# SOME DESCRIPTIVE TITLE.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2002-02-09 20:09+0100\n"
+"PO-Revision-Date: 2002-02-09 20:40GMT\n"
+"Last-Translator: Ernst Bachmann <e.bachmann@xebec.de>\n"
+"Language-Team: Deutsch <de@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 0.9.5\n"
+
+#: TextBufferWidget.cc:39
+msgid "Clear &all"
+msgstr "&Alles löschen"
+
+#: ConnectDialog.moc.cc:42 ConnectDialog.moc.cc:47
+msgid "ConnectDialog"
+msgstr "ConnectDialog"
+
+#: xpertmud.cc:128
+msgid "General Status"
+msgstr "General Status"
+
+#: xpertmud.cc:139
+msgid ""
+"There are no scripting plugins available!\n"
+"Please check your installation"
+msgstr ""
+"Es wurden keine Scriptinterpreter gefunden!\n"
+"Bitte prüfen Sie, ob die Plugins korrekt installiert wurden."
+
+#: xpertmud.cc:139 xpertmud.cc:763
+msgid "Error!"
+msgstr "Fehler!"
+
+#: xpertmud.cc:481 xpertmud.cc:591 xpertmud.cc:814 xpertmud.cc:826
+#: xpertmud.cc:838 xpertmud.cc:1087 xpertmud.cc:1302 xpertmud.cc:1310
+msgid "Ready."
+msgstr "Fertig."
+
+#: xpertmud.cc:593
+msgid "Sent:"
+msgstr "Gesendet:"
+
+#: xpertmud.cc:594 xpertmud.cc:596 xpertmud.cc:906 xpertmud.cc:913
+#, ycp-format
+msgid "%1 Bytes"
+msgstr "%1 Bytes"
+
+#: xpertmud.cc:595
+msgid "Rcvd:"
+msgstr "Empfangen:"
+
+#: xpertmud.cc:597
+msgid "No scripting language loaded"
+msgstr "Keine Scriptsprache geladen"
+
+#: xpertmud.cc:601
+msgid "&Connect..."
+msgstr "&Verbinden..."
+
+#: xpertmud.cc:603
+msgid "Connect to a MUD"
+msgstr "Mit einem MUD verbinden"
+
+#: xpertmud.cc:605
+msgid "&Disconnect"
+msgstr "Verbindung &Trennen"
+
+#: xpertmud.cc:607
+msgid "Drop current connection"
+msgstr "Verbindung trennen"
+
+#: xpertmud.cc:613
+msgid "Quits the application"
+msgstr "Anwendung beenden"
+
+#: xpertmud.cc:616
+msgid "Enables/disables the toolbar"
+msgstr "Toolbar an/ausschalten"
+
+#: xpertmud.cc:618
+msgid "Show &Inputbar"
+msgstr "&Eingabezeile anzeigen"
+
+#: xpertmud.cc:619
+msgid "Enables/disables the inputbar"
+msgstr "Eingabezeile an/ausschalten"
+
+#: xpertmud.cc:622
+msgid "Enables/disables the statusbar"
+msgstr "Statuszeile ein/ausschalten"
+
+#: xpertmud.cc:625
+msgid "Configure the toolbar"
+msgstr "Toolbar konfigurieren"
+
+#: xpertmud.cc:628
+msgid "Configure the application"
+msgstr "Anwendung konfigurieren"
+
+#: xpertmud.cc:630
+msgid "&Tile"
+msgstr "Fenster &kacheln"
+
+#: xpertmud.cc:631
+msgid "&Cascade"
+msgstr "Fenster &stapeln"
+
+#: xpertmud.cc:633
+msgid "&Window"
+msgstr "&Fenster"
+
+#: xpertmud.cc:636
+msgid "&Scripting"
+msgstr "&Scripting"
+
+#: xpertmud.cc:639
+msgid "&Search for new Languages"
+msgstr "&Nach neuen Sprachen suchen"
+
+#: xpertmud.cc:641
+msgid "Search for new interpreter plugins"
+msgstr "Sucht nach neuen Sprachplugins"
+
+#: xpertmud.cc:643
+msgid "&Unload the Interpreter"
+msgstr "&Interpreter entfernen"
+
+#: xpertmud.cc:645
+msgid "Unloads any currently loaded Interpreter"
+msgstr "Entfernt die aktuelle Scriptsprache aus dem Speicher"
+
+#: xpertmud.cc:647
+msgid "Send &Feedback Mail..."
+msgstr "&Feedback senden..."
+
+#: xpertmud.cc:652
+msgid "Input Line"
+msgstr "Eingabezeile"
+
+#: xpertmud.cc:695
+#, ycp-format
+msgid "Restart &%1 interpreter"
+msgstr "&%1-Interpreter neustarten"
+
+#: xpertmud.cc:698
+#, ycp-format
+msgid "Start &%1 interpreter"
+msgstr "&%1-interpreter starten"
+
+#: xpertmud.cc:732
+msgid "stopped interpreter"
+msgstr "Interpreter angehalten"
+
+#: xpertmud.cc:738
+msgid "unloaded interpreter"
+msgstr "interpreter entfernt"
+
+#: xpertmud.cc:763
+msgid "Library loaded, but no ScriptInterpreter created"
+msgstr "Library loaded, but no ScriptInterpreter created"
+
+#: xpertmud.cc:766
+#, c-format, ycp-format
+msgid ""
+"Library could not be loaded: \n"
+"%1"
+msgstr ""
+"Library could not be loaded: \n"
+"%1"
+
+#: xpertmud.cc:767
+#, ycp-format
+msgid "Error while loading %1!"
+msgstr "Fehler beim Laden von %1!"
+
+#: xpertmud.cc:802
+msgid "Toggle the toolbar..."
+msgstr "Toolbar an/ausschalten"
+
+#: xpertmud.cc:818
+msgid "Toggle the inputbar..."
+msgstr "Eingabezeile an/ausschalten"
+
+#: xpertmud.cc:830
+msgid "Toggle the statusbar..."
+msgstr "Statuszeile an/ausschalten"
+
+#: xpertmud.cc:902 xpertmud.cc:909
+#, ycp-format
+msgid "%1 MB"
+msgstr "%1 MB"
+
+#: xpertmud.cc:904 xpertmud.cc:911
+#, ycp-format
+msgid "%1 KB"
+msgstr "%1 KB"
+
+#: xpertmud.cc:1030
+msgid "Exiting..."
+msgstr "Beende..."
+
+#: xpertmud.cc:1050
+#, ycp-format
+msgid "Connecting to %1:%2"
+msgstr "Verbindungsaufbau zu %1:%2"
+
+#: xpertmud.cc:1072
+msgid "This connection was not found in the bookmarks"
+msgstr "Diese Verbindung war nicht in den Bookmarks enthalten"
+
+#: xpertmud.cc:1072 xpertmud.cc:1107 xpertmud.cc:1329
+msgid "Error !"
+msgstr "Fehler !"
+
+#: xpertmud.cc:1077
+msgid "Disonnecting."
+msgstr "Verbindungsabbau."
+
+#: xpertmud.cc:1107
+msgid "Evil error occured :)"
+msgstr "Evil error occured :)"
+
+#: xpertmud.cc:1291
+msgid "Executing startup script..."
+msgstr "Startup-Script läuft..."
+
+#: xpertmud.cc:1325
+#, ycp-format
+msgid ""
+"Error In Connection:\n"
+"%1, %2\n"
+"%3"
+msgstr ""
+"Verbindungsfehler:\n"
+"%1, %2\n"
+"%3"
+
+#: ConnectDialog.cc:30
+msgid "Connect"
+msgstr "Verbinde"
+
+#: ConnectDialog.cc:33
+msgid "&Connect"
+msgstr "&Verbinde"
+
+#: ConnectDialog.cc:41 ConnectDialog.cc:60
+msgid "Name:"
+msgstr "Name:"
+
+#: ConnectDialog.cc:50
+msgid "New"
+msgstr "Neu"
+
+#: ConnectDialog.cc:69
+msgid "Host:"
+msgstr "Host:"
+
+#: ConnectDialog.cc:78
+msgid "Port:"
+msgstr "Port:"
+
+#: ConnectDialog.cc:89
+msgid "Script:"
+msgstr "Script:"
+
+#: TextWidget.moc.cc:42 TextWidget.moc.cc:47
+msgid "TextWidget"
+msgstr "TextWidget"
+
+#: main.cc:28 main.cc:41 xpertmud.moc.cc:42 xpertmud.moc.cc:47
+msgid "Xpertmud"
+msgstr "Xpertmud"
+
+#: main.cc:34
+msgid "The name of the bookmark to open"
+msgstr "Der Name des zu öffnenden Bookmarks"
+
+#: main.cc:48
+msgid "the feedback mail dialog"
+msgstr "Der Feedback Dialog"
+
+#: _translatorinfo.cpp:1
+msgid ""
+"_: NAME OF TRANSLATORS\n"
+"Your names"
+msgstr "Ernst Bachmann"
+
+#: _translatorinfo.cpp:3
+msgid ""
+"_: EMAIL OF TRANSLATORS\n"
+"Your emails"
+msgstr "e.bachmann@xebec.de"
+
+#: InputAction.moc.cc:42 InputAction.moc.cc:47
+msgid "InputAction"
+msgstr "InputAction"
+
+#: ConnectEntry.h:29
+msgid "Unnamed"
+msgstr "Unnamed"
+
+#: TextBufferWidget.moc.cc:42 TextBufferWidget.moc.cc:47
+msgid "TextBufferWidget"
+msgstr "TextBufferWidget"
+
+#: configdialog.moc.cc:42 configdialog.moc.cc:47
+msgid "ConfigDialog"
+msgstr "ConfigDialog"
+
+#: configdialog.cc:18
+msgid "Configure Xpertmud"
+msgstr "Konfiguriere Xpertmud"
+
+#: configdialog.cc:33
+msgid "Colors"
+msgstr "Farben"
+
+#: configdialog.cc:56
+msgid "History"
+msgstr "History"
+
+#: configdialog.cc:61
+msgid "Default History Size:"
+msgstr "Default History Size:"
+
+#: configdialog.cc:66
+msgid "limit buffer size"
+msgstr "limit buffer size"
+
+#: configdialog.cc:74
+msgid "lines"
+msgstr "Zeilen"
+
+#: configdialog.cc:93
+msgid "Scripting"
+msgstr "Scripting"
+
+#: configdialog.cc:98
+msgid "Default Scripting engine:"
+msgstr "Default Scriptinterpreter:"
+
+#: rc.cpp:1
+msgid "&Connection"
+msgstr "&Verbindung"
+
+#: rc.cpp:5
+msgid "Input Line Toolbar"
+msgstr "Input Line Toolbar"
+
+#: Feedback.cc:17
+msgid "What is your general opinion about this program?"
+msgstr "Was ist deine allgemeine Meinung zu diesem Programm?"
+
+#: Feedback.cc:19
+msgid "It's one of my favourites"
+msgstr "Es ist eins meiner mein Lieblingsprogramm"
+
+#: Feedback.cc:20
+msgid "I like it"
+msgstr "Ich mag es"
+
+#: Feedback.cc:21
+msgid "It's sometimes useful"
+msgstr "Ist manchmal nützlich"
+
+#: Feedback.cc:22
+msgid "It's average"
+msgstr "Durchschnitt"
+
+#: Feedback.cc:23
+msgid "Nice try, but this could be done better"
+msgstr "Netter Versuch, könnte viel besser sein"
+
+#: Feedback.cc:24
+msgid "It's poor"
+msgstr "Schlecht"
+
+#: Feedback.cc:25
+msgid "It's useless"
+msgstr "Nutzlos"
+
+#: Feedback.cc:26
+msgid "It's crap"
+msgstr "Kompletter Müll"
+
+#: Feedback.cc:29
+msgid "How do you rate the stability of this program?"
+msgstr "Wie bewertest Du die Stabilität dieses Programms?"
+
+#: Feedback.cc:30
+msgid "Rock solid"
+msgstr "Sehr stabil"
+
+#: Feedback.cc:31 Feedback.cc:39
+msgid "Good"
+msgstr "Gut"
+
+#: Feedback.cc:32 Feedback.cc:40
+msgid "Average"
+msgstr "Durchschnitt"
+
+#: Feedback.cc:33 Feedback.cc:41
+msgid "Poor"
+msgstr "Schlecht"
+
+#: Feedback.cc:34
+msgid "It keeps crashing all the time"
+msgstr "Stürzt dauernd ab"
+
+#: Feedback.cc:37
+msgid "How do you rate the performance of this program?"
+msgstr "Wie bewertest Du die Geschwindigkeit dieses Programms?"
+
+#: Feedback.cc:38
+msgid "Great"
+msgstr "Super"
+
+#: Feedback.cc:42
+msgid "It's so slow it drives me nuts"
+msgstr "Beim Warten dreh ich noch durch"
+
+#: Feedback.cc:45
+msgid "Are there features you are missing?"
+msgstr "Fehlen Dir irgendwelche Funktionen?"
+
+#: Feedback.cc:46
+msgid "Yes, a lot! (please add comment below)"
+msgstr "Ja, viele! (Bitte im Bemerkungsfeld angeben)"
+
+#: Feedback.cc:47
+msgid "Some (please add comment below)"
+msgstr "Einige (Bitte im Bemerkungsfeld angeben)"
+
+#: Feedback.cc:48
+msgid "None"
+msgstr "Keine"
+
+#: Feedback.cc:49
+msgid "It has too many features already!"
+msgstr "Es hat schon zu viele Funktionen!"
+
+#: Feedback.cc:52
+msgid "Which scripting environment do you prefer?"
+msgstr "Welche Scriptsprache verwendest Du lieber?"
+
+#: Feedback.cc:53
+msgid "Perl"
+msgstr "Perl"
+
+#: Feedback.cc:54
+msgid "Python"
+msgstr "Python"
+
+#: Feedback.cc:55
+msgid "None of those, I want something else! (please add comment below)"
+msgstr "Keine von diesen, ich will eine andere! (Bitte im Bemerkungsfeld angeben)"
+
+#: Feedback.cc:58
+msgid "Did you have trouble learning/using the scripting API?"
+msgstr "War es für Dich schwierig, dich in die Scripting API einzuarbeiten?"
+
+#: Feedback.cc:60
+msgid "No problem"
+msgstr "Kein Problem"
+
+#: Feedback.cc:61
+msgid "Some"
+msgstr "Etwas"
+
+#: Feedback.cc:62
+msgid "I'm still learning"
+msgstr "Ich lerne noch"
+
+#: Feedback.cc:63
+msgid "I didn't have a clue what to do at first"
+msgstr "Ich wusste nicht, wie ich anfangen sollte"
+
+#: Feedback.cc:64
+msgid "I still don't have a clue what to do"
+msgstr "Hab überhaupt keine Ahnung"
+
+#: Feedback.cc:67
+msgid "Where do you use this program most?"
+msgstr "Wo benutzt Du dieses Programm am häufigsten?"
+
+#: Feedback.cc:68
+msgid "At work"
+msgstr "In der Arbeit"
+
+#: Feedback.cc:69
+msgid "At home"
+msgstr "Zu Hause"
+
+#: Feedback.cc:70
+msgid "At university / school"
+msgstr "In der Schule / Universität"
+
+#: Feedback.cc:73
+msgid "How did you get to know this program?"
+msgstr "Wie hast Du dieses Programm kennengelernt?"
+
+#: Feedback.cc:74
+msgid "In a menu on my machine"
+msgstr "In einem Menü auf meinem Rechner"
+
+#: Feedback.cc:75
+msgid "Somebody told me about it"
+msgstr "Jemand hat mir davon erzählt"
+
+#: Feedback.cc:76
+msgid "Somebody told me about it in a MUD"
+msgstr "Ich habe davon in einem MUD gehört"
+
+#: Feedback.cc:77
+msgid "On the internet"
+msgstr "Im Internet"
+
+#: Feedback.cc:78
+msgid "On the internet, on a MUD related page"
+msgstr "Im Internet, auf einer Seite über MUDs"
+
+#: Feedback.cc:79
+msgid "Printed magazine / book"
+msgstr "Gedrucktes Magazin / Buch"
+
+#: Feedback.cc:80
+msgid "Other (please add comment below)"
+msgstr "Anderswo (Bitte Kommentar eintragen)"
+
+#: Feedback.cc:83
+msgid "Would you recommend this program to a friend?"
+msgstr "Würdest Du dieses Programm einem Freund empfehlen?"
+
+#: kfeedback.moc.cc:42 kfeedback.moc.cc:47
+msgid "KFeedbackDialog"
+msgstr "KFeedbackDialog"
+
+#: kfeedback.moc.cc:117 kfeedback.moc.cc:122
+msgid "KFeedbackForm"
+msgstr "KFeedbackForm"
+
+#: kfeedback.moc.cc:211 kfeedback.moc.cc:216
+msgid "KFeedbackQuestionList"
+msgstr "KFeedbackQuestionList"
+
+#: TextWidget.cc:112
+msgid "&Clear"
+msgstr "&Löschen"
+
+#: kfeedback.cc:33
+msgid "Feedback"
+msgstr "Feedback"
+
+#: kfeedback.cc:38
+msgid "&Mail this..."
+msgstr "&Mail schicken..."
+
+#: kfeedback.cc:85
+msgid ""
+"Please answer as any questions as you can.\n"
+"\n"
+"You will be able to review everything in your mailer before the mail will be "
+"sent.\n"
+"Nothing will be sent behind your back.\n"
+msgstr ""
+"Bitte beantworte soviele Fragen, wie Du kannst.\n"
+"\n"
+"Du kannst die Mail bearbeiten, bevor sie verschickt wird.\n"
+"Ohne Deine Zustimmung werden keine Daten versendet.\n"
+
+#: kfeedback.cc:111
+msgid "Questions marked with "
+msgstr "Fragen, die mit "
+
+#: kfeedback.cc:120
+msgid " must be answered before a mail can be sent."
+msgstr "markiert sind, müssen vor dem Versenden beantwortet werden."
+
+#: kfeedback.cc:131
+msgid "&Additional comments:"
+msgstr "&Bemerkungen:"
+
+#: kfeedback.cc:307
+msgid "yes"
+msgstr "Ja"
+
+#: kfeedback.cc:308
+msgid "no"
+msgstr "Nein"
+
+#: mxinputline.moc.cc:42 mxinputline.moc.cc:47
+msgid "MXInputLine"
+msgstr "MXInputLine"
+
+#: scripting/perl/XMPerlFactory.moc.cc:42
+#: scripting/perl/XMPerlFactory.moc.cc:47
+msgid "XMPerlFactory"
+msgstr "XMPerlFactory"
+
+#: scripting/perl/XMPerl.moc.cc:42 scripting/perl/XMPerl.moc.cc:47
+msgid "XMPerl"
+msgstr "XMPerl"
+
+#: scripting/python/XMPythonFactory.moc.cc:42
+#: scripting/python/XMPythonFactory.moc.cc:47
+msgid "XMPythonFactory"
+msgstr "XMPythonFactory"
+
+#: scripting/python/XMPython.moc.cc:42 scripting/python/XMPython.moc.cc:47
+msgid "XMPython"
+msgstr "XMPython"
+
+#: scripting/Scripting.moc.cc:42 scripting/Scripting.moc.cc:47
+msgid "XMScripting"
+msgstr "XMScripting"
+

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="stylesheet" type="text/css" href="general.css" />
+<!-- TITLE --><title></title>
+</head>
+
+<body>
+<!-- UPPER -->
+
+<div class="window">
+<div class="window-title">Xpertmud Design Overview</div>
+<div class="window-content">
+Xpertmud has a very flexible and modular design. There
+are some basic components which are best described by
+looking at the directory structure of xpertmud's cvs.
+<ul>
+<li><b>xpertmud/</b><br />
+Xpertmud's main components. These are qt and kde dependent and
+show xpertmud's basic design. The files in here include the
+telnet handler, ansi control parser and xpertmud's main widgets.
+<ul>
+ <li><b>plugins/</b><br />
+All plugins for xpertmud. Plugins are simply Qt widgets which
+follow a generic (not xpertmud specific) interface. 
+These can be called from scripts
+via the scripting API. There's a subdir for each interpreter.
+The scripting docs are here, too, because the docs for perl
+and python are very alike.</li>
+ <li><b>scripting/</b><br />
+Here you find the glue that connects xpertmud to the scripting
+interpreters (currently perl and python). The interpreters
+are implemented as dynamic libraries, which implement the
+scripting api.</li>
+</ul>
+</li>
+<li><b>qextmdi/</b><br />
+A qextmdi fork for xpertmud. Solves some issues where qextmdi
+didn't fit xpertmud's needs.</li>
+<li><b>compat/</b><br />
+Files that are required to compile xpertmud without kde and/or
+with Qt 2.3. These enable us to compile xpertmud with
+a native win32 MFVC.</li>
+</ul>
+</div>
+</div>
+
+<!-- LOWER -->
+</body>
+</html>

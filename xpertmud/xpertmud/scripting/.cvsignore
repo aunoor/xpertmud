@@ -1,0 +1,12 @@
+*.la
+*.lo
+Makefile.in
+Makefile
+.deps
+.libs
+*_pl.h
+*_meta_unload.cc
+*moc.cc
+moc_*.cpp
+*_skel.cc
+*.kidl

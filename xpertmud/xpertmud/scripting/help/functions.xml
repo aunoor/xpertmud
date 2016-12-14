@@ -1,0 +1,421 @@
+<?xml version="1.0"?>
+<help lang="en" id="xm-functions" name="Xpertmud Online Help - Functions">
+  <function name="#">
+    <description>
+If you write a # at the beginning of a line then the line is processed by the <pe>perl</pe><py>python</py> interpreter. The statement is executed in global space<pe>, but be aware that because of the 'strict'-directive and the block-binding of the 'my'-keyword you're only able to define variables via the 'use vars'-directive</pe><py>, so you can simply assign and read variables as you'd do with the python interpreter shell</py>.
+<py>See also the help on ## (multiple line commands) and % (easy function calls)</py>
+    </description>
+    <example>	Type into the input line:
+	<alt>
+	  <pe>#use vars qw/$firstVar $secondVar/
+	Now we've definied two variables globally
+	#$firstVar = new XMTextWindow()</pe>
+	  <py>#a = XMTextWindow()
+	#a.setTitle("A Window")</py>
+      </alt></example>
+  </function>
+
+  <function name="##" restriction="py">
+    <description>
+Typed at the beginning of a line, the line is stored in an input buffer. If you then enter ## alone, the input buffer is parsed by the python interpreter. This enables you to do multiline editing.
+Note that multiline editing can be also done by using the # directive and getting new lines with ctrl-return. Now you can enter functions and stuff just like you would do in a text editor.
+    </description>
+    <example>	##def myfunc():
+	##  prs("Hello World!\n")
+	##
+	Now we can use the defined function:
+	#myfunc()</example>
+  </function>
+  <function name="%" restriction="py">
+    <description>
+The python syntax is rather restrictive and the command line user is rather lazy. Typed at the beginning of a line, the line is interpreted as 'easy function call'. The first word in the line is the function name. All following words or strings are string arguments to the function. This only works with functions that take only string arguments!
+    </description>
+    <example>	Type at the command line:
+	%help %
+	This becomes: help("%")
+	%help "Step-by-Step: Window Positions"
+	This becomes: help("Step-by-Step: Window Positions")
+	%help Step-by-Step: Window Positions
+	becomes: help("Step-by-Step:", "Window", "Positions")
+	and yields in an error message
+
+	You can use it like:
+	##def myfunc(t1, t2, t3):
+	##  prs(t1 + "/" + t2 + ":" + t3)
+	##
+	%myfunc Hallo "Dies ist ein Test\\"Mit allem Drum" und_dran
+	becomes: myfunc("Hallo", "Dies ist ein Test\\"Mit allem Drum", "und_dran")</example>
+  </function>
+  <function name="activeWindow">
+    <description>
+Get the XMTextWindow object of the focused text window.
+    </description>
+  </function>
+  <function name="addAlias">
+    <arg name="name">
+      The alias's name (used by other functions to access this alias).
+    </arg>
+    <arg name="regExp">
+      Assume you typed a line. If line matches regExp the alias is "triggered".
+    </arg>
+    <arg name="do">
+      <alt>
+	<pe>If you give a string here, the line you typed is processed like s/regExp/do/g, and then printed to the server like usual. If you specify a sub ref, then the sub is called with line as it's argument. The sub's return value is printed to the server like usual.</pe>
+	  <py>The line you type is processed like re.subn(regExp, do, line). So you can specify a string or function object.</py>
+      </alt>
+    </arg>
+    <arg name="breakOn">
+      1, if the execution of aliases should stop if this one matched, 0 otherwise (default = 0).
+    </arg>
+    <arg name="isActive">
+      The initial alias state (default = 1, see setAliasState).
+    </arg>
+    <example>	addAlias("My_Alias1", "^gg", "me's grinning...")<pe>;</pe>
+	# this adds a alias which sends "me's grinning..."
+	# if you type "gg" at the input line</example>
+  </function>
+
+  <function name="addDelayed"> 
+    <arg name="name">
+      The delay's name (used by other functions to access this delay).
+    </arg>
+    <arg name="delay">
+      The action will be performed at getTime() + delay.
+    </arg>
+    <arg name="do">
+      If you give a string here, the string is sent to the server. If you specify a <pe>sub ref</pe><py>function object</py>, it's executed.
+    </arg>
+    <example>	addDelayed("MyDelayed", 10, "Action!")<pe>;</pe>
+	# Action! will be sent to the server in 10 tics</example>
+  </function>
+
+  <function name="addKeyBinding"> 
+    <arg name="name">
+      The keybinding's name (used by other functions to access this keybinding).
+    </arg>
+    <arg name="onKey">	
+      If the representation (see below) of the pressed key matches onKey, the keybinding is triggered.
+    </arg>
+    <arg name="do">	
+      If you give a string here, the string is sent to the server.
+      <alt>
+	<pe>If you specify a sub ref, it's executed (you can access the key by the perl $1...$n variables. The last match was your onKey regexp match). If the sub returned true, the key is considered "used" and not processed any further.</pe>
+	<py>If you specify a function object, it's executed getting the match object as parameter.</py>
+      </alt>
+    </arg>
+    <arg name="isActive">
+      The initial keybinding state (default = 1, see setKeyBindingState).
+    </arg>
+    <example>	<alt>
+	<pe>addKeyBinding('Underscore', '..10.... (.*)',
+		      sub { XM::send("_$1\n"); return 1; }</pe>
+	<py>def ctrla(m):
+	  XM.send("_" + m.group(1) + "\n")
+	  return 1
+	addKeyBinding('Underscore', '.1...... (.*)', ctrla)</py>
+	</alt>
+	# If you press ctrl-a, for example, "_a" is sent
+	# to the server</example>
+  </function>
+  <function name="addTimer"> 
+    <arg name="name">
+      The timer's name (used by other functions to access this timer).
+    </arg>
+    <arg name="inc">
+      Specify the amount of seconds between two calls to this timer.
+    </arg>
+    <arg name="do">
+      If you give a string here, the string is sent to the server. If you specify a <pe>sub ref</pe><py>function object</py>, it's executed.
+    </arg>
+    <arg name="isActive">
+      The initial timer state (default = 1, see setTimerState)
+    </arg>
+    <example>	addTimer("My_Timer1", 0.5, "Hello, it's me")<pe>;</pe>
+	# The string "Hello, it's me" is written to the
+	# server two times a second.</example>
+  </function>
+  <function name="addTrigger">
+    <arg name="name">
+      The trigger's name (used by other functions to access this trigger).
+    </arg>
+    <arg name="regExp">
+      Assume a line is read from the server. If line =~ regExp the trigger is "triggered".
+    </arg>
+    <arg name="do">
+      <pe>If you give a string here, the line from the server is processed like s/regExp/do/g, and then printed like usual. If you specify a sub ref, then the sub is called with line as it's argument. The sub's return value is printed like usual.</pe>
+      <py>The line from the server is processed like re.subn(regExp, do, line). So you can specify a string or function object.</py>
+    </arg>
+    <arg name="breakOn">
+      1, if the execution of triggers should stop if this one matched, 0 otherwise (default = 0).
+    </arg>
+    <arg name="isActive">
+      The initial trigger state (default = 1, see setTriggerState).
+    </arg>
+    <example>	addTrigger("My_Trig1", "^evil guy says:", "")<pe>;</pe>
+	# this adds a trigger which hides every line starting
+	# with "^evil guy says:"</example>
+  </function>
+  <function name="connection">
+    <arg name="id" />
+    <description>
+Get the XMConnection object for the specified connection id. Connection ids are configured via the bookmark editor, where 0 is always the default connection. You will need multiple connections only in some special cases. Usually connection(0) will be your way to access your active connection.
+    </description>
+  </function>
+  <function name="delAlias">
+    <arg name="regExp" />
+    <description>
+      Delete all aliases who's name matches regExp.
+    </description>
+    <example>	delAlias("^My_")<pe>;</pe>
+	# delete all aliases who's name start with My_
+	delAlias("a")<pe>;</pe>
+	# delete all aliases with an a in their name</example>
+  </function>
+  <function name="delDelayed">
+    <arg name="regExp" />
+    <description>
+Delete all delays who's name matches regExp.
+    </description>
+    <example>	delDelayed("^My_")<pe>;</pe>
+	# delete all delays who's name start with My_
+	delDelayed("a")<pe>;</pe>
+	# delete all delays with an a in their name</example>
+  </function>
+  <function name="delKeyBinding">
+    <arg name="regExp" />
+    <description>
+      Delete all key bindings who's name matches regExp.
+    </description>
+    <example>	delKeyBinding("^My_")<pe>;</pe>
+	# delete all key bindings who's name start with My_
+	delKeyBinding("a")<pe>;</pe>
+	# delete all key bindings with an a in their name</example>
+  </function>
+  <function name="delTimer">
+    <arg name="regExp" />
+    <description>
+      Delete all timers who's name matches regExp.
+    </description>
+    <example>	delTimer("^My_")<pe>;</pe>
+	# delete all timers who's name start with My_
+	delTimer("a")<pe>;</pe>
+	# delete all timers with an a in their name</example>
+  </function>
+  <function name="delTrigger">
+    <arg name="regExp" />
+    <description>
+Delete all triggers who's name matches regExp.
+    </description>
+    <example>	delTrigger("^My_")<pe>;</pe>
+	# delete all triggers who's name start with My_
+	delTrigger("a")<pe>;</pe>
+	# delete all triggers with an a in their name</example>
+  </function>
+  <function name="focusedInputLine">
+    <description>
+Get the XMInputLine object for the focused input line.
+    </description>
+  </function>
+  <function name="getTime">
+    <description>
+Returns the time in tics. One tic is a quarter of a second.
+    </description>
+  </function>
+  <function name="listAliases">
+    <description>
+List all current aliases.
+    </description>
+  </function>
+  <function name="listDelayed">
+    <description>
+List all current delays.
+    </description>
+  </function>
+  <function name="listKeyBindings">
+    <description>
+List all current key bindings.
+    </description>
+  </function>
+  <function name="listTimers">
+    <description>
+List all current timers.
+    </description>
+  </function>
+  <function name="listTriggers">
+    <description>
+List all current triggers.
+    </description>
+  </function>
+  <function name="parse">
+    <arg name="script" />
+    <description>
+This is used to parse a script in <pe>@INC</pe><py>sys.path</py> by using the <pe>perl do</pe><py>python exec</py> command. <pe>The only differnce is that parse will print an error if perl reports errors during do. So t</pe><py>T</py>his is the recommended way to load your scripts.
+    </description>
+    <example>	parse("myscript.pl")<pe>;</pe>
+
+	<alt>
+	  <pe>statusWindow->print(@INC."\n");</pe>
+	  <py>statusWindow().write(str(sys.path))
+	# to show the include path</py>
+	</alt></example>
+  </function>
+  <function name="parseHelp">
+    <arg name="file" />
+    <description>
+Parse a help xml file (like those in xpertmud/scripting/help that come with the xpertmud source package). Adds the content of the help xml file to the current help system. Use this if you want to document scripts or plugins you've written.
+    </description>
+  </function>
+  <function name="prs">
+    <arg name="text" />
+    <description>
+This is simply shorthand for writing
+      <code><alt>
+	  <pe>statusWindow()->print($text);</pe>
+	  <py>statusWindow().write(text)</py>
+	</alt></code>
+Don't use this in your scripts, cause it makes them less readable, but at the command line it's valuable ;-)
+    </description>
+  </function>
+  <function name="resetWriteRegExps">
+    <description>
+Reset the write regexps to default values.
+See setWriteRegExps() for extensive information.
+    </description>
+  </function>
+  <function name="setAliasState">
+    <arg name="regExp" />
+    <arg name="state" />
+    <description>
+Set the state of all aliases who's name matches regExp to state. A state of 0 means that this alias is not processed.
+    </description>
+    <example>	setAliasState("^My_Mode1_", 0)<pe>;</pe>
+	# disable all aliases that got names starting
+	# with My_Mode1_</example>
+  </function>
+  <function name="setDelayed">
+    <arg name="regExp" />
+    <arg name="delay" />
+    <description>
+Set the time incremnt of all delays who's name matches regExp to delay.
+    </description>
+    <example>	setDelayed("^My_Mode1_", 15)<pe>;</pe>
+	# All delays that got names starting with
+	# My_Mode1_ will be executed in 15 tics</example>
+  </function>
+  <function name="setKeyBindingState">
+    <arg name="regExp" />
+    <arg name="state" />
+    <description>
+Set the state of all key bindings who's name matches regExp to state. A state of 0 means that this key binding is not processed.
+    </description>
+    <example>	setKeyBindingState("^My_Mode1_", 0)<pe>;</pe>
+	# disable all key bindings that got names starting
+	# with My_Mode1_</example>
+  </function>
+  <function name="setLocalEcho">
+    <arg name="state" />
+    <description>
+If set to 0, the text typed on the command line will not be printed to the status window.
+    </description>
+  </function>
+  <function name="setTimerState">
+    <arg name="regExp" />
+    <arg name="state" />
+    <description>
+Set the state of all timers who's name matches regExp to state. A state of 0 means that this timer is not processed.
+    </description>
+    <example>	setTimerState("^My_Mode1_", 0)<pe>;</pe>
+	# disable all timers that got names starting
+	# with My_Mode1_</example>
+  </function>
+  <function name="setTimerInc">
+    <arg name="regExp" />
+    <arg name="newInc" />
+    <description>
+      Change the increment (interval) of all timers who's name matches regExp to newInc.
+    </description>
+    <example>	setTimerInc("^My_Mode1_", 1.0)<pe>;</pe>
+	# all timers that got names starting
+	# with My_Mode1_ will be executed every second</example>
+  </function>
+  <function name="setTriggerState">
+    <arg name="regExp" />
+    <arg name="state" />
+    <description>
+Set the state of all triggers who's name matches regExp to state. A state of 0 means that this trigger is not processed.
+    </description>
+    <example>	setTriggerState("^My_Mode1_", 0)<pe>;</pe>
+	# disable all triggers that got names starting
+	# with My_Mode1_</example>
+  </function>
+  <function name="setWriteRegExps">
+    <arg name="writeAtOnce" />
+    <arg name="dontWriteAtOnce" />
+    <description>
+      <para>Sets the <pe>$</pe>writeAtOnceRegExp and <pe>$</pe>dontWriteAtOnce variables to the given values. To set only one, leave the other undef.</para>
+      <para>This mainly influences, how a string coming from the server is parsed. The problem is: The server may send a line in five parts, and it may send some lines at once, just like it likes to. So now we mostly want to base triggers on complete lines. For example a trigger for "evil guy says: " will not be executed, if the server sends "evil g" in one packet and "uy says: something\n" in the next packet. Therefor xpertmud has the ability to cache the output of a line until a complete line's finished and call the triggers with the complete line. 
+The problem is now, that sometimes you want to see and use triggers on lines, which are not complete (for example prompts). Xpertmud can't solve this problem by itself, so there are two variables:
+      <code><pe>$</pe>writeAtOnceRegExp     (default = ".?")  and 
+<pe>$</pe>dontWriteAtOnceRegExp (default = "^\$")</code>
+      which you can set according to your own needs.</para>
+      <para>Xpertmud than does the following:
+      <code><alt>
+          <pe>	if(&lt;line is not complete&gt; &amp;&amp;
+	   ($line =~ /$writeAtOnceRegExp/) &amp;&amp;
+	   ($line !~ /$dontWriteAtOnceRegExp/)) {
+	  execute triggers on the line part;
+	  print the line part;
+	} else {
+	  cache the line part without doing anything yet;
+	}</pe>
+          <py>	if &lt;line is not complete&gt; and
+	     re.search(writeAtOnceRegExp, line) != None and
+	     re.search(dontWriteAtOnceRegExp, line) == None:
+	  execute triggers on the line part
+	  print the line part
+	else:
+	  cache the line part without doing anything yet</py>
+	</alt></code>
+      This means that by default all text is written to the status window even if it's not a full line.</para>
+
+      <para>There are two variables, so you can choose which to set according to the mud you're playing. If you mainly need full lines, you'll set <pe>$</pe>writeAtOnceRegExp to match you're few prompts or whatever and <pe>$</pe>dontWriteAtOnceRegExp to "^\$". If you only occasionaly want to cache lines, you'll set <pe>$</pe>writeAtOnceRegExp to ".*" and <pe>$</pe>dontWriteAtOnceRegExp to match in occasions where you want caching.</para>
+    </description>
+  </function>
+  <function name="showKeyNames">
+    <description>
+      <para>Show the key names as they are compared when triggering key bindings. The key names consist of the eight modifier bits and the key's normal name. Let's make that clear using an example...</para>
+      <para>Assume that you want to write "kill bunny" to the mud everytime you press shift-F3. Now at the command line type
+	<code>#showKeyNames()</code>
+Then press shift-F3. You'll see something like
+	<code>00000000 Shift_L
+10000000 F3</code>
+The first is the key press event generated when pressing the shift key, the second is the shift-F3 event. Note that the first 1 means that the shift key is hold down. Now press "x" to leave the key name mode.
+      </para>
+      <para>
+So, now we know on what we have to match. A keybinding will be triggered whenever the specified regexp matches the key name we've just seen. So
+#addKeyBinding("MySlay", "^10000000 F3\$", "kill bunny")
+will do exactly what we want. Nearly.
+      </para>
+      <para>
+Try the following:
+	<code>#showKeyNames()</code>
+Press the caps-lock key.
+Press some other key.
+You see? The caps-lock key generates a modifier. So the above example wouldn't work if caps-lock is active. To prevent this we just write
+	<code>#addKeyBinding("MySlay", "^10...... F3\$", "kill bunny");</code>
+Now this will cause the client to write "kill bunny"  whenever the shift key is hold down while pressing F3 and the ctrl-key is _not_ pressed, but any other modifier may be present.
+      </para>
+    </description>
+  </function>
+  <function name="statusWindow">
+    <description>
+Returns the status window (XMTextBufferWindow) instance.
+    </description>
+    <example>	<alt>
+          <pe>statusWindow()->hide();
+	statusWindow().hide()
+	statusWindow()->print("some text\n");</pe>
+          <py>statusWindow().write("some text\n")</py>
+      </alt></example>
+  </function>
+</help>

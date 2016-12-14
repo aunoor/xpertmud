@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=MimeType
+Comment=xpertmud Bookmark
+Comment[de]=xpertmud Bookmark
+DefaultApp=xpertmud
+Icon=xpertmud
+MimeType=application/x-xpertmud-bookmark
+Patterns=*.xmud

@@ -1,0 +1,12 @@
+Source: xpertmud
+Section: net
+Priority: optional
+Maintainer: Manuel Klimek <klimek@box4.net>
+Build-Depends: debhelper (>= 4.0.0), kdelibs4-dev (>= 4), libperl-dev (>= 5.8.0-15), libqt3-mt-dev (>= 3), python-dev (>= 2.2.2-5), xutils (>= 4.2.1-5), docbook-to-man
+Standards-Version: 3.5.8
+
+Package: xpertmud
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: a Perl, Python and Ruby scriptable KDE Mud Client
+ A nice perl and python scriptable MUD client.

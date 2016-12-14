@@ -1,0 +1,41 @@
+<table width="100%">
+<tr><td class="header" colspan="3">Xpertmud - The Mud Experience</td></tr>
+<tr><td style="vertical-align:top;">
+<div class="window">
+<div class="window-title">Project</div>
+<div class="window-content">
+//index.html//About/News
+//status.html//Status
+//features.html//Features
+//screenshots.html//Screenshots
+</div>
+</div>
+<div class="window">
+<div class="window-title">Download</div>
+<div class="window-content">
+//download.html//Xpertmud
+//download.html#scripts//Scripts
+//download.html#plugins//Plugins
+</div>
+</div>
+<div class="window">
+<div class="window-title">Help</div>
+<div class="window-content">
+<a href="http://sourceforge.net/forum/?group_id=29649">Forum</a><br />
+<a href="http://sourceforge.net/mail/?group_id=29649">Mailing List</a><br />
+//faq.html//FAQ
+//howto.html//HOWTO
+//tutorial.html//Plugin-Tutorial
+</div>
+</div>
+<div class="window">
+<div class="window-title">Development</div>
+<div class="window-content">
+<a href="http://sourceforge.net/projects/xpertmud/">SourceForge</a><br />
+<a href="http://sourceforge.net/cvs/?group_id=29649">CVS Access</a><br />
+//xpertmud-design.html//Design
+//vision.html//Vision
+</div>
+</div>
+</td>
+<td style="vertical-align:top;">

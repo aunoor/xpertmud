@@ -1,0 +1,71 @@
+<!DOCTYPE kpartgui SYSTEM "kpartgui.dtd">
+<kpartgui name="xpertmud" version="0.1">
+
+<MenuBar>
+  <Menu name="file">
+    <text>&amp;File</text>
+    <Action name="file_edit" />
+    <Action name="file_recent" />
+  </Menu>
+
+  <Menu name="Connection">
+    <text>&amp;Connection</text>
+    <Action name="file_connect" />
+    <Action name="file_disconnect" />
+  </Menu>
+
+  <!-- <Action name="window_menu" /> -->
+
+  <Action name="scripting_menu" />
+
+  <Menu name="settingsc" noMerge="1">
+    <text>&amp;Settings</text> 
+    <Action name="toggle_toolbar" />
+    <Action name="toggle_inputbar" />
+    <Action name="toggle_statusbar" />
+    <Action name="toggle_quickbar" />
+    <Separator />
+    <Action name="edit_toolbars" />
+    <Action name="preferences" />
+  </Menu>     
+  
+  <Menu name="help" noMerge="1"> <text>&amp;Help</text>
+    <Action name="help_contents"/>
+    <Action name="help_whats_this"/>
+    <Separator/>
+    <Action name="help_about_app"/>
+    <Action name="help_about_kde"/>
+  </Menu>
+</MenuBar>
+
+<ToolBar name="mainToolBar" hidden="true" noMerge="1">
+  <text>Main Toolbar</text>
+  <Action name="file_new" />
+  <Action name="file_open" />
+  <Action name="file_save" />
+  <Action name="file_save_as" />
+  <Seperator />
+  <Action name="file_edit" />
+  <Seperator />
+  <Action name="file_connect" />
+  <Action name="file_disconnect" /> 
+</ToolBar>
+
+<ToolBar name="inputBar" position="bottom" newline="true">
+  <text>Input Line Toolbar</text>
+  <Action name="input_line" />
+  <Action name="toggle_inputmode" />
+</ToolBar>
+
+<ActionProperties>
+  <Action name="file_connect" icon="connect_creating" /> 
+  <Action name="file_disconnect" icon="stop" /> 
+  <Action name="file_edit" icon="edit" />
+  <Action name="find_languages" icon="reload" />
+  <Action name="unload_language" icon="stop" />
+  <Action name="input_line" icon="pencil" />
+  <Action name="toggle_inputmode" icon="pencil" />
+  <Action name="window_menu" icon="window_new" />
+</ActionProperties>
+
+</kpartgui>

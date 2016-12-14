@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="stylesheet" type="text/css" href="general.css" />
+<!-- TITLE --><title></title>
+</head>
+
+<body>
+<!-- UPPER -->
+
+<div class="window">
+<div class="window-title">FAQ</div>
+<div class="window-content">
+<p>
+Table of Contents:
+<ol>
+<li><a href="#q1">How do I contribute to this FAQ?</a></li>
+<li><a href="#q2">How do I compile xpertmud for windows?</a></li>
+<li><a href="#q3">xpertmud segfaults on startup!</a></li>
+<li><a href="#q4">The "login sequence"/"startup script" don't work correctly</a></li>
+<li><a href="#q5">How do I activate that graphical HUD plugin for Battletech?!</a></li>
+<li><a href="#q6">I want to sell my script/plugin. May I do that?</a></li>
+<li><a href="#q7">I want to publish my script/plugin. Can you do that for me?</a></li>
+<li><a href="#q8">I only see alpha and beta versions arround here. Where are the real releases?</a></li>
+</ol>
+</p>
+
+<p>
+<a name="q1"><b>How do I contribute to this FAQ?</b></a><br />
+You can either ask at the forum, the mailing list or send
+a mail to <a href="mailto:globbi@users.sourceforge.net">Manuel Klimek</a>
+or <a href="mailto:entropy@users.sourceforge.net">Ernst Bachmann</a>.
+</p>
+
+<p>
+<a name="q2"><b>How do I compile xpertmud for windows?</b></a><br />
+<b>Short answer:</b> You don't. Xpertmud is GPL'ed, and as long as
+there is no QT with GPL compatible license for Windows, you can't
+do that.<br />
+<b>Long answer:</b> Open a shell, make sure your VC and QT environment
+variables are set. Execute "nmake Makefile.ms config", then "nmake".
+Start praying.<br />
+<b>Update:</b> the <a href="kde-cygwin.sf.net/">KDE on Cygwin</a> Project
+did great work porting the GPL'ed QT-X11 to Windows. It is now possible 
+to compile xpertmud using only the cygwin tool chain and OpenSource Libraries.<br />
+A release of a new Win32 build will follow soon.<br />
+If you want to try building it yourself, look at the INSTALL-WIN32 file in CVS.
+</p>
+
+
+<p>
+<a name="q3"><b>xpertmud segfaults on startup!</b></a><br />
+You probably installed it wrong. Supply a --prefix argument to ./configure.
+"/usr/local" won't work on most of the distros out there.<br />
+Your prefix needs to be in kde's search path, otherwise xpertmud won't find 
+its plugins. Current CVS versions do a better job at selecting working default 
+prefix.<br />
+Instead of reinstalling, you can also try to extend kde's search path:
+<pre>
+export KDEDIRS=$KDEDIRS:/usr/local
+xpertmud
+</pre>
+</p>
+
+
+<p>
+<a name="q4"><b>The "login sequence"/"startup script" don't work correctly</b></a><br />
+Make sure you pressed enter at the end of the last line in both input boxes.
+Xpertmud sends/executes the stuff in there "as-is", so if there is no newline
+at the end, no newline is sent.<br />
+Maybe we'll add some warning popup when the last newline is missing in the future...
+</p>
+
+
+<p>
+<a name="q5"><b>How do I activate that graphical HUD plugin for Battletech?!</b></a><br />
+First make yourself a bookmark that connects you and logs you in correctly. The 
+HUD will not load correctly if you're not logged in. Test it. If that one works,
+go to the scripting settings of your bookmark, choose perl, and input<br />
+<pre>
+#parse "xperthud.pl";
+</pre>
+for the script. (Python users use "btcockpit.py")<br />
+Remember, those scripts are just examples for the Battletech plugin, so you'll
+probably want to edit them. Put your modified version in "~/.kde*/share/apps/xpertmud/perl",
+that directory is in Perl's search path, and it won't be overwritten when you update xpertmud.<br />
+You might also want to add<pre>
+#parse "pipes.pl"
+#parse "completion.pl"
+</pre>
+to the script, for some additional features.<br />
+F6/F5 activate/deactivate the HUD, for other key bindings, please read the source.
+</p>
+
+<p>
+<a name="q6"><b>I want to sell my script/plugin. May I do that?</b></a><br />
+<a href="http://www.gnu.org/licenses/gpl-faq.html#DoesTheGPLRequireAvailabilityToPublic">Yes</a>,
+but you'll most likely have to put your script/plugin under a GPL compatible license,
+so the guy you sold it to will redistribute it for free.<br />
+Scripts are condidered "linking" against Xpertmud, since they use it's library functions.
+So scripts can't escape the GPL.<br />
+There is a way you can escape it for plugins, but it's not easy:<br />
+Split your plugins in a GPL and a proprietary part. The GPL part is used
+in xpertmud, and has to execute the proprietary part as a seperate process.<br />
+More information about this issue is available
+<a href="http://www.gnu.org/licenses/gpl-faq.html#GPLModuleLicense">here</a> and
+<a href="http://www.gnu.org/licenses/gpl-faq.html#GPLAndPlugins">here</a>
+</p>
+
+<p>
+<a name="q7"><b>I want to publish my script/plugin. Can you do that for me?</b></a><br />
+Sure. Mail us about it, and we'll add a link to your plugin to the download section.<br />
+But you're also welcome to join the developers, and work on your plugin in the xpertmud
+CVS repository. That way it will be distributed along with xpertmud, which should
+attract quite some people to your favorite mud. Ask one of the project admins about
+CVS access.
+</p>
+
+<p>
+<a name="q8"><b>I only see alpha and beta versions arround here. Where are the real releases?</b></a><br />
+There are none.<br />
+<b>Why? Version X.Y runs quite fine here?</b><br />
+Cause it's not stable. Just play with the scripting menu, try to load/unload perl multiple times...<br />
+Or watch the strange behavior of MDI windows while maximizing, resizing etc... or ...<br />
+So unless the quality of the libraries we depend on (qextmdi, libperl, ...) improves, we
+can't really do a real release and be happy about it. 
+</p>
+
+</div>
+</div>
+
+<!-- LOWER -->
+</body>
+</html>

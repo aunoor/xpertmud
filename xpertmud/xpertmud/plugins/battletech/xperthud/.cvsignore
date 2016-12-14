@@ -1,0 +1,7 @@
+.deps
+.libs
+Makefile
+Makefile.in
+*.moc.cc
+*_meta_unload.cc
+xperthud

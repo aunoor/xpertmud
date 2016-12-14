@@ -1,0 +1,351 @@
+#include "config.h"
+#include "XMRuby.h"
+#include "../GuiScriptingBindings.h"
+#include "ruby.h"
+#include "sysinit_rb.h"
+#include <iostream>
+#include <sstream>
+#include <cassert>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <unistd.h>
+
+// Code mostly just a modded version of the python script code
+// thanx globby (yea..and entropy ... I stole from the perl code, too)
+#include <kglobal.h>
+#include <kstandarddirs.h>
+
+VALUE module=Qnil;
+struct RbMethodDef {
+  RbMethodDef(char *name, int argc,  VALUE (*ptr) (...)) :name(name),
+						       argc(argc),
+						       ptr(ptr) {}
+  char *name;
+  int argc;
+  VALUE (*ptr) (...);
+};
+
+static GuiScriptingBindings *currentCallBack;
+
+extern "C" {
+  
+  ___IMPLEMENTATIONS___
+  static RbMethodDef XM_Methods[] = {
+    ___DEFINITIONS___
+#line 29 "XMRuby_cc.in"
+    RbMethodDef(NULL, 0, NULL)
+  };
+  
+  
+}
+
+
+XMRuby::XMRuby(QObject* parent,
+	       const char* name):
+  XMScripting(parent,name),callBack(NULL),initialized(false) {
+    
+  }
+
+XMRuby::~XMRuby() {
+  if(initialized) {
+    ruby_finalize();
+  }
+}
+
+void XMRuby::reportError(const QString &function, int err) {
+  std::cout << "Error in calling " << function << " (" << err << ")" << std::endl;
+  VALUE lasterr = rb_gv_get("$!");
+  
+  // class
+  VALUE klass = rb_class_path(CLASS_OF(lasterr));
+  std::cout << "class = " << RSTRING(klass)->ptr << std::endl; 
+  
+  // message
+  VALUE message = rb_obj_as_string(lasterr);
+  std::cout << "message = " << RSTRING(message)->ptr << std::endl;
+  if(!NIL_P(ruby_errinfo)) {
+    std::ostringstream o;
+    VALUE ary = rb_funcall(ruby_errinfo, rb_intern("backtrace"), 0);
+    if (ary) {
+      int c;
+      for (c=0; c<RARRAY(ary)->len; c++) {
+        o << "\tfrom " << 
+   	RSTRING(RARRAY(ary)->ptr[c])->ptr << 
+  	"\n";
+      }
+    }
+    std::cout << "backtrace = " << o.str() << std::endl;
+  } else {
+    std::cout << "backtrace = Qnil" << std::endl;
+  }
+//  assert(0);
+}
+extern "C" void Init_stack(VALUE *addr);
+		 
+void XMRuby::setCallback(GuiScriptingBindings *cB) {
+  currentCallBack = cB;
+  callBack = cB;
+  if(!initialized) {
+
+    // Initialize Interpreter
+    ruby_init();
+
+#if defined(STACKBASE)
+    Init_stack(reinterpret_cast<VALUE *>(STACKBASE));
+#elif defined(__linux__) and defined(__i386__)
+    Init_stack(reinterpret_cast<VALUE *>(0xBFFFFFFC));
+#endif
+
+    // Initialize the loadpath.
+    ruby_init_loadpath();
+    //set script name
+    ruby_script(const_cast<char *>("xpertmud-embedded"));
+
+    // adjust the script include Paths
+    QStringList incPath=KGlobal::dirs()->findDirs("appdata","ruby");
+    
+    VALUE loadPath = rb_gv_get("$:");
+    if(loadPath != Qnil)
+      for (QStringList::Iterator it=incPath.begin();
+	 it!=incPath.end(); ++it) {
+	rb_ary_unshift(loadPath,rb_str_new2((*it).latin1()));
+    }
+    // Register my stuff
+    module = rb_define_module("XM");
+    
+    RbMethodDef *i = XM_Methods;
+
+    while(i->name != NULL) {
+      rb_define_module_function(module, i->name, i->ptr, i->argc); 
+      ++i;
+    }
+    // Parse the SYSINIT script
+    evalSysInit();
+
+    initialized=true;
+  }
+}
+
+static VALUE int_ruby_eval(VALUE rcode) {
+  rb_eval_string(STR2CSTR(rcode));
+  return Qnil;
+}
+
+
+bool XMRuby::evalSysInit() {
+  int i=0;
+  int sum=0;
+  while(rubySysInitScript[i] != NULL) {
+    sum += strlen(rubySysInitScript[i]);
+    ++i;
+  }
+  char *commandString = new char[sum+1];
+  i=0;
+  int c=0;
+  while(rubySysInitScript[i] != NULL) {
+    int y=0;
+    while(rubySysInitScript[i][y] != 0) {
+      commandString[c] = rubySysInitScript[i][y];
+      ++y; ++c;
+    }
+    ++i;
+  }
+  commandString[c] = 0;
+  VALUE tmp = rb_str_new2(commandString);
+  rb_gc_register_address(&tmp);
+  int ret;
+  rb_protect(int_ruby_eval,tmp,&ret);
+  rb_gc_unregister_address(&tmp);
+  delete[] commandString;
+  //just be nice and clean up, because we have a huge string
+  // which noone will ever need again
+  //  rb_gc();
+  return (ret ? false:true);
+}
+VALUE int_call_glob_func(VALUE args) {
+  char *name = STR2CSTR(rb_ary_shift(args));
+//  std::cout << "trying kernel call: " << name << " " <<  rb_intern(name) << std::endl;
+  return rb_apply(module,rb_intern(name),args);
+//  return rb_apply(rb_mKernel,rb_intern(name),args);
+//  return rb_funcall(module,rb_intern(name),args);
+}
+
+void XMRuby::textEntered(const QString & text) {
+  if(!initialized) return;
+  currentCallBack = callBack;
+
+  VALUE args = rb_ary_new2(2);
+  rb_ary_store(args,0,rb_str_new2("wrap_onTextEntered"));
+  QCString ctmp = text.utf8();
+  rb_ary_store(args,1, rb_str_new(ctmp,ctmp.length()));
+  int err;
+  rb_protect(int_call_glob_func,args,&err);
+  if(err != 0)
+    reportError("onTextEntered",err);
+}
+
+bool XMRuby::keyPressed(const QString & key, const QString & ascii) {
+  if(!initialized) return false;
+  currentCallBack = callBack;
+
+  VALUE args = rb_ary_new2(3);
+  rb_ary_store(args,0,rb_str_new2("wrap_onKeyPressed"));
+  QCString ctmp = key.utf8();
+  rb_ary_store(args,1, rb_str_new(ctmp,ctmp.length()));
+  ctmp = ascii.utf8();
+  rb_ary_store(args,2, rb_str_new(ctmp,ctmp.length()));
+  int err;
+  bool ret = (rb_protect(int_call_glob_func,args,&err) == Qtrue ? true:false);
+  if(err != 0)
+    reportError("onKeyPressed",err);
+  return ret;
+}
+
+void XMRuby::textReceived(const QString & line, int id) {
+  if(!initialized) return;
+  currentCallBack = callBack;
+
+  VALUE args = rb_ary_new2(3);
+  rb_ary_store(args, 0,rb_str_new2("wrap_onTextReceived"));
+  QCString ctmp = line.utf8();
+  rb_ary_store(args, 1, rb_str_new(ctmp,ctmp.length()));
+  rb_ary_store(args, 2,INT2NUM(id));
+  int err;
+  rb_protect(int_call_glob_func,args,&err);
+  if(err != 0)
+    reportError("textReceived",err);
+}
+
+
+
+
+void XMRuby::timer() {
+  if(!initialized) return;
+  currentCallBack = callBack;
+
+  VALUE args = rb_ary_new2(1);
+  rb_ary_store(args,0,rb_str_new2("wrap_onTimer"));
+  int err;
+  rb_protect(int_call_glob_func,args,&err);
+  if(err != 0) {
+  reportError("timer",err);
+  }
+}
+
+
+void XMRuby::echo(bool state, int id) {
+  if(!initialized) return;
+  currentCallBack = callBack;
+
+  VALUE args = rb_ary_new2(3);
+  rb_ary_store(args,0,rb_str_new2("wrap_onEcho"));
+  rb_ary_store(args,1,(state?Qtrue:Qfalse));
+  rb_ary_store(args,2,INT2NUM(id));
+  
+  int err;
+  rb_protect(int_call_glob_func,args,&err);
+  if(err != 0)
+    reportError("echo",err);
+}
+
+
+void XMRuby::connectionEstablished(int id) {
+  if(!initialized) return;
+  currentCallBack = callBack;
+
+  VALUE args = rb_ary_new2(2);
+  rb_ary_store(args,0,rb_str_new2("wrap_onConnectionEstablished"));
+  rb_ary_store(args,1,INT2NUM(id));
+  
+  int err;
+  rb_protect(int_call_glob_func,args,&err);
+  if(err != 0)
+    reportError("connectionEstablished",err);
+}
+
+void XMRuby::connectionDropped(int id) {
+  if(!initialized) return;
+  currentCallBack = callBack;
+
+  VALUE args = rb_ary_new2(2);
+  rb_ary_store(args,0,rb_str_new2("wrap_onConnectionDropped"));
+  rb_ary_store(args,1,INT2NUM(id));
+  
+  int err;
+  rb_protect(int_call_glob_func,args,&err);
+  if(err != 0)
+    reportError("connectionDropped",err);
+}
+
+
+void XMRuby::mouseDown(int id, int x, int y) {
+  if(!initialized) return;
+  currentCallBack = callBack;
+
+  VALUE args = rb_ary_new2(4);
+  rb_ary_store(args,0,rb_str_new2("wrap_mouseDown"));
+  rb_ary_store(args,1,INT2NUM(id));
+  rb_ary_store(args,2,INT2NUM(x));
+  rb_ary_store(args,3,INT2NUM(y));
+  
+  int err;
+  rb_protect(int_call_glob_func,args,&err);
+  if(err != 0)
+    reportError("mouseDown",err);
+}
+
+void XMRuby::mouseDrag(int id, int x, int y) {
+  if(!initialized) return;
+  currentCallBack = callBack;
+
+  VALUE args = rb_ary_new2(4);
+  rb_ary_store(args,0,rb_str_new2("wrap_onMouseDrag"));
+  rb_ary_store(args,1,INT2NUM(id));
+  rb_ary_store(args,2,INT2NUM(x));
+  rb_ary_store(args,3,INT2NUM(y));
+  
+  int err;
+  rb_protect(int_call_glob_func,args,&err);
+  if(err != 0)
+    reportError("mouseDrag",err);
+}
+
+void XMRuby::mouseUp(int id, int x, int y) {
+  if(!initialized) return;
+  currentCallBack = callBack;
+
+  VALUE args = rb_ary_new2(4);
+  rb_ary_store(args,0,rb_str_new2("wrap_mouseUp"));
+  rb_ary_store(args,1,INT2NUM(id));
+  rb_ary_store(args,2,INT2NUM(x));
+  rb_ary_store(args,3,INT2NUM(y));
+  
+  int err;
+  rb_protect(int_call_glob_func,args,&err);
+  if(err != 0)
+    reportError("mouseUp",err);
+}
+
+QVariant XMRuby::pluginCall(int id, int function, const QVariant & vargs) {
+  if(!initialized) return QVariant();
+  currentCallBack = callBack;
+
+  VALUE args = rb_ary_new2(4);
+  rb_ary_store(args,0,rb_str_new2("wrap_pluginCall"));
+  rb_ary_store(args,1,INT2NUM(id));
+  rb_ary_store(args,2,INT2NUM(function));
+  QCString ctmp = vargs.toString().utf8();
+  rb_ary_store(args, 1, rb_str_new(ctmp,ctmp.length()));
+  
+  int err;
+  VALUE ret = rb_protect(int_call_glob_func,args,&err);
+  if(TYPE(ret) != T_STRING) {
+    reportError("pluginCall",err);
+    return QVariant();
+  }
+  if(err != 0)
+    reportError("pluginCall",err);
+
+  return QString::fromUtf8(STR2CSTR(ret));
+}
+

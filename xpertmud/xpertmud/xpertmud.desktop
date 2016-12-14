@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Exec=xpertmud %i %m -caption "%c"  
+Icon=xpertmud
+MiniIcon=xpertmud
+DocPath=xpertmud/index.html
+Comment=xtensible perl scripable mud client
+Comment[de]=xtensible perl scripable mud client
+Terminal=0
+Name=Xpertmud
+Name[de]=Xpertmud
+BinaryPattern=xpertmud
+MimeType=application/x-xpertmud-bookmark

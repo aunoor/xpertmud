@@ -1,0 +1,40 @@
+	* Inputline: Command retention configurable
+
+2002-01-01	Manuel Klimek & Ernst Bachmann
+
+	* Release of Version 2.0beta1
+
+	* Added Plugin support for Scripting languages
+
+	* Implemented Python interpreter
+
+	* Implemented default script for Python
+
+	* Reworked the default scripting environment
+
+	* Higher-Level functions like Aliases, Triggers, Timers are now available
+
+	* New System for automatically generated Dokumentation for scripting functions
+
+	* Configuration Page for the default scripting language
+
+	* Lots of little details
+
+2001-11-06	Manuel Klimek & Ernst Bachmann
+
+	* Release of Version 1.0beta2
+
+	* Telnet Options are now supported
+
+	* Your password won't be shown on the input line anymore (And you can turn on/off echo on the inut line as you like).
+
+	* Text is printed when we get it, not when there's a complete line (This is user configurable - of course ;-).
+
+	* The perl interpreter can be restarted.
+
+	* Overall ANSI command enhancements... You can nearly run emacs now.
+
+2001-07-07	Manuel Klimek & Ernst Bachmann
+
+	* Release of Version 1.0beta1
+

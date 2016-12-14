@@ -1,0 +1,609 @@
+# POT file for xpertmud.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2002-02-09 20:09+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8-bit\n"
+
+#: TextBufferWidget.cc:39
+msgid "Clear &all"
+msgstr ""
+
+#: ConnectDialog.moc.cc:42 ConnectDialog.moc.cc:47
+msgid "ConnectDialog"
+msgstr ""
+
+#: xpertmud.cc:128
+msgid "General Status"
+msgstr ""
+
+#: xpertmud.cc:139
+msgid ""
+"There are no scripting plugins available!\n"
+"Please check your installation"
+msgstr ""
+
+#: xpertmud.cc:139 xpertmud.cc:763
+msgid "Error!"
+msgstr ""
+
+#: xpertmud.cc:481 xpertmud.cc:591 xpertmud.cc:814 xpertmud.cc:826
+#: xpertmud.cc:838 xpertmud.cc:1087 xpertmud.cc:1302 xpertmud.cc:1310
+msgid "Ready."
+msgstr ""
+
+#: xpertmud.cc:593
+msgid "Sent:"
+msgstr ""
+
+#: xpertmud.cc:594 xpertmud.cc:596 xpertmud.cc:906 xpertmud.cc:913
+#, ycp-format
+msgid "%1 Bytes"
+msgstr ""
+
+#: xpertmud.cc:595
+msgid "Rcvd:"
+msgstr ""
+
+#: xpertmud.cc:597
+msgid "No scripting language loaded"
+msgstr ""
+
+#: xpertmud.cc:601
+msgid "&Connect..."
+msgstr ""
+
+#: xpertmud.cc:603
+msgid "Connect to a MUD"
+msgstr ""
+
+#: xpertmud.cc:605
+msgid "&Disonnect"
+msgstr ""
+
+#: xpertmud.cc:607
+msgid "Drop current connection"
+msgstr ""
+
+#: xpertmud.cc:613
+msgid "Quits the application"
+msgstr ""
+
+#: xpertmud.cc:616
+msgid "Enables/disables the toolbar"
+msgstr ""
+
+#: xpertmud.cc:618
+msgid "Show &Inputbar"
+msgstr ""
+
+#: xpertmud.cc:619
+msgid "Enables/disables the inputbar"
+msgstr ""
+
+#: xpertmud.cc:622
+msgid "Enables/disables the statusbar"
+msgstr ""
+
+#: xpertmud.cc:625
+msgid "Configure the toolbar"
+msgstr ""
+
+#: xpertmud.cc:628
+msgid "Configure the application"
+msgstr ""
+
+#: xpertmud.cc:630
+msgid "&Tile"
+msgstr ""
+
+#: xpertmud.cc:631
+msgid "&Cascade"
+msgstr ""
+
+#: xpertmud.cc:633
+msgid "&Window"
+msgstr ""
+
+#: xpertmud.cc:636
+msgid "&Scripting"
+msgstr ""
+
+#: xpertmud.cc:639
+msgid "&Search for new Languages"
+msgstr ""
+
+#: xpertmud.cc:641
+msgid "Search for new interpreter plugins"
+msgstr ""
+
+#: xpertmud.cc:643
+msgid "&Unload the Interpreter"
+msgstr ""
+
+#: xpertmud.cc:645
+msgid "Unloads any currently loaded Interpreter"
+msgstr ""
+
+#: xpertmud.cc:647
+msgid "Send &Feedback Mail..."
+msgstr ""
+
+#: xpertmud.cc:652
+msgid "Input Line"
+msgstr ""
+
+#: xpertmud.cc:695
+#, ycp-format
+msgid "Restart &%1 interpreter"
+msgstr ""
+
+#: xpertmud.cc:698
+#, ycp-format
+msgid "Start &%1 interpreter"
+msgstr ""
+
+#: xpertmud.cc:732
+msgid "stopped interpreter"
+msgstr ""
+
+#: xpertmud.cc:738
+msgid "unloaded interpreter"
+msgstr ""
+
+#: xpertmud.cc:763
+msgid "Library loaded, but no ScriptInterpreter created"
+msgstr ""
+
+#: xpertmud.cc:766
+#, c-format, ycp-format
+msgid ""
+"Library could not be loaded: \n"
+"%1"
+msgstr ""
+
+#: xpertmud.cc:767
+#, ycp-format
+msgid "Error while loading %1!"
+msgstr ""
+
+#: xpertmud.cc:802
+msgid "Toggle the toolbar..."
+msgstr ""
+
+#: xpertmud.cc:818
+msgid "Toggle the inputbar..."
+msgstr ""
+
+#: xpertmud.cc:830
+msgid "Toggle the statusbar..."
+msgstr ""
+
+#: xpertmud.cc:902 xpertmud.cc:909
+#, ycp-format
+msgid "%1 MB"
+msgstr ""
+
+#: xpertmud.cc:904 xpertmud.cc:911
+#, ycp-format
+msgid "%1 KB"
+msgstr ""
+
+#: xpertmud.cc:1030
+msgid "Exiting..."
+msgstr ""
+
+#: xpertmud.cc:1050
+#, ycp-format
+msgid "Connecting to %1:%2"
+msgstr ""
+
+#: xpertmud.cc:1072
+msgid "This connection was not found in the bookmarks"
+msgstr ""
+
+#: xpertmud.cc:1072 xpertmud.cc:1107 xpertmud.cc:1329
+msgid "Error !"
+msgstr ""
+
+#: xpertmud.cc:1077
+msgid "Disonnecting."
+msgstr ""
+
+#: xpertmud.cc:1107
+msgid "Evil error occured :)"
+msgstr ""
+
+#: xpertmud.cc:1291
+msgid "Executing startup script..."
+msgstr ""
+
+#: xpertmud.cc:1325
+#, ycp-format
+msgid ""
+"Error In Connection:\n"
+"%1, %2\n"
+"%3"
+msgstr ""
+
+#: ConnectDialog.cc:30
+msgid "Connect"
+msgstr ""
+
+#: ConnectDialog.cc:33
+msgid "&Connect"
+msgstr ""
+
+#: ConnectDialog.cc:41 ConnectDialog.cc:60
+msgid "Name:"
+msgstr ""
+
+#: ConnectDialog.cc:50
+msgid "New"
+msgstr ""
+
+#: ConnectDialog.cc:69
+msgid "Host:"
+msgstr ""
+
+#: ConnectDialog.cc:78
+msgid "Port:"
+msgstr ""
+
+#: ConnectDialog.cc:89
+msgid "Script:"
+msgstr ""
+
+#: TextWidget.moc.cc:42 TextWidget.moc.cc:47
+msgid "TextWidget"
+msgstr ""
+
+#: main.cc:28 main.cc:41 xpertmud.moc.cc:42 xpertmud.moc.cc:47
+msgid "Xpertmud"
+msgstr ""
+
+#: main.cc:34
+msgid "The name of the bookmark to open"
+msgstr ""
+
+#: main.cc:48
+msgid "the feedback mail dialog"
+msgstr ""
+
+#: _translatorinfo.cpp:1
+msgid ""
+"_: NAME OF TRANSLATORS\n"
+"Your names"
+msgstr ""
+
+#: _translatorinfo.cpp:3
+msgid ""
+"_: EMAIL OF TRANSLATORS\n"
+"Your emails"
+msgstr ""
+
+#: InputAction.moc.cc:42 InputAction.moc.cc:47
+msgid "InputAction"
+msgstr ""
+
+#: ConnectEntry.h:29
+msgid "Unnamed"
+msgstr ""
+
+#: TextBufferWidget.moc.cc:42 TextBufferWidget.moc.cc:47
+msgid "TextBufferWidget"
+msgstr ""
+
+#: configdialog.moc.cc:42 configdialog.moc.cc:47
+msgid "ConfigDialog"
+msgstr ""
+
+#: configdialog.cc:18
+msgid "Configure Xpertmud"
+msgstr ""
+
+#: configdialog.cc:33
+msgid "Colors"
+msgstr ""
+
+#: configdialog.cc:56
+msgid "History"
+msgstr ""
+
+#: configdialog.cc:61
+msgid "Default History Size:"
+msgstr ""
+
+#: configdialog.cc:66
+msgid "limit buffer size"
+msgstr ""
+
+#: configdialog.cc:74
+msgid "lines"
+msgstr ""
+
+#: configdialog.cc:93
+msgid "Scripting"
+msgstr ""
+
+#: configdialog.cc:98
+msgid "Default Scripting engine:"
+msgstr ""
+
+#: rc.cpp:1
+msgid "&Connection"
+msgstr ""
+
+#: rc.cpp:5
+msgid "Input Line Toolbar"
+msgstr ""
+
+#: Feedback.cc:17
+msgid "What is your general opinion about this program?"
+msgstr ""
+
+#: Feedback.cc:19
+msgid "It's one of my favourites"
+msgstr ""
+
+#: Feedback.cc:20
+msgid "I like it"
+msgstr ""
+
+#: Feedback.cc:21
+msgid "It's sometimes useful"
+msgstr ""
+
+#: Feedback.cc:22
+msgid "It's average"
+msgstr ""
+
+#: Feedback.cc:23
+msgid "Nice try, but this could be done better"
+msgstr ""
+
+#: Feedback.cc:24
+msgid "It's poor"
+msgstr ""
+
+#: Feedback.cc:25
+msgid "It's useless"
+msgstr ""
+
+#: Feedback.cc:26
+msgid "It's crap"
+msgstr ""
+
+#: Feedback.cc:29
+msgid "How do you rate the stability of this program?"
+msgstr ""
+
+#: Feedback.cc:30
+msgid "Rock solid"
+msgstr ""
+
+#: Feedback.cc:31 Feedback.cc:39
+msgid "Good"
+msgstr ""
+
+#: Feedback.cc:32 Feedback.cc:40
+msgid "Average"
+msgstr ""
+
+#: Feedback.cc:33 Feedback.cc:41
+msgid "Poor"
+msgstr ""
+
+#: Feedback.cc:34
+msgid "It keeps crashing all the time"
+msgstr ""
+
+#: Feedback.cc:37
+msgid "How do you rate the performance of this program?"
+msgstr ""
+
+#: Feedback.cc:38
+msgid "Great"
+msgstr ""
+
+#: Feedback.cc:42
+msgid "It's so slow it drives me nuts"
+msgstr ""
+
+#: Feedback.cc:45
+msgid "Are there features you are missing?"
+msgstr ""
+
+#: Feedback.cc:46
+msgid "Yes, a lot! (please add comment below)"
+msgstr ""
+
+#: Feedback.cc:47
+msgid "Some (please add comment below)"
+msgstr ""
+
+#: Feedback.cc:48
+msgid "None"
+msgstr ""
+
+#: Feedback.cc:49
+msgid "It has too many features already!"
+msgstr ""
+
+#: Feedback.cc:52
+msgid "Which scripting environment do you prefer?"
+msgstr ""
+
+#: Feedback.cc:53
+msgid "Perl"
+msgstr ""
+
+#: Feedback.cc:54
+msgid "Python"
+msgstr ""
+
+#: Feedback.cc:55
+msgid "None of those, I want something else! (please add comment below)"
+msgstr ""
+
+#: Feedback.cc:58
+msgid "Did you have trouble learning/using the scripting API?"
+msgstr ""
+
+#: Feedback.cc:60
+msgid "No problem"
+msgstr ""
+
+#: Feedback.cc:61
+msgid "Some"
+msgstr ""
+
+#: Feedback.cc:62
+msgid "I'm still learning"
+msgstr ""
+
+#: Feedback.cc:63
+msgid "I didn't have a clue what to do at first"
+msgstr ""
+
+#: Feedback.cc:64
+msgid "I still don't have a clue what to do"
+msgstr ""
+
+#: Feedback.cc:67
+msgid "Where do you use this program most?"
+msgstr ""
+
+#: Feedback.cc:68
+msgid "At work"
+msgstr ""
+
+#: Feedback.cc:69
+msgid "At home"
+msgstr ""
+
+#: Feedback.cc:70
+msgid "At university / school"
+msgstr ""
+
+#: Feedback.cc:73
+msgid "How did you get to know this program?"
+msgstr ""
+
+#: Feedback.cc:74
+msgid "In a menu on my machine"
+msgstr ""
+
+#: Feedback.cc:75
+msgid "Somebody told me about it"
+msgstr ""
+
+#: Feedback.cc:76
+msgid "Somebody told me about it in a MUD"
+msgstr ""
+
+#: Feedback.cc:77
+msgid "On the internet"
+msgstr ""
+
+#: Feedback.cc:78
+msgid "On the internet, on a MUD related page"
+msgstr ""
+
+#: Feedback.cc:79
+msgid "Printed magazine / book"
+msgstr ""
+
+#: Feedback.cc:80
+msgid "Other (please add comment below)"
+msgstr ""
+
+#: Feedback.cc:83
+msgid "Would you recommend this program to a friend?"
+msgstr ""
+
+#: kfeedback.moc.cc:42 kfeedback.moc.cc:47
+msgid "KFeedbackDialog"
+msgstr ""
+
+#: kfeedback.moc.cc:117 kfeedback.moc.cc:122
+msgid "KFeedbackForm"
+msgstr ""
+
+#: kfeedback.moc.cc:211 kfeedback.moc.cc:216
+msgid "KFeedbackQuestionList"
+msgstr ""
+
+#: TextWidget.cc:112
+msgid "&Clear"
+msgstr ""
+
+#: kfeedback.cc:33
+msgid "Feedback"
+msgstr ""
+
+#: kfeedback.cc:38
+msgid "&Mail this..."
+msgstr ""
+
+#: kfeedback.cc:85
+msgid ""
+"Please answer as any questions as you can.\n"
+"\n"
+"You will be able to review everything in your mailer before the mail will be "
+"sent.\n"
+"Nothing will be sent behind your back.\n"
+msgstr ""
+
+#: kfeedback.cc:111
+msgid "Questions marked with "
+msgstr ""
+
+#: kfeedback.cc:120
+msgid " must be answered before a mail can be sent."
+msgstr ""
+
+#: kfeedback.cc:131
+msgid "&Additional comments:"
+msgstr ""
+
+#: kfeedback.cc:307
+msgid "yes"
+msgstr ""
+
+#: kfeedback.cc:308
+msgid "no"
+msgstr ""
+
+#: mxinputline.moc.cc:42 mxinputline.moc.cc:47
+msgid "MXInputLine"
+msgstr ""
+
+#: scripting/perl/XMPerlFactory.moc.cc:42
+#: scripting/perl/XMPerlFactory.moc.cc:47
+msgid "XMPerlFactory"
+msgstr ""
+
+#: scripting/perl/XMPerl.moc.cc:42 scripting/perl/XMPerl.moc.cc:47
+msgid "XMPerl"
+msgstr ""
+
+#: scripting/python/XMPythonFactory.moc.cc:42
+#: scripting/python/XMPythonFactory.moc.cc:47
+msgid "XMPythonFactory"
+msgstr ""
+
+#: scripting/python/XMPython.moc.cc:42 scripting/python/XMPython.moc.cc:47
+msgid "XMPython"
+msgstr ""
+
+#: scripting/Scripting.moc.cc:42 scripting/Scripting.moc.cc:47
+msgid "XMScripting"
+msgstr ""

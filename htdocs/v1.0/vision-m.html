@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="stylesheet" type="text/css" href="general.css" />
+<!-- TITLE --><title></title>
+</head>
+
+<body>
+<!-- UPPER -->
+
+<div class="window">
+<div class="window-title">The Vision</div>
+<div class="window-content">
+<p>Xpertmud is very modular and flexible. The idea is to
+use the design and knowledge available with xpertmud to create a
+new tool, or a set of new tools which use the same
+scripting and plugin interface. This would enable the
+community to share a lot of code. In this document I
+propose a way how this might be done. Of course this
+requires more manpower, and I hope this document will
+inspire some of you out there to join the project.</p>
+<p>The main idea evolved, when I read some threads about
+Qt/XEmacs and some other python-scriptable editors.
+I realized that all the technology that is needed to
+build a flexible, scriptable and pluginable editor
+is right now available within the xpertmud code. So
+why not use this as a starting point to create a
+<b>Xpert Development Environment</b>, a programming
+environment for extensible (think plugins), perl, python and (see lower) 42
+scriptable applications.</p>
+<p>The best way to look at this proposed environment is
+in my opinion to look at it in terms of a new directory (think module)
+hierarchy:</p>
+<ul>
+<li><b>widgets/</b><br />
+Some widgets which qt doesn't have, but which are usable in
+many applications. This includes modular
+and extensible fixed font widgets.</li>
+<li><b>telnet/</b><br />
+Basic telnet classes, which feature a very extensible, modular
+and easy way to code telnet applications. This is already 
+available in the xpertmud codebase.</li>
+<li><b>ansi/</b><br />
+A flexible and modular ansi parser. Also available in the
+xpertmud codebase.</li>
+<li><b>plugin/</b><br />
+A library that allows Xpert applications to use plugins from
+within scripts. This is strongly coupled to xpert-script.</li>
+<li><b>script/</b><br />
+The environment to include scripting languages in Xpert
+applications. Because the scripting API is very application
+dependent this needs to feature a meta-compiler, which creates
+API files and binding library code from API specs and some
+code skeletons.
+<ul>
+<li><b>fourtytwo/</b><br />
+A very basic scripting language, which enables Xpert applications
+scripting without being dependent on 3-rd party tools. There
+should be an easy way to compile perl, python and other language
+code from fourtytwo. Fourtytwo must have exactly the features
+Xpert applications need to fulfill their basic scripting needs.
+Not more and not less. Then application developers just code their
+extensions once, and the user can easily switch to other supported
+languages if they need more power in their own scripts.</li>
+<li><b>apicompiler/</b><br />
+A compiler that reads the scripting api in some yet-to-define
+format and generates C++ Classes that provide the glue
+between the scripting language and the application. The
+way the api is specified limits the possible scripting languages
+the environment can support in the future (think types), so
+this has to be done very carefully. The application coder just
+specifies the api and some C++ code that has to be executed
+once the callback is called. Using skeletons for the different
+scripting languages, apicompiler compiles not only some
+classes to use in the application, but also all the code
+for the dynamic library, which embeds the scripting interpreter.
+</li>
+</ul>
+</li>
+<li><b>mdi/</b><br />
+A new (or qextmdi based) mdi for Xpert applications which need it.</li>
+<li><b>compat/</b><br />
+Everything that is needed to compile Xpert applications without
+kde and/or Qt 2.3 (think compatibility classes). There are
+already many of those in the xpertmud repository.</li>
+<li><b>xpertmud/</b><br />
+Our good old xpertmud client after some code cleanup.</li>
+<li><b>xperted/</b><br />
+An extensbile, scriptable and pluginable editor for kde and windows.
+Being a kpart it can be embedded for example in kdevelop. Being
+pluginable it can easily do expensive things like code completion.
+Being scriptable many things can be done simply with perl,
+python or 42.</li>
+</ul>
+<p>Now if you're as excited as I am about writing the next
+generation cross platform editor, please drop me a mail
+and/or subscribe to the (very, very low traffic at the
+moment) xpertmud mailinglist. This will only be possible
+(and probably this will only be begun) if enough people
+join. Ernst and I can't do all this at the moment, but
+I know there are many talented coders out there!</p>
+<p>
+So long,<br />
+&nbsp;&nbsp;&nbsp;Manuel</p>
+
+</div>
+</div>
+
+<!-- LOWER -->
+</body>
+</html>

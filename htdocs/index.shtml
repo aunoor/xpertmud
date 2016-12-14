@@ -1,0 +1,75 @@
+<!--#include file="includes/common_header" -->
+
+<!--#include file="includes/box_start" -->
+<IMG SRC="images/w_what.gif">
+<!--#include file="includes/box_seperator" -->
+	<FONT FACE="Arial" SIZE=-1 COLOR=#FFFFFF>
+	Xpertmud is an extensible perl scriptable MUD client. Basically it's just a 
+	scriptable telnet, but most people would use it for mudding. It supports 
+	multiple windows (which are perl-scriptable, yeah), and if you know perl you 
+	can do triggers, aliases, whatever you want for every bit of text that comes 
+	from or goes to the server will be processed by your perl script (or some 
+	standard perl script). 
+	<P>See some <A HREF="screenshots.shtml">screen shots</A>!
+	</FONT>
+<!--#include file="includes/box_end" -->
+
+<!--#include file="includes/box_start" -->
+<IMG SRC="images/w_latestnews.gif">
+<!--#include file="includes/box_seperator" -->
+	<FONT FACE="Arial" SIZE=-1 COLOR=#FFFFFF>
+	<B>2002-04-26 Work in progress</B>
+
+	<p>
+	  There are quite some exciting improvements currently in CVS
+	  and much more new features are currently planned:</p>
+	
+	<b>A improved input bar supporting multiple lines of input:</b>
+	<p>simply press Ctrl-Enter and the inputbar gets one line taller.
+	  This is quite usefull when writing long messages or scode.
+	  Newlines in your input are transmitted as such to perl, so if 
+	  you need one long, uninterrupted line of text, an alias like
+	  <tt># addAlias("Enter","\n"," ");</tt> should do the trick.</p>
+	<center>
+	  <a href="images/multiline.png" target="_blank">
+	    <img src="images/multiline_th.png" width="200" height="197"
+		 border="0" alt="Multiline inputbar">
+	  </a>
+	</center>
+	<p><A HREF="screenshots.shtml">more screen shots</A></p>
+
+	<b>Plugin support:</b>
+	<p>The support for loadable plugins is nearly finished and writing
+	  plugins is really simple:</p>
+	<p>Simply put any QWidget in a lib, add one signal and one slot:
+	  your plugin is complete :)</p>
+	<p>Your plugin can be contolled using the standard XMWindow perl functions
+	  like <tt>move, show, resize...</tt> and, of course, functions specific to
+	  the plugin.
+	</p>
+	<p>The other way round, the plugin can call specific perl functions, e.g.
+	  in response to some mouse click.</p>
+	</FONT> 
+<!--#include file="includes/box_end" -->
+<!--#include file="includes/box_start" -->
+<IMG SRC="images/w_latestnews.gif">
+<!--#include file="includes/box_seperator" -->
+	<FONT FACE="Arial" SIZE=-1 COLOR=#FFFFFF>
+	<B>2002-03-27 kde3 support in latest cvs</B>
+
+	<P>You can now compile xpertmud for kde2 or kde3. Just
+	ensure that the correct configure options are set. Helpful
+	are --disable-mt for older qt versions, --with-qt-dir to
+	point to the correct version of qt and the $KDEDIR
+	variable which should point to the correct kde prefix
+	(on SuSE /opt/kde2 or /opt/kde3).</P>
+
+
+	<P>Sad as it is, there won't be a 2.0final version of xpertmud, we'll 
+	   continue with a new series of beta versions (3.0beta1,2,3...)
+
+	</FONT> 
+<!--#include file="includes/box_end" -->
+
+
+<!--#include file="includes/common_footer" -->

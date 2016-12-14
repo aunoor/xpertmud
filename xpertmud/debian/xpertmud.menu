@@ -1,0 +1,8 @@
+?package(xpertmud):\
+        needs="x11"\
+        section="Apps/Net"\
+        hints="KDE,MUD"\
+        title="Xpertmud"\
+	icon32x32="/usr/share/pixmaps/xpertmud.xpm"\
+	icon16x16="/usr/share/pixmaps/xpertmud-16.xpm"\
+        command="/usr/bin/xpertmud"
