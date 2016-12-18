@@ -27,12 +27,8 @@
 #ifndef _QEXTMDICHILDAREA_H_
 #define _QEXTMDICHILDAREA_H_
 
-#include <qframe.h>
-#if QT_VERSION < 300
-# include <qlist.h>
-#else
-# include <qptrlist.h>
-#endif
+#include <QFrame>
+#include <QList>
 
 #include "qextmdichildfrm.h"
 #include "qextmdichildview.h"
@@ -62,11 +58,7 @@ public:
    /** 
    * Z Order stack of @ref QextMdiChildFrm childframe windows (top=last) 
    */
-#if QT_VERSION < 300
-   QList<QextMdiChildFrm> *m_pZ; //Auto delete enabled
-#else
-   QPtrList<QextMdiChildFrm> *m_pZ; //Auto delete enabled
-#endif
+   QList<QextMdiChildFrm*> *m_pZ; //Auto delete enabled
    /**
    * the default size of an newly created childframe
    */
@@ -114,23 +106,23 @@ public:
    * Appends a new QextMdiChildFrm to this manager.
    * The child is shown,raised and gets focus if this window has it.
    */
-   void manageChild(QextMdiChildFrm *lpC,bool bShow=TRUE,bool bCascade=TRUE);
+   void manageChild(QextMdiChildFrm *lpC, bool bShow=true, bool bCascade=true);
    /**
    * Destroys a QextMdiChildFrm managed.<br>
    * Note that if a client is attached to this child , it is deleted too!
    */
-   void destroyChild(QextMdiChildFrm *lpC,bool bFocusTopChild = TRUE);
+   void destroyChild(QextMdiChildFrm *lpC, bool bFocusTopChild = true);
    /**
    * Destroys a QextMdiChildFrm managed.<br>
    * Note that if a client is attached to this child , it is NOT deleted!
    */
-   void destroyChildButNotItsView(QextMdiChildFrm *lpC,bool bFocusTopChild = TRUE);
+   void destroyChildButNotItsView(QextMdiChildFrm *lpC, bool bFocusTopChild = true);
    /**
    * Brings the child lpC to the top of the stack
    * The children is focused if bSetFocus is TRUE
    * otherwise is raised only
    */
-   void setTopChild(QextMdiChildFrm *lpC,bool bSetFocus=FALSE);
+   void setTopChild(QextMdiChildFrm *lpC, bool bSetFocus=true);
    /**
    * Returns the topmost child (the active one) or 0 if there are no children.
    * Note that the topmost child may be also hidded , if ALL the windows are minimized.

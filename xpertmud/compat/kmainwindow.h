@@ -1,10 +1,9 @@
 #ifndef KMAINWINDOW_H
 #define KMAINWINDOW_H
 
-#include <qmainwindow.h>
-#include <qmenubar.h>
-#include <qtoolbar.h>
-#include "qptrlist.h"
+#include <QMainWindow>
+#include <QMenuBar>
+#include <QToolBar>
 #include "kstatusbar.h"
 #include "ktoolbar.h"
 #include "kaction.h"
@@ -22,13 +21,13 @@ using std::endl;
 class KMainWindow: public QMainWindow {
   Q_OBJECT
  public:
-  KMainWindow(QWidget *parent, const char *name, int flags);
+  KMainWindow(QWidget *parent, const QString name, Qt::WindowFlags flags, QList<Qt::WidgetAttribute> a);
   virtual ~KMainWindow();
 
   virtual KStatusBar* statusBar() { return _bar; }
   virtual QObject* actionCollection() { return &_actionCollection; }
   KToolBar * toolBar(const QString& name) { 
-    QObject *c = child(name);
+    QObject *c = this->findChild<QObject *>(name);
     if(c != NULL) 
       if(c->inherits("KToolBar"))
 	return (KToolBar*) c;

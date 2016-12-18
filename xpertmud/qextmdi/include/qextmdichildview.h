@@ -163,11 +163,11 @@ public:
    /**
    * Constructor
    */
-   QextMdiChildView( const QString& caption, QWidget* parentWidget = 0L, const char* name = 0L, WFlags f=0);
+   QextMdiChildView( const QString& caption, QWidget* parentWidget = 0L, const char* name = 0L, Qt::WindowFlags f=0);
    /**
    * Constructor 2 (sets "Unnamed" as default caption)
    */
-   QextMdiChildView( QWidget* parentWidget = 0L, const char* name = 0L, WFlags f=0);
+   QextMdiChildView( QWidget* parentWidget = 0L, const char* name = 0L, Qt::WindowFlags f=0);
    /**
    * Destructor
    */

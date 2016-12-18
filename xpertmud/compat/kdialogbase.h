@@ -1,13 +1,13 @@
 #ifndef KDIALOGBASE_H
 #define KDIALOGBASE_H
 
-#include <qdialog.h>
-#include <qstring.h>
-#include <qvbox.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <qwidgetstack.h>
-#include <qlistbox.h>
+#include <QDialog>
+#include <QString>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QListWidget>
+#include <QStackedWidget>
 #include "kiconloader.h"
 
 #include <map>
@@ -23,6 +23,25 @@ class KDialog: public QDialog {
   static int spacingHint() {
     return 4;
   }
+};
+
+class QVBox : public QWidget {
+public:
+    QVBox(QWidget *parent):QWidget(parent) {
+      QVBoxLayout *layout = new QVBoxLayout();
+      this->setLayout(layout);
+    }
+};
+
+class QHBox : public QWidget {
+public:
+    QHBox(QWidget *parent):QWidget(parent) {
+      QHBoxLayout *layout = new QHBoxLayout();
+      this->setLayout(layout);
+    }
+    void setSpacing(int value) {
+      layout()->setSpacing(value);
+    }
 };
 
 class VPage {
@@ -58,20 +77,24 @@ class KDialogBase: public QDialog {
     Help = 1<<3,
     Default = 1<<4
   };
-
+// QDialog ( QWidget * parent = 0, const char * name = 0, bool modal = FALSE, WFlags f = 0 )
   KDialogBase(int dummy, const char* name,
 	      int buttons, int buttons2, QWidget* parent=NULL,
 	      const char* name2=""):
-    QDialog(parent, name, true), mainWidget(0), buttonMap(buttons)
+    QDialog(parent), mainWidget(0), buttonMap(buttons)
     {
+      setModal(true);
+      setObjectName(QString(name));
       mainWidget = makeMainWidget();
     }
 
   KDialogBase(QWidget* parent, const char* name,
 	      bool sw, const QString& heading,
 	      int buttons):
-    QDialog(parent, name, true), mainWidget(0), buttonMap(buttons)
+    QDialog(parent), mainWidget(0), buttonMap(buttons)
     {
+      setModal(true);
+      setObjectName(QString(name));
       mainWidget = makeMainWidget();
     }
 
@@ -80,9 +103,9 @@ class KDialogBase: public QDialog {
   QVBox* addVBoxPage(const QString& name, const QString& description,
 		     const BarIcon& icon) {
     vpages[name] = VPage(new QVBox(stack), name, description);
-    stack->addWidget(vpages[name].getBox(), 0);
-    stack->raiseWidget(vpages[name].getBox());
-    list->insertItem(name);
+    stack->insertWidget(0, vpages[name].getBox());
+    stack->setCurrentWidget(vpages[name].getBox());
+    list->addItem(name);
     return vpages[name].getBox();
   }
 
@@ -90,19 +113,19 @@ class KDialogBase: public QDialog {
   QFrame *makeMainWidget() {
     cout << "makeMainWidget" << endl;
     QVBoxLayout *l = new QVBoxLayout(this);
-    l->setAutoAdd(TRUE);
+    //l->setAutoAdd(TRUE);
     l->setSpacing(5);
     l->setMargin(5);
 
     QFrame *mainWidget = new QFrame(this);
     upperPart = new QHBox(this);
     sideBar = new QVBox(upperPart);
-    list = new QListBox(sideBar);
+    list = new QListWidget(sideBar);
     connect(list, SIGNAL(selectionChanged(QListBoxItem *)),
 	    this, SLOT(slotSelectionChanged(QListBoxItem *)));
 
     page = new QVBox(upperPart);
-    stack = new QWidgetStack(page);
+    stack = new QStackedWidget(page);
 
     buttons = new QHBox(this);
     buttons->setSpacing(5);
@@ -123,7 +146,8 @@ class KDialogBase: public QDialog {
   }
  public:
   virtual int exec() {
-    list->setSelected(list->topItem(), true);
+    list->setCurrentRow(0);
+    //list->setSelected(list->topItem(), true);
     return QDialog::exec();
   }
 
@@ -146,10 +170,10 @@ class KDialogBase: public QDialog {
   }
 
  private slots:
-  void slotSelectionChanged(QListBoxItem *item) {
+  void slotSelectionChanged(QListWidgetItem *item) {
    cout << "selection changed" << endl;
     QString name = item->text();
-    stack->raiseWidget(vpages[name].getBox());
+    stack->setCurrentWidget(vpages[name].getBox());
   } 
 
  protected:
@@ -157,9 +181,9 @@ class KDialogBase: public QDialog {
   QHBox *buttons;
   QHBox *upperPart;
   QVBox *sideBar;
-  QListBox *list;
+  QListWidget *list;
   QVBox *page;
-  QWidgetStack *stack;
+  QStackedWidget *stack;
   int buttonMap;
 
   map<QString, VPage> vpages;

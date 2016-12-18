@@ -8,21 +8,21 @@
 class KFileDialog: public QFileDialog {
   Q_OBJECT
  public:
-  static KURL getOpenURL(KURL initially = QString::null, 
+  static KURL getOpenURL(KURL initially = QString(),
 		     const QString & filter = QString::null, 
 		     QWidget * parent = 0, const char * name = 0) {
     if (initially.isEmpty()) {
        initially=qApp->applicationDirPath();
     }
-    return getOpenFileName(initially.url(), filter, parent, name);
+    return getOpenFileName(parent, name, initially.url(), filter);
   }
-  static KURL getSaveURL(KURL  initially = QString::null, 
+  static KURL getSaveURL(KURL  initially = QString(),
 		     const QString & filter = QString::null, 
 		     QWidget * parent = 0, const char * name = 0) {
     if (initially.isEmpty()) {
        initially=qApp->applicationDirPath();
     }
-    return getSaveFileName(initially.url(), filter, parent, name);
+    return getSaveFileName(parent, name, initially.url(), filter);
   }
 };
 

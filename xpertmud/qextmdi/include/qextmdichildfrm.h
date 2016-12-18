@@ -27,19 +27,14 @@
 #ifndef _QEXTMDICHILDFRM_H_
 #define _QEXTMDICHILDFRM_H_
 
-#if QT_VERSION < 300
-# include <qlist.h>
-#else
-# include <qptrlist.h>
-#endif
-#include <qpixmap.h>
-#include <qpopupmenu.h>
-#include <qpushbutton.h>
-#include <qtoolbutton.h>
-#include <qlabel.h>
-#include <qdict.h>
-#include <qdatetime.h>
-#include <qlayout.h>
+#include <QList>
+#include <QPixMap>
+#include <QMenu>
+#include <QPushButton>
+#include <QToolButton>
+#include <QLabel>
+#include <QDateTime>
+#include <QLayout>
 
 #include "qextmdichildfrmcaption.h"
 
@@ -66,6 +61,17 @@ signals:
 /* some special events, see qetxtmdidefines.h
 */
 //------------------------------------------------------------------------------
+
+class QCustomEvent : public QEvent {
+public:
+    QCustomEvent (QEvent::Type type, void * data = NULL) : QEvent(type) {
+       m_data = data;
+    }
+    void * data() {return m_data;}
+protected:
+    void *m_data;
+};
+
 /**
  * @short a QCustomEvent for move
  * This special event will be useful, to inform view about child frame event.
@@ -184,7 +190,7 @@ protected:
    QPopupMenu*             m_pSystemMenu;
    QSize                   m_oldClientMinSize;
    QSize                   m_oldClientMaxSize;
-   QLayout::ResizeMode     m_oldLayoutResizeMode;
+//   QLayout::ResizeMode     m_oldLayoutResizeMode;
    QTime                   m_timeMeasure;
 
 // methods
@@ -233,7 +239,7 @@ public:
    /**
    * Minimizes , Maximizes or restores the window.
    */
-   void setState(MdiWindowState state,bool bAnimate=TRUE);
+   void setState(MdiWindowState state,bool bAnimate=true);
    /**
    * Returns the current state of the window
    * Cool to have it inline...
@@ -383,11 +389,11 @@ protected:
    /** Restore the focus policies for _all_ widgets in the view using the list given as parameter.
    * Install the event filter for all direct child widgets of this. (See @ref QextMdiChildFrm::eventFilter ) 
    */
-   void linkChildren( QDict<FocusPolicy>* pFocPolDict);
+   void linkChildren( QHash<QString, Qt::FocusPolicy>* pFocPolDict);
    /** Backups all focus policies of _all_ child widgets in the MDI childview since they get lost during a reparent.
    * Remove all event filters for all direct child widgets of this. (See @ref QextMdiChildFrm::eventFilter ) 
    */
-   QDict<QWidget::FocusPolicy>* unlinkChildren();
+   QHash<QString, Qt::FocusPolicy>* unlinkChildren();
    /** Calculates the corner id for the resize cursor. The return value can be tested for:
    * QEXTMDI_RESIZE_LEFT, QEXTMDI_RESIZE_RIGHT, QEXTMDI_RESIZE_TOP, QEXTMDI_RESIZE_BOTTOM
    * or an OR'd variant of them for the corners. 

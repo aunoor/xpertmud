@@ -24,7 +24,6 @@
 #include <qdom.h>
 
 #include <kurl.h>
-#include <qvaluevector.h>
 
 
 // Most of those get-Funcs are "logically" const,
@@ -76,7 +75,7 @@ public:
 #ifdef USE_STL_VECTOR_FOR_CONNECTIONS
   vector<int> getAvailableConnections();
 #else
-  QValueVector<int> getAvailableConnections();
+  QVector<int> getAvailableConnections();
 #endif
   bool isConnectionAvailable(int);
   void addConnection(int);

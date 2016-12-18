@@ -174,7 +174,7 @@ void TextBuffer::clearBOL() {
   unsigned int line = getLine(cursorY);
 
   if(line < buffer.size()) {
-    unsigned int width = QMIN(cursorX, buffer[line].size());
+    unsigned int width = qMin(cursorX, buffer[line].size());
     for(unsigned int i=0; i<width; ++i)
       buffer[line][i] = defaultAttributes;
 
@@ -271,7 +271,7 @@ void TextBuffer::carriageReturn() {
 
 void TextBuffer::scrollLines(int delta) {
   if(delta == 0) return;
-  if((unsigned int)QABS(delta) >= ansiViewHeight)
+  if((unsigned int)qAbs(delta) >= ansiViewHeight)
     clearWindow();
 
   if(delta > 0) {
@@ -303,7 +303,7 @@ void TextBuffer::scrollLines(int delta) {
 
 void TextBuffer::scrollColumns(int delta) {
   if(delta == 0) return;
-  if((unsigned int)QABS(delta) >= ansiViewWidth)
+  if((unsigned int)qAbs(delta) >= ansiViewWidth)
     clearWindow();
   
   if(delta > 0) {
@@ -321,7 +321,7 @@ void TextBuffer::scrollColumns(int delta) {
   } else {
     for(int y=buffer.size()-ansiViewHeight; 0<=y && y<(int)buffer.size(); ++y) {
       if(buffer[y].size() < ansiViewWidth) {
-	buffer[y].resize(QMIN(buffer[y].size()-delta,
+	buffer[y].resize(qMin(buffer[y].size()-delta,
 				  ansiViewWidth));
       }
       for(int x=buffer[y].size()-1; x>=0; --x) {
@@ -345,16 +345,16 @@ void TextBuffer::setDefaultBGColor(int color) {
 
 void TextBuffer::resize(unsigned int width, unsigned int height) {
   // cursorX is relative to left
-  cursorX = QMIN(cursorX, width - 1);
+  cursorX = qMin(cursorX, width - 1);
 
   // cursorY is relative to bottom
   int toBottom = ansiViewHeight - cursorY;
-  int newY = QMIN(QMAX(0, (int)height - toBottom),
+  int newY = qMin(qMax(0, (int)height - toBottom),
 		     (int)height - 1);
 
   // don't go into unfilled area...
   if(newY >= (int)buffer.size()) {
-    newY = QMAX((int)buffer.size()-1, 0);
+    newY = qMax((int)buffer.size()-1, 0);
   }
   cursorY = newY;
 

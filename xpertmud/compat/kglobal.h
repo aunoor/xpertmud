@@ -4,7 +4,7 @@
 #include "kstandarddirs.h"
 #include "kconfig.h"
 #include "kaboutdata.h"
-#include <qstringlist.h>
+#include <QStringList>
 
 #ifndef Q_CHECK_PTR
 #define Q_CHECK_PTR(X)
@@ -15,19 +15,19 @@ class KIconLoader;
 class KGlobal {
  public:
   static KStandardDirs* dirs() {
-    if(instance == NULL) _instance = new KGlobal();
+    if(_instance == NULL) _instance = new KGlobal();
     return &_instance->d;
   }
 
   static KConfig* config() {
-    if(instance == NULL) _instance = new KGlobal();
+    if(_instance == NULL) _instance = new KGlobal();
     return &_instance->c;
   }
 
   static KIconLoader* iconLoader();
 
   static KGlobal* instance() {
-    if(instance == NULL) _instance = new KGlobal();
+    if(_instance == NULL) _instance = new KGlobal();
     return _instance;
   }
 

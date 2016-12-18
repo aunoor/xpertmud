@@ -6,7 +6,7 @@
 #pragma warning ( disable:4786 )
 #endif
 
-#include <qstring.h> // unicode ...
+#include <QString> // unicode ...
 #include <map>
 #include <vector>
 
@@ -102,7 +102,7 @@ private:
 	ret.append(encodeCharset(it));
       }
 #else
-      ret.setLength(to-from);
+      ret.resize(to-from);
       for(int i=0; i<to-from; ++i) {
 	ret[i] = encodeCharset(from+i);
       }

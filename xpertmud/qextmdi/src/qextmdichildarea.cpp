@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 
 #include <math.h>
-#include <qpopupmenu.h>
+#include <QMenu>
 
 #include "qextmdidefines.h"
 #include "qextmdichildarea.h"

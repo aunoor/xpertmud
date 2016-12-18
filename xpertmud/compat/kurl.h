@@ -43,7 +43,7 @@ class KURL {
 
  private:
   void getFromString(const QString& str) {
-    int pos = str.findRev('/', -2); // ignore a trailing '/'
+    int pos = str.lastIndexOf('/'); // ignore a trailing '/'
     name = str.mid(pos+1);
     if(pos != -1)
       dir = str.left(pos);

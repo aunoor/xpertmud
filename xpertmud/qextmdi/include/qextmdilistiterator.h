@@ -26,46 +26,30 @@
 #ifndef _QEXTMDILISTITERATOR_H_
 #define _QEXTMDILISTITERATOR_H_
 
-#if QT_VERSION < 300
-# include <qlist.h>
-#else
-# include <qptrlist.h>
-#endif
+#include <QList>
 
 template <class Item>
 class QextMdiListIterator : public QextMdiIterator<Item*> {
 public:
-#if QT_VERSION < 300
    QextMdiListIterator(QList<Item>& list) {
-      m_iterator = new QListIterator<Item>(list);
+      m_iterator = list.begin();
    }
-#else
-   QextMdiListIterator(QPtrList<Item>& list) {
-      m_iterator = new QPtrListIterator<Item>(list);
-   }
-#endif
-
    virtual void first() {
       m_iterator->toFirst();
    }
    virtual void last() {
       m_iterator->toLast();
    }
-   virtual void next()  { ++(*m_iterator); }
-   virtual void prev()  { --(*m_iterator); }
+   virtual void next()  { ++(m_iterator); }
+   virtual void prev()  { --(m_iterator); }
    virtual bool isDone() const { return m_iterator->current() == NULL; }
    virtual Item* currentItem() const { return m_iterator->current(); }
 
    virtual ~QextMdiListIterator() {
-      delete m_iterator;
    }
   
 private:
-#if QT_VERSION < 300
-   QListIterator<Item> *m_iterator;
-#else
-   QPtrListIterator<Item> *m_iterator;
-#endif
+   QList<Item>::iterator m_iterator;
 };
 
 #endif // _QEXTMDILISTITERATOR_H_

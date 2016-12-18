@@ -1,14 +1,13 @@
 #ifndef KPOPUPMENU_H
 #define KPOPUPMENU_H
 
-#include <qpopupmenu.h>
+#include <QMenu>
 
-class KPopupMenu: public QPopupMenu {
+class KPopupMenu: public QMenu {
   Q_OBJECT
  public:
   KPopupMenu(QObject *parent):
-    QPopupMenu(static_cast<QWidget *>(parent)) {}
-
+    QMenu(static_cast<QWidget *>(parent)) {}
 };
 
 #endif

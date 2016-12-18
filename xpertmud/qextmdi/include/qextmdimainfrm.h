@@ -29,27 +29,17 @@
 #ifndef _QEXTMDIMAINFRM_H_
 #define _QEXTMDIMAINFRM_H_
 
-#ifndef NO_KDE2
-#include <kmainwindow.h>
-#include <kmenubar.h>
-#include <kpopupmenu.h>
-#include <kparts/dockmainwindow.h>
-using KParts::DockMainWindow;
-#else
-#include <qmenubar.h>
-#include <qpopupmenu.h>
-#include <dummykpartsdockmainwindow.h>
-#endif
 
-#if QT_VERSION < 300
-# include <qlist.h>
-#else
-# include <qptrlist.h>
-#endif
-#include <qrect.h>
-#include <qapplication.h>
-#include <qdom.h>
-#include <qguardedptr.h>
+#include <QMenuBar>
+#include <QMenu>
+#include <dummykpartsdockmainwindow.h>
+
+
+#include <QList>
+#include <QRect>
+#include <QApplication>
+#include <QDomImplementation>
+//#include <qguardedptr.h>
 
 #include "qextmditaskbar.h"
 #include "qextmdichildarea.h"
@@ -214,11 +204,7 @@ class QextMdiMainFrm : public DockMainWindow
 protected:
    QextMdiChildArea        *m_pMdi;
    QextMdiTaskBar          *m_pTaskBar;
-#if QT_VERSION < 300
    QList<QextMdiChildView> *m_pWinList;
-#else
-   QPtrList<QextMdiChildView> *m_pWinList;
-#endif
    QextMdiChildView        *m_pCurrentWindow;
    QPopupMenu              *m_pWindowPopup;
    QPopupMenu              *m_pTaskBarPopup;
@@ -226,11 +212,7 @@ protected:
    QPopupMenu              *m_pDockMenu;
    QPopupMenu              *m_pMdiModeMenu;
    QPopupMenu              *m_pPlacingMenu;
-#ifdef NO_KDE2
    QMenuBar                *m_pMainMenuBar;
-#else
-   KMenuBar                *m_pMainMenuBar;
-#endif
 
    QPixmap                 *m_pUndockButtonPixmap;
    QPixmap                 *m_pMinButtonPixmap;

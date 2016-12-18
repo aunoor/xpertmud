@@ -26,7 +26,7 @@ class KStandardDirs {
   QStringList findAllResources(const QString& type,
 		   const QString& cfilter,
 		   bool, bool) {
-    cout << "Searching for: " << type.latin1() << "/" << cfilter.latin1() << endl;
+    cout << "Searching for: " << type.toLatin1().data() << "/" << cfilter.toLatin1().data() << endl;
     QStringList ret;
     if(type == "module") {
       findModules("dll/interpreter", cfilter, ret);
@@ -38,17 +38,18 @@ class KStandardDirs {
       d.setFilter( QDir::Files | QDir::Readable );
 
       QString filter = cfilter;
-      const QFileInfoList *fList = d.entryInfoList(filter);
+      const QFileInfoList fList = d.entryInfoList(QStringList() << filter);
 
-      if(fList == NULL) return ret;
+      if(fList.isEmpty()) return ret;
 
-      QFileInfoListIterator it( *fList );
-      QFileInfo *fi;
-      while ( (fi=it.current()) ) {
-	QString name = fi->filePath();
-	cout << name.latin1() << endl;
-	ret.append(name);
-	++it;
+      QListIterator<QFileInfo> it (fList);
+      QFileInfo fi;
+
+      while ( it.hasNext() ) {
+          fi = it.next();
+          QString name = fi.filePath();
+          cout << name.toLocal8Bit().data() << endl;
+          ret.append(name);
       }
     }
     return ret;
@@ -73,7 +74,7 @@ class KStandardDirs {
 
       QString filter = cfilter;
       bool isDotLa = false;
-      if(filter.find(".la") != -1) {
+      if(filter.indexOf(".la") != -1) {
 #ifdef WIN32
 	filter.replace(QRegExp("\\.la"), ".dll");
 #else
@@ -85,28 +86,29 @@ class KStandardDirs {
 #endif
 	isDotLa = true;
       }
-	cout << "Final Filter: " << filter.latin1() << endl;
-      const QFileInfoList *fList = d.entryInfoList(filter);
+	cout << "Final Filter: " << filter.toLatin1().data() << endl;
+      const QFileInfoList fList = d.entryInfoList(QStringList() << filter);
 
-      if(fList == NULL) return;
+      if(fList.isEmpty()) return;
 
-      QFileInfoListIterator it( *fList );
-      QFileInfo *fi;
-      while ( (fi=it.current()) ) {
-	QString name = fi->filePath();
-	if(isDotLa) 
+      QListIterator<QFileInfo> it (fList);
+      QFileInfo fi;
+
+      while (it.hasNext()) {
+          fi = it.next();
+	      QString name = fi.filePath();
+          if(isDotLa)
 #ifdef WIN32
-	  name.replace(QRegExp("\\.dll"), ".la");
+          name.replace(QRegExp("\\.dll"), ".la");
 #else
 #ifdef MACOS_X
-	  name.replace(QRegExp("\\.dylib"), ".la");
+          name.replace(QRegExp("\\.dylib"), ".la");
 #else
-	  name.replace(QRegExp("\\.so"), ".la");
+          name.replace(QRegExp("\\.so"), ".la");
 #endif
 #endif
-	cout << name.latin1() << endl;
-	ret.append(name);
-	++it;
+          cout << name.toLatin1().data() << endl;
+          ret.append(name);
       }
   }
 

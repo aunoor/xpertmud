@@ -2,18 +2,18 @@
 #ifndef KEXTENDEDSOCKET_H
 #define KEXTENDEDSOCKET_H
 
-#include <qsocket.h>
-#include <qtextstream.h>
+#include <QTcpSocket>
+#include <QTextStream>
 #include <iostream>
 using std::cout;
 using std::endl;
 
 class KExtendedSocket;
 
-class QSocketWrapper: public QSocket {
+class QSocketWrapper: public QTcpSocket {
   Q_OBJECT
 public:
-  QSocketWrapper(): QSocket() {}
+  QSocketWrapper(): QTcpSocket() {}
   virtual ~QSocketWrapper() {}
   
   friend class KExtendedSocket;
@@ -63,7 +63,7 @@ public:
   void enableRead(bool) {}
   int lookup() { return 0; }
   int startAsyncConnect() {
-    cout << "Connecting to: " << _host.latin1() << ", " << _port << endl;
+    cout << "Connecting to: " << _host.toLatin1().data() << ", " << _port << endl;
 
     socket.connectToHost(_host, _port);
     return 0;
@@ -72,13 +72,13 @@ public:
     socket.close();
   }
   void writeBlock(const char *block, int length) {
-    socket.writeBlock(block, length);
+    socket.write(block, length);
   }
   int readBlock(char *block, int maxlen) {
-    return socket.readBlock(block, maxlen);
+    return (int)socket.read(block, maxlen);
   }
   int bytesAvailable() {
-    return socket.bytesAvailable();
+    return (int)socket.bytesAvailable();
   }
   int status() {
     return err;
@@ -92,7 +92,7 @@ public:
   }
   
   int state() {
-    if(socket.state() == QSocket::Connection) {
+    if(socket.state() == QTcpSocket::ConnectedState) {
       return connected;
     }
     return unknown;
@@ -121,7 +121,7 @@ private slots:
   }
 
 protected:
-  QSocket socket;
+  QTcpSocket socket;
   QString _host;
   int _port;
   int err;

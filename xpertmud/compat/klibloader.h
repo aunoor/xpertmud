@@ -32,7 +32,7 @@ class KLibFactory: public QObject {
 
   virtual QObject* create(QObject* parent, const QString& text1,
 		  const QString& text2) {
-    return createObject(parent, text1, text2, "");
+    return createObject(parent, text1.toLatin1().data(), text2.toLatin1().data(), QStringList(""));
   }
 
   virtual QObject* createObject(QObject* parent, const char* name,
@@ -65,7 +65,7 @@ class KLibLoader {
   }
 
   KLibFactory* factory(const QString& libname) {
-    cout << "trying to load lib " << libname.latin1() << endl;
+    cout << "trying to load lib " << libname.toLatin1().data() << endl;
 #ifdef WIN32
     QString name = libname + ".dll";
 #else
@@ -78,14 +78,15 @@ class KLibLoader {
     QStringList list = 
       KGlobal::dirs()->findAllResources("module", name, false, true);
     if(list.count() == 0) { 
-      cout << "Couldn't find library " << name.latin1() << endl;
+      cout << "Couldn't find library " << name.toLocal8Bit().data() << endl;
       return 0; 
     }
-    cout << list.first().latin1() << endl;
+    cout << list.first().toLocal8Bit().data() << endl;
     
     QString function = QString("init_") + libname;
-    cout << "QLibrary::resolve('" << list.first().latin1() << "', '" << function.latin1() << "');" << endl;
-    void *symAddr = QLibrary::resolve(list.first().latin1(), function.latin1());
+    cout << "QLibrary::resolve('" << list.first().toLocal8Bit().data() << "', '" << function.toLocal8Bit().data() << "');" << endl;
+    QFunctionPointer symAddr = QLibrary::resolve(list.first(), function.toLocal8Bit().data());
+    //void *symAddr = QLibrary::resolve(list.first(), function.toLocal8Bit().data());
 
     if(symAddr == NULL) { cout << "buuuuh2" << endl; return 0; }
     

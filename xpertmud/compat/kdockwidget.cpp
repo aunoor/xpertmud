@@ -19,26 +19,14 @@
 #include "kdockwidget_private.h"
 #include <kdocktabctl.h>
 
-#include <qlayout.h>
-#include <qpainter.h>
-#include <qobjectlist.h>
-#include <qstrlist.h>
-#include <qcursor.h>
+#include <QLayout>
+#include <QPainter>
+#include <QObjectList>
+#include <QStringList>
+#include <QCursor>
 
-#ifndef NO_KDE2
-#include <X11/X.h>
-#include <X11/Xlib.h>
-#include <kapp.h>
-#include <kconfig.h>
-#include <ktoolbar.h>
-#include <kpopupmenu.h>
-#include <kwin.h>
-#include <kdebug.h>
-#else
-#include <qapplication.h>
-#include <qtoolbar.h>
-#include <qpopupmenu.h>
-#endif
+#include <QApplication>
+#include <QMenu>
 
 #define DOCK_CONFIG_VERSION "0.0.5"
 
@@ -81,11 +69,11 @@ static const char*not_close_xpm[]={
  *
  * @author Max Judin.
 */
-KDockMainWindow::KDockMainWindow( QWidget* parent, const char *name, WFlags f)
-:KMainWindow( parent, name, f )
+KDockMainWindow::KDockMainWindow( QWidget* parent, const QString name, Qt::WindowFlags f, QList<Qt::WidgetAttribute> a)
+:KMainWindow( parent, name, f, a )
 {
   QString new_name = QString(name) + QString("_DockManager");
-  dockManager = new KDockManager( this, new_name.latin1() );
+  dockManager = new KDockManager( this, new_name );
   mainDockWidget = 0L;
 }
 
@@ -102,20 +90,16 @@ void KDockMainWindow::setMainDockWidget( KDockWidget* mdw )
 
 void KDockMainWindow::setView( QWidget *view )
 {
-  if ( view->isA("KDockWidget") ){
+  if ( view->staticMetaObject.className() ==  "KDockWidget" ){
     if ( view->parent() != this ) ((KDockWidget*)view)->applyToWidget( this );
   }
 
-#ifndef NO_KDE2
-  KMainWindow::setCentralWidget(view);
-#else
   QMainWindow::setCentralWidget(view);
-#endif
 }
 
 KDockWidget* KDockMainWindow::createDockWidget( const QString& name, const QPixmap &pixmap, QWidget* parent, const QString& strCaption, const QString& strTabPageLabel)
 {
-  return new KDockWidget( dockManager, name.latin1(), pixmap, parent, strCaption, strTabPageLabel );
+  return new KDockWidget( dockManager, name, pixmap, parent, strCaption, strTabPageLabel );
 }
 
 void KDockMainWindow::makeDockVisible( KDockWidget* dock )
@@ -166,14 +150,15 @@ void KDockMainWindow::slotDockWidgetUndocked()
 }
 
 /*************************************************************************/
-KDockWidgetAbstractHeaderDrag::KDockWidgetAbstractHeaderDrag( KDockWidgetAbstractHeader* parent, KDockWidget* dock, const char* name )
-:QFrame( parent, name )
+KDockWidgetAbstractHeaderDrag::KDockWidgetAbstractHeaderDrag( KDockWidgetAbstractHeader* parent, KDockWidget* dock, const QString name )
+:QFrame( parent )
 {
+  setObjectName(name);
   dw = dock;
   installEventFilter( dock->dockManager() );
 }
 /*************************************************************************/
-KDockWidgetHeaderDrag::KDockWidgetHeaderDrag( KDockWidgetAbstractHeader* parent, KDockWidget* dock, const char* name )
+KDockWidgetHeaderDrag::KDockWidgetHeaderDrag( KDockWidgetAbstractHeader* parent, KDockWidget* dock, const QString name )
 :KDockWidgetAbstractHeaderDrag( parent, dock, name )
 {
 }
@@ -184,31 +169,32 @@ void KDockWidgetHeaderDrag::paintEvent( QPaintEvent* )
   QPainter paint;
 
   paint.begin( &drawBuffer );
-  paint.fillRect( drawBuffer.rect(), QBrush(colorGroup().brush(QColorGroup::Background)) );
+  paint.fillRect( drawBuffer.rect(), QBrush( palette().background() );
 
-  paint.setPen( colorGroup().light() );
+  paint.setPen( palette().light().color() );
   paint.drawLine( 1, 3, 1, 2 );
   paint.drawLine( 1, 2, width(), 2 );
 
-  paint.setPen( colorGroup().mid() );
+  paint.setPen( palette().mid().color() );
   paint.drawLine( 1, 4, width(), 4 );
   paint.drawLine( width(), 4, width(), 3 );
 
-  paint.setPen( colorGroup().light() );
+  paint.setPen( palette().light().color() );
   paint.drawLine( 1, 6, 1, 5 );
   paint.drawLine( 1, 5, width(), 5 );
 
-  paint.setPen( colorGroup().mid() );
+  paint.setPen( palette().mid().color() );
   paint.drawLine( 1, 7, width(), 7 );
   paint.drawLine( width(), 7, width(), 6 );
 
-  bitBlt( this,0,0,&drawBuffer,0,0,width(),height() );
+  paint.drawPixmap(0,0,drawBuffer,0,0,width(),height());
   paint.end();
 }
 /*************************************************************************/
-KDockWidgetAbstractHeader::KDockWidgetAbstractHeader( KDockWidget* parent, const char* name )
-:QFrame( parent, name )
+KDockWidgetAbstractHeader::KDockWidgetAbstractHeader( KDockWidget* parent, const QString name )
+:QFrame( parent )
 {
+  setObjectName(name);
 }
 /*************************************************************************/
 KDockWidgetHeader::KDockWidgetHeader( KDockWidget* parent, const char* name )
@@ -316,20 +302,21 @@ void KDockWidgetHeader::loadConfig( KConfig* c )
 #endif
 
 /*************************************************************************/
-KDockWidget::KDockWidget( KDockManager* dockManager, const char* name, const QPixmap &pixmap, QWidget* parent, const QString& strCaption, const QString& strTabPageLabel, WFlags f)
-: QWidget( parent, name, f )
+KDockWidget::KDockWidget( KDockManager* dockManager, const QString name, const QPixmap &pixmap, QWidget* parent, const QString& strCaption, const QString& strTabPageLabel, Qt::WindowFlags f)
+: QWidget( parent, f )
   ,formerBrotherDockWidget(0L)
   ,currentDockPos(DockNone)
   ,formerDockPos(DockNone)
   ,pix(new QPixmap(pixmap))
   ,prevSideDockPosBeforeDrag(DockNone)
 {
+  setObjectName(name);
   d = new KDockWidgetPrivate();  // create private data
 
   d->_parent = parent;
 
   layout = new QVBoxLayout( this );
-  layout->setResizeMode( QLayout::Minimum );
+  layout->setSizeConstraint(QLayout::SetMinimumSize);
 
   manager = dockManager;
   manager->childDock->append( this );
@@ -338,12 +325,12 @@ KDockWidget::KDockWidget( KDockManager* dockManager, const char* name, const QPi
   header = 0L;
   setHeader( new KDockWidgetHeader( this, "AutoCreatedDockHeader" ) );
   if( strCaption == 0L)
-    setCaption( name );
+    setWindowTitle( name );
   else
-    setCaption( strCaption);
+    setWindowTitle( strCaption );
 
   if( strTabPageLabel == " ")
-    setTabPageLabel( caption());
+    setTabPageLabel( windowTitle() );
   else
     setTabPageLabel( strTabPageLabel);
 
@@ -353,7 +340,7 @@ KDockWidget::KDockWidget( KDockManager* dockManager, const char* name, const QPi
   isGroup = false;
   isTabGroup = false;
 
-  setIcon( pixmap);
+  setWindowIcon(pixmap);
   widget = 0L;
 
   QObject::connect(this, SIGNAL(hasUndocked()), manager->main, SLOT(slotDockWidgetUndocked()) );
@@ -1005,8 +992,8 @@ public:
   bool splitterHighResolution;
 };
 
-KDockManager::KDockManager( QWidget* mainWindow , const char* name )
-:QObject( 0, name )
+KDockManager::KDockManager( QWidget* mainWindow , const QString name )
+:QObject( 0 )
   ,main(mainWindow)
   ,currentDragWidget(0L)
   ,currentMoveWidget(0L)
@@ -1018,6 +1005,7 @@ KDockManager::KDockManager( QWidget* mainWindow , const char* name )
   ,undockProcess(false)
   ,dropCancel(true)
 {
+  setObjectName(name);
   d = new KDockManagerPrivate;
   d->splitterOpaqueResize = false;
   d->splitterKeepSize = false;

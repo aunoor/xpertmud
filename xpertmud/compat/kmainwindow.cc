@@ -1,9 +1,13 @@
 #include "kmainwindow.h"
-#include <qobjcoll.h>
-#include <qtextstream.h>
+#include <QTextStream>
+#include <QCloseEvent>
 
-KMainWindow::KMainWindow(QWidget *parent, const char *name, int flags):
-  QMainWindow(parent, name) {
+KMainWindow::KMainWindow(QWidget *parent, const QString name, Qt::WindowFlags flags, QList<Qt::WidgetAttribute> a):
+    QMainWindow(parent, flags) {
+  setObjectName(name);
+  foreach (Qt::WidgetAttribute attr, a) {
+   setAttribute(attr);
+  }
   _bar = new KStatusBar(QMainWindow::statusBar());
   _toolBar = new KToolBar();
 }
@@ -21,21 +25,22 @@ void KMainWindow::saveMainWindowSettings(KConfig *config, const QString& name) {
   config->writeEntry("maximized", (int)isMaximized());
   config->writeEntry("StatusBar Hidden", (int)statusBar()->isHidden());
 
-  saveToolBar(config, (QToolBar*)child("inputBar"));
-  saveToolBar(config, (QToolBar*)child("QextMdiTaskBar"));
+  saveToolBar(config, findChild<QToolBar*>("inputBar"));
+  saveToolBar(config, findChild<QToolBar*>("QextMdiTaskBar"));
 }
 
 void KMainWindow::saveToolBar(KConfig *config, QToolBar *tb) {
   if(tb != NULL) {
-    QString name = tb->name();
-    cout << "saving " << name.latin1() << endl;
-    ToolBarDock dock;
+    QString name = tb->objectName();
+    cout << "saving " << name.toLatin1().data() << endl;
+    Qt::ToolBarArea dock;
     int index;
     bool nl;
     int extraOffset;
-    getLocation(tb, dock, index, nl, extraOffset);
+     //TODO: reimplement of getLocation
+    ////getLocation(tb, dock, index, nl, extraOffset);
     QString s;
-    QTextStream str(&s, IO_WriteOnly);
+    QTextStream str(&s, QIODevice::WriteOnly);
     str << (int)dock << " " << index << " " << (int)nl << " " << extraOffset;
     config->writeEntry(name + " Location", s);
     config->writeEntry(name + " Hidden", (int)tb->isHidden());
@@ -55,22 +60,23 @@ void KMainWindow::applyMainWindowSettings(KConfig *config, const QString& name) 
   if(config->readNumEntry("StatusBar Hidden", 0))
     statusBar()->hide();
 
-  restoreToolBar(config, (QToolBar*)child("inputBar"));
-  restoreToolBar(config, (QToolBar*)child("QextMdiTaskBar"));
+  restoreToolBar(config, findChild<QToolBar*>("inputBar"));
+  restoreToolBar(config, findChild<QToolBar*>("QextMdiTaskBar"));
 }
 
 void KMainWindow::restoreToolBar(KConfig *config, QToolBar *tb) {
   if(tb != NULL) {
-    QString name = tb->name();
+    QString name = tb->objectName();
     QString s = config->readEntry(name + " Location", "");
     if(s != "") {
       int dock;
       int index;
       int nl;
       int extraOffset;
-      QTextStream str(&s, IO_ReadOnly);
+      QTextStream str(&s, QIODevice::ReadOnly);
       str >> dock >> index >> nl >> extraOffset;
-      moveToolBar(tb, (ToolBarDock)dock, (bool)nl, index, extraOffset);
+        //TODO: reimplement moveToolBar!
+      //moveToolBar(tb, (ToolBarDock)dock, (bool)nl, index, extraOffset);
     }
     if(config->readNumEntry(name + " Hidden", 0))
       tb->hide();
@@ -79,60 +85,79 @@ void KMainWindow::restoreToolBar(KConfig *config, QToolBar *tb) {
 
 void KMainWindow::createGUI(QWidget *) {
   QObject *col = actionCollection();
-  KAction *inputAction = (KAction *)col->child("input_line");
+  KAction *inputAction = col->findChild<KAction *>("input_line");
 
-  KAction *fileNew = (KAction *)col->child("open_new");
-  KAction *fileOpen = (KAction *)col->child("open");
-  KAction *fileSave = (KAction *)col->child("save");
-  KAction *fileSaveAs = (KAction *)col->child("save_as");
-  KAction *fileEdit = (KAction *)col->child("file_edit");
-  KAction *fileQuit = (KAction *)col->child("quit");
+  KAction *fileNew = col->findChild<KAction *>("open_new");
+  KAction *fileOpen = col->findChild<KAction *>("open");
+  KAction *fileSave = col->findChild<KAction *>("save");
+  KAction *fileSaveAs = col->findChild<KAction *>("save_as");
+  KAction *fileEdit = col->findChild<KAction *>("file_edit");
+  KAction *fileQuit = col->findChild<KAction *>("quit");
 
-  KAction *connect = (KAction *)col->child("file_connect");
-  KAction *disconnect = (KAction *)col->child("file_disconnect");
+  KAction *connect = col->findChild<KAction *>("file_connect");
+  KAction *disconnect = col->findChild<KAction *>("file_disconnect");
 
-  KAction *showInputBar = (KAction *)col->child("toggle_inputbar");
-  KAction *showStatus = (KAction *)col->child("toggle_statusbar");
-  KAction *showQuickBar = (KAction *)col->child("toggle_quickbar");
-  KAction *preferences = (KAction *)col->child("preferences");
+  KAction *showInputBar = col->findChild<KAction *>("toggle_inputbar");
+  KAction *showStatus = col->findChild<KAction *>("toggle_statusbar");
+  KAction *showQuickBar = col->findChild<KAction *>("toggle_quickbar");
+  KAction *preferences = col->findChild<KAction *>("preferences");
 
 
-  KActionMenu *scriptingMenu = (KActionMenu *)col->child("scripting_menu");
+  KActionMenu *scriptingMenu = col->findChild<KActionMenu *>("scripting_menu");
 
-  QPopupMenu *file = new QPopupMenu(this);
+  QMenu *file = new QMenu(this);
+  file->setTitle("&File");
   if(fileNew) { fileNew->plug(file, 0); }
   if(fileOpen) { fileOpen->plug(file, 0); }
-  file->insertSeparator();
-  if(fileSave) { fileSave->plug(file, 0); }
+  if(fileSave) {
+      fileSave->plug(file, 0);
+      file->insertSeparator(fileSave);
+  }
   if(fileSaveAs) { fileSaveAs->plug(file, 0); }
-  file->insertSeparator();
-  if(fileEdit) { fileEdit->plug(file, 0); }
-  file->insertSeparator();
-  if(fileQuit) { fileQuit->plug(file, 0); }
 
-  QPopupMenu *connection = new QPopupMenu(this);
+  if(fileEdit) {
+      fileEdit->plug(file, 0);
+      file->insertSeparator(fileEdit);
+  }
+
+  if(fileQuit) {
+      fileQuit->plug(file, 0);
+      file->insertSeparator(fileQuit);
+  }
+
+  QMenu *connection = new QMenu(this);
+  connection->setTitle("&Connection");
   if(connect) { connect->plug(connection, 0); }
   if(disconnect) { disconnect->plug(connection, 0); }
 
-  QPopupMenu *options = new QPopupMenu(this);
+  QMenu *options = new QMenu(this);
+  options->setTitle("&Settings");
   if(showInputBar) { showInputBar->plug(options, 0); }
   if(showStatus) { showStatus->plug(options, 0); }
   if(showQuickBar) { showQuickBar->plug(options, 0); }
-  options->insertSeparator();
-  if(preferences) { preferences->plug(options, 0); }
+  if(preferences) {
+      options->insertSeparator(preferences);
+      preferences->plug(options, 0);
+  }
 
-  QPopupMenu *help = new QPopupMenu(this);
+  QMenu *help = new QMenu(this);
+  help->setTitle("&Help");
 
-  QMenuBar *menu = new QMenuBar(this, "Menu");
-  menu->insertItem("&File", file);
-  menu->insertItem("&Connection", connection);
+  QMenuBar *menu = new QMenuBar(this);
+  menu->setObjectName("Menu");
+  //menu->insertItem("&File", file);
+  menu->addMenu(file);
+  //menu->insertItem("&Connection", connection);
+  menu->addMenu(connection);
 //  if(scriptingMenu) { menu->insertItem("&Scripting", 
 //				       scriptingMenu->popupMenu()); }
-  menu->insertItem("&Settings", options);
-  menu->insertItem("&Help", help);
+  //menu->insertItem("&Settings", options);
+  menu->addMenu(options);
+  //menu->insertItem("&Help", help);
+  menu->addMenu(help);
 
   KToolBar *tb = new KToolBar("InputBar", this,
-			      QMainWindow::Bottom, true,
+			      Qt::BottomToolBarArea, true,
 			      "inputBar");
   if(inputAction) { inputAction->plug(tb,0); }
 }

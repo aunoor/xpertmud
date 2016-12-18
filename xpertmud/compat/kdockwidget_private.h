@@ -23,12 +23,8 @@
 #ifndef KDOCKWIDGET_PRIVATE_H
 #define KDOCKWIDGET_PRIVATE_H
 
-#include <qwidget.h>
-#include <qpushbutton.h>
-
-#ifndef NO_KDE2
-#include <netwm_def.h>
-#endif
+#include <QWidget>
+#include <QPushButton>
 
 class QFrame;
 
@@ -42,7 +38,7 @@ class KDockSplitter : public QWidget
 {
   Q_OBJECT
 public:
-  KDockSplitter(QWidget *parent= 0, const char *name= 0, Orientation orient= Vertical, int pos= 50, bool highResolution=false);  
+  KDockSplitter(QWidget *parent = 0, const char *name = 0, Qt::Orientation orient = Qt::Vertical, int pos = 50, bool highResolution = false);
   virtual ~KDockSplitter(){};
 
   void activate(QWidget *c0, QWidget *c1 = 0L);
@@ -76,7 +72,7 @@ private:
   void setupMinMaxSize();
 
   QWidget *child0, *child1;
-  Orientation orientation;
+  Qt::Orientation orientation;
   bool initialised;
   QFrame* divider;
   int xpos;
@@ -120,10 +116,6 @@ public:
   int splitPosInPercent;
   bool pendingFocusInEvent;
   bool blockHasUndockedSignal;
-
-#ifndef NO_KDE2
-  NET::WindowType windowType;
-#endif
 
   QWidget *_parent;
   bool transient;

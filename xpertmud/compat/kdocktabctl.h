@@ -40,23 +40,14 @@
 #ifndef KDOCKTABCTL_H
 #define KDOCKTABCTL_H
 
-#include <qwidget.h>
-#if QT_VERSION < 300
-# include <qlist.h>
-#else
-# include <qptrlist.h>
-#endif
-#include <qpixmap.h>
-#include <qtooltip.h>
+#include <QWidget>
+#include <QList>
+#include <QPixmap>
+#include <QToolTip>
 
-#ifndef NO_KDE2
-#undef  EXPORT_DOCKCLASS
-#define EXPORT_DOCKCLASS
-#else
 #include "exportdockclass.h"
-#endif
 
-class QWidgetStack;
+class QStackedWidget;
 class QBoxLayout;
 class QPushButton;
 
@@ -301,11 +292,7 @@ private:
 
   TabPos tabPos;
   KDockTabBarPainter* barPainter;
-#if QT_VERSION < 300
-  QList<KDockTabBar_PrivateStruct> *mainData;
-#else
-  QPtrList<KDockTabBar_PrivateStruct> *mainData;
-#endif
+  QList<KDockTabBar_PrivateStruct*> *mainData;
   int _currentTab;
   int leftTab;
 
@@ -710,7 +697,7 @@ protected:
   /**
    * a data structure that contains all embedded widgets.
    */
-  QWidgetStack* stack;
+  QStackedWidget* stack;
 
   /**
    * The layout manager for automatic positioning and resizing of the embedded tab pages.
@@ -727,11 +714,7 @@ protected:
    * An data item is of type KDockTabCtl_PrivateStruct (a struct) that contains the widget, its id and information
    * about whether it is enabled or disabled.
    */
-#if QT_VERSION < 300
-  QList<KDockTabCtl_PrivateStruct> *mainData;
-#else
-  QPtrList<KDockTabCtl_PrivateStruct> *mainData;
-#endif
+  QList<KDockTabCtl_PrivateStruct*> *mainData;
 
   /**
    * A pointer to the widget that is the current tab page in the covered tab bar.

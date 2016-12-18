@@ -1,10 +1,10 @@
 #include "Connection.h"
 
-#include <qwidget.h>
+#include <QWidget>
 #include <kmessagebox.h>
 #include <klocale.h>
-#include <qtextcodec.h>
-#include <qdatetime.h>
+#include <QTextCodec>
+#include <QDateTime>
 #include <cassert>
 //#include <ksock.h>
 

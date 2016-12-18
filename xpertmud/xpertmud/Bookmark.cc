@@ -16,10 +16,11 @@
  ***************************************************************************/
 
 #include "Bookmark.h"
-#include <qfile.h>
+#include <QFile>
 #include <qtextstream.h>
 #include <klocale.h>
 #include <kio/netaccess.h>
+#include <QVector>
 
 #include <cassert>
 
@@ -74,7 +75,7 @@ bool Bookmark::load(const KURL & url) {
   if (KIO::NetAccess::download( url, tmpfile )) {
     QDomDocument doc( "xpertmudBookmark" );
     QFile f( tmpfile );
-    if ( !f.open( IO_ReadOnly ) ) {
+    if ( !f.open( QIODevice::ReadOnly ) ) {
       KIO::NetAccess::removeTempFile( tmpfile );
       //      KMessageBox::error(this,i18n("Bookmark '%1' could not be read").arg(url.url()), i18n("Error !"));
       return false;
@@ -109,7 +110,7 @@ bool Bookmark::save(const KURL & url) {
     return false;
   }
   QFile f(url.directory()+'/' +url.fileName());
-  if (!f.open(IO_WriteOnly)) {
+  if (!f.open( QIODevice::WriteOnly)) {
     //    KMessageBox::error(kapp,i18n("Could not open %1 for writing").arg(url.fileName()));
     return false;
   }
@@ -213,8 +214,8 @@ void Bookmark::setGlobalScript(const QString & script) {
 }
 
 
-QValueVector<int> Bookmark::getAvailableConnections() {
-  QValueVector<int> cids;
+QVector<int> Bookmark::getAvailableConnections() {
+  QVector<int> cids;
 
   QDomNodeList conns=data.elementsByTagName("Connection");
   for (unsigned int i=0; i<conns.count(); ++i) {

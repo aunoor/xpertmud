@@ -35,7 +35,7 @@ class DLL_IMP_EXP_QEXTMDICLASS DockMainWindow : public KDockMainWindow
 {
    Q_OBJECT
 public:
-   DockMainWindow( QWidget* parentWidget = 0L, const char* name = "", WFlags flags = WType_TopLevel) : KDockMainWindow( parentWidget, name, flags) {};
+   DockMainWindow( QWidget* parentWidget = 0L, const char* name = "", Qt::WindowFlags flags = Qt::Window, QList<Qt::WidgetAttribute> a = QList<Qt::WidgetAttribute>()) : KDockMainWindow( parentWidget, name, flags, a) {};
    ~DockMainWindow() {};
 };
 

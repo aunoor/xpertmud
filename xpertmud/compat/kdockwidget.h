@@ -49,10 +49,10 @@
 
 #define _KDOCKWIDGET_2_2_
 
-#include <qpoint.h>
-#include <qlist.h>
-#include <qframe.h>
-#include <qdom.h>
+#include <QPoint>
+#include <QList>
+#include <QFrame>
+#include <QDomImplementation>
 
 #ifndef NO_KDE2
 #include <kmainwindow.h>
@@ -60,7 +60,7 @@
 #undef  EXPORT_DOCKCLASS
 #define EXPORT_DOCKCLASS
 #else
-#include <qmainwindow.h>
+#include <QMainWindow>
 #include "exportdockclass.h"
 #include <kmainwindow.h>
 #endif
@@ -75,7 +75,7 @@ class KDockButton_Private;
 class KDockWidgetPrivate;
 class KDockArea;
 
-class QObjectList;
+//class QObjectList;
 class QPopupMenu;
 class QVBoxLayout;
 class QHBoxLayout;
@@ -89,11 +89,7 @@ class QToolBar;
 #endif
 
 // KDE 3.0 TODO: this belongs in a namespace!! (Clash with X11/Intrinsic.h!)
-#if QT_VERSION < 300
 typedef QList<QWidget> WidgetList;
-#else
-typedef QPtrList<QWidget> WidgetList;
-#endif
 
 /**
  * An abstract base clase for all dockwidget headers (and member of the dockwidget class set).
@@ -113,7 +109,7 @@ public:
    * @param parent the parent widget (usually a dockwidget)
    * @param name   the object instance name
    */
-  KDockWidgetAbstractHeader( KDockWidget* parent, const char* name = 0L );
+  KDockWidgetAbstractHeader( KDockWidget* parent, const QString name );
 
   /**
    * Destructs this.
@@ -122,14 +118,6 @@ public:
 
   /** Provides things concerning to switching to toplevel mode. Must be overridden by an inheriting class. */
   virtual void setTopLevel( bool ){};
-
-#ifndef NO_KDE2
-  /** Provides saving the current configuration. Must be overridden by an inheriting class. */
-  virtual void saveConfig( KConfig* ){};
-
-  /** Provides loading the current configuration.  Must be overridden by an inheriting class */
-  virtual void loadConfig( KConfig* ){};
-#endif
 
 private:
   class KDockWidgetAbstractHeaderPrivate;
@@ -156,7 +144,7 @@ public:
    * @param name   the object instance name
    */
   KDockWidgetAbstractHeaderDrag( KDockWidgetAbstractHeader* parent,
-                                 KDockWidget* dock, const char* name = 0L );
+                                 KDockWidget* dock, const QString name);
 
   /**
    * Destructs this.
@@ -196,7 +184,7 @@ public:
    * @param name   the object instance name
    */
   KDockWidgetHeaderDrag( KDockWidgetAbstractHeader* parent, KDockWidget* dock,
-                         const char* name = 0L );
+                         const QString name );
 
   /**
    * Destructs this.
@@ -388,9 +376,9 @@ public:
    * @param strCaption  Title of the dockwidget window (shown when toplevel)
    * @param strTabPageLabel The title of the tab page (shown when in tab page mode), if it is "", only the icon will be shown, if it is 0L, the label is set to strCaption
    */
-  KDockWidget( KDockManager* dockManager, const char* name,
+  KDockWidget( KDockManager* dockManager, const QString name,
                const QPixmap &pixmap, QWidget* parent = 0L, const QString& strCaption = 0L,
-               const QString& strTabPageLabel = " ", WFlags f = 0);
+               const QString& strTabPageLabel = " ",  Qt::WindowFlags f = 0);
 
   /**
    * Destructs a dockwidget.
@@ -720,7 +708,7 @@ private:
   // GROUP data
   QString firstName;
   QString lastName;
-  Orientation splitterOrientation;
+  Qt::Orientation splitterOrientation;
   bool isGroup;
   bool isTabGroup;
 
@@ -756,43 +744,12 @@ public:
    * @param mainWindow the main window controlled by this
    * @param name the internal QOject name
    */
-  KDockManager( QWidget* mainWindow, const char* name = 0L );
+  KDockManager( QWidget* mainWindow, const QString name );
 
   /**
    * Destructs a dockmanager.
    */
   virtual ~KDockManager();
-
-#ifndef NO_KDE2
-  /**
-   * Saves the current state of the dockmanager and of all controlled widgets.
-   * State means here to save the geometry, visibility, parents, internal object names, orientation,
-   * separator positions, dockwidget-group information, tab widget states (if it is a tab group) and
-   * last but not least some necessary things for recovering the dockmainwindow state.
-   *
-   * @param c the KDE configuration saver
-   * @param group the name of the section in KConfig
-   */
-  void writeConfig( KConfig* c = 0L, QString group = QString::null );
-
-  /**
-   * Like writeConfig but reads the whole stuff in.
-   *
-   * In order to restore a window configuration
-   * from a config file, it looks up widgets by name
-   * (QObject::name) in the childDock variable of
-   * KDockManager. This list in turn contains all
-   * KDockWidgets (according to the KDockWidget constructor).
-   * So in principle, in order to restore a window layout,
-   * one must first construct all widgets, put each of them in a
-   * KDockWidget and then call readConfig(). And for all that
-   * to work, each widget must have a unique name.
-   *
-   * @param c the KDE configuration saver
-   * @param group the name of the section in KConfig
-   */
-  void readConfig ( KConfig* c = 0L, QString group = QString::null );
-#endif
 
   /**
    * Saves the current dock window layout into a DOM tree below the given element.
@@ -1064,11 +1021,7 @@ private:
   /**
    * An internal list containing data for the menuitems for the visibility popup menu.
    */
-#if QT_VERSION < 300
   QList<MenuDockData> *menuData;
-#else
-  QPtrList<MenuDockData> *menuData;
-#endif
 
   class KDockManagerPrivate;
   KDockManagerPrivate *d;
@@ -1136,7 +1089,8 @@ public:
    *
    * @param name object name
    */
-  KDockMainWindow( QWidget* parent = 0L, const char *name = 0L, WFlags f = WType_TopLevel | WDestructiveClose );
+  KDockMainWindow( QWidget* parent = 0L, const QString name, Qt::WindowFlags f = Qt::Window,
+                   QList<Qt::WidgetAttribute> a = (QList<Qt::WidgetAttribute>() << Qt::WA_DeleteOnClose));
 
   /**
    * Destructs a dockmainwindow.

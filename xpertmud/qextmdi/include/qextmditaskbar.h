@@ -27,19 +27,11 @@
 #ifndef _QEXTMDITASKBAR_H_
 #define _QEXTMDITASKBAR_H_
 
-#ifdef NO_KDE2
 #include <ktoolbar.h>
-#else
-#include <ktoolbar.h>
-#endif
-#if QT_VERSION < 300
-# include <qlist.h>
-#else
-# include <qptrlist.h>
-#endif
-#include <qpixmap.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
+#include <QList>
+#include <QPixmap>
+#include <QLabel>
+#include <QPushButton>
 
 #include "qextmdidefines.h"
 
@@ -133,7 +125,7 @@ public:
    /** 
    * Constructor (NoFocus, minimum width = 1, an internal QList of taskbar buttons (autodelete)) 
    */
-   QextMdiTaskBar(QextMdiMainFrm *parent,QMainWindow::ToolBarDock dock);
+   QextMdiTaskBar(QextMdiMainFrm *parent, QMainWindow::ToolBarDock dock);
    /** 
    * Destructor (deletes the taskbar button list) 
    */
@@ -148,7 +140,7 @@ public:
    * Removes a @ref QextMdiTaskBarButton and deletes it. If the rest of the buttons are smaller
    * than they usually are, all those buttons will be resized in a way that the new free size is used as well. 
    */
-   void removeWinButton(QextMdiChildView *win_ptr, bool haveToLayoutTaskBar = TRUE);
+   void removeWinButton(QextMdiChildView *win_ptr, bool haveToLayoutTaskBar = true);
    /** 
    * Returns the neighbor taskbar button of the taskbar button of the MDI view given by parameter
    * bRight specifies the side, of course left is used if bRight is false. 
@@ -191,11 +183,7 @@ protected:
    * A list of taskbar buttons.
    * Note: Each button stands for one MDI view (toolviews doesn't have got a taskbar button). 
    */
-#if QT_VERSION < 300
    QList<QextMdiTaskBarButton>*  m_pButtonList;
-#else
-   QPtrList<QextMdiTaskBarButton>*  m_pButtonList;
-#endif
    /**
    * The belonging MDI mainframe (parent widget of this)
    */

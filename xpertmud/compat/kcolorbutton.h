@@ -15,7 +15,7 @@ class KColorButton: public QPushButton {
     this->col = col;
     QPixmap fillMap(30, 10);
     fillMap.fill(col);
-    setPixmap(fillMap);
+    setIcon(QIcon(fillMap));
   }
   QColor color() { return col; }
 

@@ -4,8 +4,8 @@
 #include "kpopupmenu.h"
 #include "kurl.h"
 #include "kconfig.h"
-#include <qaction.h>
-#include <qobject.h>
+#include <QAction>
+#include <QObject>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -14,24 +14,33 @@ class KAction: public QAction {
   Q_OBJECT
  public:
   KAction():
-    QAction("", "", 0, NULL, "", false) {}
+  //QAction ( const QString & text, const QString & menuText, QKeySequence accel, QObject * parent, const char * name = 0, bool toggle = FALSE )  (obsolete)
+    QAction(NULL) {}
+    //QAction("", "", 0, NULL, "", false) {}
 
   KAction( const QString& text, int accel,
   	   const QObject* receiver, const char* slot,
 	   QObject* parent, const char* name="",
 	   bool toggle=false):
-    QAction(text, text, accel, parent, name, toggle) {
-      connect(this, SIGNAL(activated()),
-	      receiver, slot);
+    QAction(text, parent) {
+    //QAction(text, text, accel, parent, name, toggle) {
+      this->toggled(toggle);
+      this->setShortcut(accel);
+      this->setObjectName(QString(name));
+      connect(this, SIGNAL(activated()), receiver, slot);
     }
 
   KAction( const QString& text, int accel, 
 	   QObject* parent = 0, const char* name = 0,
 	   bool toggle=false):
-    QAction(text, text, accel, parent, name, toggle) {
+    QAction(text, parent) {
+    //QAction(text, text, accel, parent, name, toggle) {
       std::cout << (long)this << std::endl;
       std::cout << (long)parent << std::endl;
       std::cout << name << std::endl;
+      this->toggled(toggle);
+      this->setShortcut(accel);
+      this->setObjectName(QString(name));
     }
 
   virtual ~KAction() {}
@@ -46,7 +55,8 @@ class KAction: public QAction {
   void removeContainer(int) {}
 
   virtual int plug( QWidget *w, int index = -1 ) {
-    return addTo(w);
+    w->addAction(this);
+    return true;
   }
   
   virtual void unplug( QWidget *w ) {}
@@ -73,8 +83,8 @@ class KToggleAction: public KAction {
 
   //KToggleAction() {}
 
-  bool isChecked() { return isOn(); }
-  void setChecked(bool enable) { setOn(enable); }
+  bool isChecked() { return isChecked(); }
+  void setChecked(bool enable) { setChecked(enable); }
 };
 
 class KActionMenu: public KAction {

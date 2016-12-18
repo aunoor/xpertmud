@@ -1,8 +1,8 @@
 #ifndef KICONLOADER_H
 #define KICONLOADER_H
 
-#include <qiconset.h>
-#include <qstring.h>
+#include <QIcon>
+#include <QString>
 
 #include "kglobal.h"
 
@@ -23,7 +23,7 @@ class BarIcon {
   BarIcon(const QString& name, KIcon::ESize size) {}
 };
 
-class SmallIcon: public QIconSet {
+class SmallIcon: public QIcon {
  public:
   SmallIcon(const QString& name) {
   }

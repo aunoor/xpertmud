@@ -3,7 +3,6 @@
 
 #include <qfontdialog.h>
 #include <qpushbutton.h>
-#include <qvbox.h>
 
 class KFontDialog {
  public:
@@ -30,7 +29,8 @@ class KFontChooser: public QWidget {
  public:
   KFontChooser() {}
   KFontChooser(QWidget *parent, const char *name, bool):
-    QWidget(parent, name) {
+    QWidget(parent) {
+    setObjectName(name);
     QPushButton *button = new QPushButton("Change Font", this);
     connect(button, SIGNAL(clicked()), this, SLOT(slotClicked()));
   }

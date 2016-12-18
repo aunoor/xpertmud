@@ -16,7 +16,7 @@
 #  define QT_NO_COMPAT_WAS_REMOVED
 #endif
 
-#include <qstyle.h>
+#include <QStyle>
 
 #ifdef QT_NO_COMPAT_WAS_REMOVED
 #  define QT_NO_COMPAT
@@ -72,10 +72,10 @@ TextBufferHistoryView(int id, QWidget* parent, const char* name,
   splitSeperator->setFrameShadow( QFrame::Sunken );
   splitSeperator->setCursor(QCursor(SplitVCursor));
 
-  vscrollBar = new QScrollBar(Vertical, this);
+  vscrollBar = new QScrollBar(Qt::Vertical, this);
   vscrollBar->show();
-  vscrollBar->setMinValue(0);
-  vscrollBar->setMaxValue(0);
+  vscrollBar->setMaximum(0);
+  vscrollBar->setMaximum(0);
 
   connect(textBuffer, SIGNAL(scrolledLines(int)),
 	  this, SLOT(slotScrolledLines(int)));
@@ -216,7 +216,7 @@ void TextBufferHistoryView::mousePressEvent(QMouseEvent* ev) {
   if(ev->y() >= splitSeperator->y()-1 &&
      ev->y() <= splitSeperator->y()+splitSeperator->height()+1) {
     movingSplit = true;
-    setCursor(QCursor(SplitHCursor));
+    setCursor(QCursor(Qt::SplitHCursor));
   }
 }
 
@@ -238,7 +238,7 @@ void TextBufferHistoryView::mouseMoveEvent(QMouseEvent* ev) {
 
 void TextBufferHistoryView::mouseReleaseEvent(QMouseEvent* /*ev*/) {
   if(movingSplit) {
-    setCursor(QCursor(ArrowCursor));
+    setCursor(QCursor(Qt::ArrowCursor));
     movingSplit = false;
   }
 }
@@ -254,10 +254,10 @@ void TextBufferHistoryView::paintEvent(QPaintEvent* /*pe*/) {
   int lineCount =
     std::max((int)textBuffer->getSizeY() - (int)mainView->getLines(), 0);
 
-  if(vscrollBar->maxValue() != lineCount) {
+  if(vscrollBar->maximum() != lineCount) {
     //    qDebug(QString("Setting maxValue to %1").arg(lineCount));
     inUpdate = true;
-    vscrollBar->setMaxValue(lineCount);
+    vscrollBar->setMaximum(lineCount);
     vscrollBar->setValue(mainView->getOffsetY());
     inUpdate = false;
     //    qDebug("finished.");

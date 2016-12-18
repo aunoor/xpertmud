@@ -18,12 +18,19 @@ class KToolBar: public QToolBar {
 
   KToolBar() {}
   KToolBar(const QString& text, QMainWindow* parent,
-	   QMainWindow::ToolBarDock dock= QMainWindow::Top,
+       Qt::ToolBarArea dock = Qt::TopToolBarArea,
 	   bool newline=false, const char *name=0):
-    QToolBar(text, parent, dock, newline, name) {}
+    QToolBar(text, parent) {
+      this->setObjectName(QString(name));
+      parent->addToolBar(dock, this);
+  }
 
   KToolBar(QMainWindow* parent, const char *name, bool, bool):
-    QToolBar(parent, name) {}
+    QToolBar(parent) {
+      this->setObjectName(QString(name));
+      parent->addToolBar(this);
+  }
+
   virtual ~KToolBar() {}
 
   void insertWidget(int id, int, QWidget*w, int) {
@@ -38,7 +45,7 @@ class KToolBar: public QToolBar {
     QWidget *w = (( it == id2widget.end() ) ? 0 : (*it));
     if(w && enable) {
       cout << "yep!" << endl;
-      setStretchableWidget(w);
+      //setStretchableWidget(w);
     }
   }
 

@@ -15,7 +15,7 @@ class KApplication: public QApplication {
  public:
   KApplication():QApplication(nothing, NULL) {
     app = this;
-    std::cout << font().family() << std::endl;
+    std::cout << font().family().toLatin1().data() << std::endl;
   }
 
   static KApplication *kApplication() { return app; }
