@@ -125,7 +125,7 @@ public:
    /** 
    * Constructor (NoFocus, minimum width = 1, an internal QList of taskbar buttons (autodelete)) 
    */
-   QextMdiTaskBar(QextMdiMainFrm *parent, QMainWindow::ToolBarDock dock);
+   QextMdiTaskBar(QextMdiMainFrm *parent, Qt::ToolBarArea dock);
    /** 
    * Destructor (deletes the taskbar button list) 
    */
@@ -183,7 +183,7 @@ protected:
    * A list of taskbar buttons.
    * Note: Each button stands for one MDI view (toolviews doesn't have got a taskbar button). 
    */
-   QList<QextMdiTaskBarButton>*  m_pButtonList;
+   QList<QextMdiTaskBarButton*>*  m_pButtonList;
    /**
    * The belonging MDI mainframe (parent widget of this)
    */

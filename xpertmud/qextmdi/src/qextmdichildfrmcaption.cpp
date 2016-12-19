@@ -24,16 +24,19 @@
 //
 //----------------------------------------------------------------------------
 
-#include <qpainter.h>
-#include <qapplication.h>
-#include <qcursor.h>
-
 #include "qextmdidefines.h"
 #include "qextmdichildfrmcaption.h"
 #include "qextmdichildfrm.h"
 #include "qextmdichildarea.h"
 #include "qextmdimainfrm.h"
 #include <iostream>
+
+#include <QPainter>
+#include <QMouseEvent>
+#include <QApplication>
+#include <QCursor>
+
+
 //////////////////////////////////////////////////////////////////////////////
 // Class   : QextMdiChildFrmCaption
 // Purpose : An MDI label that draws the title
@@ -44,13 +47,15 @@
 //============== QextMdiChildFrmCaption =============//
 
 QextMdiChildFrmCaption::QextMdiChildFrmCaption(QextMdiChildFrm *parent)
-:QWidget(parent, "qextmdi_childfrmcaption")
+:QWidget(parent)
 {
+   setObjectName("qextmdi_childfrmcaption");
    m_szCaption    = tr("Unnamed");
-   m_bActive      = FALSE;
+   m_bActive      = false;
    m_pParent      = parent;
-   setBackgroundMode(NoBackground);
-   setFocusPolicy(NoFocus);
+   //setBackgroundMode(NoBackground);
+   setAutoFillBackground(false);
+   setFocusPolicy(Qt::NoFocus);
    m_bChildInDrag = false;
 }
 
@@ -64,15 +69,15 @@ QextMdiChildFrmCaption::~QextMdiChildFrmCaption()
 
 void QextMdiChildFrmCaption::mousePressEvent(QMouseEvent *e)
 {
-   if ( e->button() == LeftButton) {
-      setMouseTracking(FALSE);
+   if ( e->button() == Qt::LeftButton) {
+      setMouseTracking(false);
       if (QextMdiMainFrm::frameDecorOfAttachedViews() != QextMdi::Win95Look) {
-         QApplication::setOverrideCursor(Qt::sizeAllCursor,TRUE);
+         QApplication::setOverrideCursor(Qt::SizeAllCursor);
       }
-      m_pParent->m_bDragging = TRUE;
+      m_pParent->m_bDragging = false;
       m_offset = mapToParent( e->pos());
    }
-   else if ( e->button() == RightButton) {
+   else if ( e->button() == Qt::RightButton) {
       m_pParent->systemMenu()->popup( mapToGlobal( e->pos()));
    }
 }
@@ -81,12 +86,12 @@ void QextMdiChildFrmCaption::mousePressEvent(QMouseEvent *e)
 
 void QextMdiChildFrmCaption::mouseReleaseEvent(QMouseEvent *e)
 {
-   if ( e->button() == LeftButton) {
+   if ( e->button() == Qt::LeftButton) {
       if (QextMdiMainFrm::frameDecorOfAttachedViews() != QextMdi::Win95Look)
          QApplication::restoreOverrideCursor();
       releaseMouse();
       if(m_pParent->m_bDragging) {
-         m_pParent->m_bDragging = FALSE;
+         m_pParent->m_bDragging = false;
          if (m_bChildInDrag) {
             //notify child view
             QextMdiChildFrmDragEndEvent ue(e);
@@ -142,15 +147,20 @@ void QextMdiChildFrmCaption::setActive(bool bActive)
       return;
    
    //    Ensure the icon's pixmap has the correct bg color
-   m_pParent->m_pWinIcon->setBackgroundColor(bActive
-   ? m_pParent->m_pManager->m_captionActiveBackColor
-   : m_pParent->m_pManager->m_captionInactiveBackColor);
-   m_pParent->m_pUnixIcon->setBackgroundColor(bActive
-   ? m_pParent->m_pManager->m_captionActiveBackColor
-   : m_pParent->m_pManager->m_captionInactiveBackColor);
+   QPalette pal(m_pParent->m_pWinIcon->palette());
+   pal.setColor(QPalette::Background, bActive
+                ? m_pParent->m_pManager->m_captionActiveBackColor
+                : m_pParent->m_pManager->m_captionInactiveBackColor);
+   m_pParent->m_pWinIcon->setPalette(pal);
+
+   pal = m_pParent->m_pUnixIcon->palette();
+   pal.setColor(QPalette::Background, bActive
+                ? m_pParent->m_pManager->m_captionActiveBackColor
+                : m_pParent->m_pManager->m_captionInactiveBackColor);
+   m_pParent->m_pUnixIcon->setPalette(pal);
 
    m_bActive = bActive;
-   repaint( FALSE);
+   repaint();
 }
 
 //=============== setCaption ===============//
@@ -158,7 +168,7 @@ void QextMdiChildFrmCaption::setActive(bool bActive)
 void QextMdiChildFrmCaption::setCaption(const QString& text)
 {
    m_szCaption = text;
-   repaint(FALSE);
+   repaint();
 }
 
 //============== heightHint ===============//
@@ -209,7 +219,7 @@ void QextMdiChildFrmCaption::paintEvent(QPaintEvent *)
 
    int captionWidthForText = width() - 4*m_pParent->m_pClose->width() - m_pParent->icon()->width() - 5;
    QString text = abbreviateText( m_szCaption, captionWidthForText);
-   p.drawText( r, AlignVCenter|AlignLeft|SingleLine, text);
+   p.drawText( r, Qt::AlignVCenter|Qt::AlignLeft|Qt::TextSingleLine, text);
    
 }
 
@@ -262,11 +272,11 @@ void QextMdiChildFrmCaption::mouseDoubleClickEvent(QMouseEvent *)
 
 void QextMdiChildFrmCaption::slot_moveViaSystemMenu()
 {
-   setMouseTracking(TRUE);
+   setMouseTracking(true);
    grabMouse();
    if (QextMdiMainFrm::frameDecorOfAttachedViews() != QextMdi::Win95Look)
-      QApplication::setOverrideCursor(Qt::sizeAllCursor,TRUE);
-   m_pParent->m_bDragging = TRUE;
+      QApplication::setOverrideCursor(Qt::SizeAllCursor);
+   m_pParent->m_bDragging = true;
    m_offset = mapFromGlobal( QCursor::pos());
 }
 

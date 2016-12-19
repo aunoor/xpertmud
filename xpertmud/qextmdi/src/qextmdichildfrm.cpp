@@ -25,13 +25,10 @@
 //----------------------------------------------------------------------------
 
 
-#include <qpainter.h>
-#include <qapplication.h>
-#include <qcursor.h>
-#include <qobjectlist.h>
-#include <qframe.h>
-
-#include <qnamespace.h>
+#include <QPainter>
+#include <QApplication>
+#include <QCursor>
+#include <QFrame>
 
 #include "qextmdidefines.h"
 #include "qextmdichildfrmcaption.h"
@@ -77,9 +74,10 @@
 #include "kde2laptop_undockbutton.xpm"
 
 
-QextMdiWin32IconButton::QextMdiWin32IconButton( QWidget* parent, const char* name)
-  : QLabel( parent, name)
+QextMdiWin32IconButton::QextMdiWin32IconButton( QWidget* parent, const QString name)
+  : QLabel( parent )
 {
+   setObjectName(name);
 }
 
 //============ mousePressEvent ============//
@@ -92,7 +90,7 @@ void QextMdiWin32IconButton::mousePressEvent( QMouseEvent*)
 //============ QextMdiChildFrm ============//
 
 QextMdiChildFrm::QextMdiChildFrm(QextMdiChildArea *parent)
- : QFrame(parent, "qextmdi_childfrm")
+ : QFrame(parent)
    ,m_pClient(0L)
    ,m_pManager(0L)
    ,m_pCaption(0L)
@@ -106,8 +104,8 @@ QextMdiChildFrm::QextMdiChildFrm(QextMdiChildArea *parent)
    ,m_restoredRect()
    ,m_iResizeCorner(QEXTMDI_NORESIZE)
    ,m_iLastCursorCorner(QEXTMDI_NORESIZE)
-   ,m_bResizing(FALSE)
-   ,m_bDragging(FALSE)
+   ,m_bResizing(false)
+   ,m_bDragging(false)
    ,m_pIconButtonPixmap(0L)
    ,m_pMinButtonPixmap(0L)
    ,m_pMaxButtonPixmap(0L)
@@ -118,8 +116,9 @@ QextMdiChildFrm::QextMdiChildFrm(QextMdiChildArea *parent)
    ,m_pSystemMenu(0L)
    ,m_oldClientMinSize()
    ,m_oldClientMaxSize()
-   ,m_oldLayoutResizeMode(QLayout::Minimum)
+   ,m_oldLayoutResizeMode(QLayout::SetMinimumSize)
 {
+   setObjectName("qextmdi_childfrm");
   /*  QBoxLayout *h = new QVBoxLayout(this); //shit, doesn't work
       h->setAutoAdd(true);*/
    m_pCaption  = new QextMdiChildFrmCaption(this);
@@ -141,21 +140,21 @@ QextMdiChildFrm::QextMdiChildFrm(QextMdiChildArea *parent)
    m_pIconButtonPixmap = new QPixmap( filenew);
    redecorateButtons();
 
-   m_pWinIcon->setFocusPolicy(NoFocus);
-   m_pUnixIcon->setFocusPolicy(NoFocus);
-   m_pClose->setFocusPolicy(NoFocus);
-   m_pMinimize->setFocusPolicy(NoFocus);
-   m_pMaximize->setFocusPolicy(NoFocus);
-   m_pUndock->setFocusPolicy(NoFocus);
+   m_pWinIcon->setFocusPolicy(Qt::NoFocus);
+   m_pUnixIcon->setFocusPolicy(Qt::NoFocus);
+   m_pClose->setFocusPolicy(Qt::NoFocus);
+   m_pMinimize->setFocusPolicy(Qt::NoFocus);
+   m_pMaximize->setFocusPolicy(Qt::NoFocus);
+   m_pUndock->setFocusPolicy(Qt::NoFocus);
 
    setFrameStyle(QFrame::WinPanel|QFrame::Raised);
-   setFocusPolicy(NoFocus);
+   setFocusPolicy(Qt::NoFocus);
 
-   setMouseTracking(TRUE);
+   setMouseTracking(true);
 
    setMinimumSize(QEXTMDI_MDI_CHILDFRM_MIN_WIDTH, m_pCaption->heightHint());
 
-   m_pSystemMenu = new QPopupMenu();
+   m_pSystemMenu = new QMenu();
 }
 
 //============ ~QextMdiChildFrm ============//
@@ -176,16 +175,16 @@ void QextMdiChildFrm::mousePressEvent(QMouseEvent *e)
 {
    if( m_bResizing) {
       if(QApplication::overrideCursor()) { QApplication::restoreOverrideCursor(); }
-      m_bResizing = FALSE;
+      m_bResizing = false;
       releaseMouse();
    }
 
-   m_pCaption->setActive(TRUE);
-   m_pManager->setTopChild(this,FALSE);
+   m_pCaption->setActive(true);
+   m_pManager->setTopChild(this,false);
 
    m_iResizeCorner=getResizeCorner(e->pos().x(),e->pos().y());
    if(m_iResizeCorner != QEXTMDI_NORESIZE) {
-      m_bResizing = TRUE;
+      m_bResizing = true;
       //notify child view
       QextMdiChildFrmResizeBeginEvent ue(e);
       if( m_pClient != 0L) {
@@ -201,7 +200,7 @@ void QextMdiChildFrm::mouseReleaseEvent(QMouseEvent *e)
    if(m_bResizing) {
       if(QApplication::overrideCursor()) { QApplication::restoreOverrideCursor(); }
 
-      m_bResizing = FALSE;
+      m_bResizing = false;
       //notify child view
       QextMdiChildFrmResizeEndEvent ue(e);
       if( m_pClient != 0L) {
@@ -222,19 +221,19 @@ void QextMdiChildFrm::setResizeCursor(int resizeCorner)
          break;
       case QEXTMDI_RESIZE_LEFT:
       case QEXTMDI_RESIZE_RIGHT:
-         QApplication::setOverrideCursor(Qt::sizeHorCursor,TRUE);
+         QApplication::setOverrideCursor(Qt::sizeHorCursor,true);
          break;
       case QEXTMDI_RESIZE_TOP:
       case QEXTMDI_RESIZE_BOTTOM:
-         QApplication::setOverrideCursor(Qt::sizeVerCursor,TRUE);
+         QApplication::setOverrideCursor(Qt::sizeVerCursor,true);
          break;
       case QEXTMDI_RESIZE_TOPLEFT:
       case QEXTMDI_RESIZE_BOTTOMRIGHT:
-         QApplication::setOverrideCursor(Qt::sizeFDiagCursor,TRUE);
+         QApplication::setOverrideCursor(Qt::sizeFDiagCursor,true);
          break;
       case QEXTMDI_RESIZE_BOTTOMLEFT:
       case QEXTMDI_RESIZE_TOPRIGHT:
-         QApplication::setOverrideCursor(Qt::sizeBDiagCursor,TRUE);
+         QApplication::setOverrideCursor(Qt::sizeBDiagCursor,true);
          break;
    }
 }
@@ -265,7 +264,7 @@ void QextMdiChildFrm::mouseMoveEvent(QMouseEvent *e)
          resizeWindow(m_iResizeCorner, p.x(), p.y());
       }
       else
-         m_bResizing = FALSE;
+         m_bResizing = false;
    }
    else {
       m_iResizeCorner = getResizeCorner(e->pos().x(), e->pos().y());
@@ -387,13 +386,13 @@ void QextMdiChildFrm::maximizePressed()
 {
    switch(m_state){
       case Maximized:
-         emit m_pManager->nowMaximized(FALSE);
+         emit m_pManager->nowMaximized(false);
          setState(Normal);
          break;
       case Normal:
       case Minimized:
          setState(Maximized);
-         emit m_pManager->nowMaximized(TRUE);
+         emit m_pManager->nowMaximized(true);
          break;
    }
 }
@@ -403,7 +402,7 @@ void QextMdiChildFrm::restorePressed()
    if( m_state == Normal)
       return;
    if( m_state == Maximized)
-      emit m_pManager->nowMaximized(FALSE);
+      emit m_pManager->nowMaximized(false);
    setState(Normal);
 }
 
@@ -415,7 +414,7 @@ void QextMdiChildFrm::minimizePressed()
       case Minimized: setState(Normal);    break;
       case Normal:    setState(Minimized); break;
       case Maximized:
-         emit m_pManager->nowMaximized(FALSE);
+         emit m_pManager->nowMaximized(false);
          setState(Normal);
          setState(Minimized);
          break;
@@ -454,7 +453,7 @@ void QextMdiChildFrm::setState(MdiWindowState state, bool /*bAnimate*/)
    case Normal:
       switch(m_state){
       case Maximized:
-         m_pClient->m_stateChanged = TRUE;
+         m_pClient->m_stateChanged = true;
          m_state=state;
          // client min / max size / layout behaviour don't change
          // set frame max size indirectly by setting the clients max size to 
@@ -464,7 +463,7 @@ void QextMdiChildFrm::setState(MdiWindowState state, bool /*bAnimate*/)
          setGeometry(m_restoredRect);
          break;
       case Minimized:
-         m_pClient->m_stateChanged = TRUE;
+         m_pClient->m_stateChanged = true;
          m_state=state;
          // restore client min / max size / layout behaviour
          m_pClient->setMinimumSize(m_oldClientMinSize.width(),m_oldClientMinSize.height());
@@ -485,7 +484,7 @@ void QextMdiChildFrm::setState(MdiWindowState state, bool /*bAnimate*/)
    case Maximized:
       switch(m_state){
       case Minimized: {
-            m_pClient->m_stateChanged = TRUE;
+            m_pClient->m_stateChanged = true;
             m_state=state;
             // restore client min / max size / layout behaviour
             m_pClient->setMinimumSize(m_oldClientMinSize.width(),m_oldClientMinSize.height());
@@ -509,7 +508,7 @@ void QextMdiChildFrm::setState(MdiWindowState state, bool /*bAnimate*/)
          }
          break;
       case Normal: {
-            m_pClient->m_stateChanged = TRUE;
+            m_pClient->m_stateChanged = true;
             m_state=state;
             // client min / max size / layout behaviour don't change
             setMaximumSize(QWIDGETSIZE_MAX,QWIDGETSIZE_MAX);
@@ -533,7 +532,7 @@ void QextMdiChildFrm::setState(MdiWindowState state, bool /*bAnimate*/)
    case Minimized:
       switch(m_state){
       case Maximized:
-         m_pClient->m_stateChanged = TRUE;
+         m_pClient->m_stateChanged = true;
          m_state=state;
          // save client min / max size / layout behaviour
          m_oldClientMinSize = m_pClient->minimumSize();
@@ -547,10 +546,10 @@ void QextMdiChildFrm::setState(MdiWindowState state, bool /*bAnimate*/)
             m_pClient->layout()->setResizeMode(QLayout::FreeResize);
          }
          switchToMinimizeLayout();
-         m_pManager->childMinimized(this,TRUE);
+         m_pManager->childMinimized(this,true);
          break;
       case Normal:
-         m_pClient->m_stateChanged = TRUE;
+         m_pClient->m_stateChanged = true;
          m_state=state;
          // save client min / max size / layout behaviour
          m_oldClientMinSize = m_pClient->minimumSize();
@@ -565,7 +564,7 @@ void QextMdiChildFrm::setState(MdiWindowState state, bool /*bAnimate*/)
             m_pClient->layout()->setResizeMode(QLayout::FreeResize);
          }
          switchToMinimizeLayout();
-         m_pManager->childMinimized(this,FALSE);
+         m_pManager->childMinimized(this,false);
          break;
       case Minimized:
          break;
@@ -615,7 +614,7 @@ void QextMdiChildFrm::setCaption(const QString& text)
 void QextMdiChildFrm::enableClose(bool bEnable)
 {
    m_pClose->setEnabled(bEnable);
-   m_pClose->repaint(FALSE);
+   m_pClose->repaint(false);
 }
 
 //============ setIcon ==================//
@@ -658,7 +657,7 @@ void QextMdiChildFrm::setClient(QextMdiChildView *w)
 
    // memorize the focuses in a dictionary because they will get lost during reparenting
    QDict<FocusPolicy>* pFocPolDict = new QDict<FocusPolicy>;
-   pFocPolDict->setAutoDelete(TRUE);
+   pFocPolDict->setAutoDelete(true);
    QObjectList *list = m_pClient->queryList( "QWidget" );
    QObjectListIt it( *list );          // iterate over the buttons
    QObject * obj;
@@ -826,7 +825,7 @@ QDict<QWidget::FocusPolicy>* QextMdiChildFrm::unlinkChildren()
 {
    // memorize the focuses in a dictionary because they will get lost during reparenting
    QDict<FocusPolicy>* pFocPolDict = new QDict<FocusPolicy>;
-   pFocPolDict->setAutoDelete(TRUE);
+   pFocPolDict->setAutoDelete(true);
 
    QObjectList *list = m_pClient->queryList( "QWidget" );
    QObjectListIt it( *list );          // iterate over all child widgets of child frame
@@ -964,9 +963,9 @@ bool QextMdiChildFrm::eventFilter( QObject *obj, QEvent *e )
    case QEvent::MouseButtonPress: 
       {
          if ( (QWidget*)obj != m_pClient ) {
-            bool bIsSecondClick = FALSE;
+            bool bIsSecondClick = false;
             if (m_timeMeasure.elapsed() <= QApplication::doubleClickInterval()) {
-               bIsSecondClick = TRUE;  // of a possible double click
+               bIsSecondClick = true;  // of a possible double click
             }
             if ( !(((obj == m_pWinIcon) || (obj == m_pUnixIcon)) && bIsSecondClick) ) {
                // in case we didn't click on the icon button
@@ -991,7 +990,7 @@ bool QextMdiChildFrm::eventFilter( QObject *obj, QEvent *e )
                else {
                   closePressed();   // double click on icon button closes the view
                }
-               return TRUE;
+               return true;
             }
          }
       }
@@ -1062,8 +1061,8 @@ void QextMdiChildFrm::raiseAndActivate()
 {
    //qDebug("ChildFrm::raiseAndActivate");
   m_pClient->show();
-   m_pCaption->setActive(TRUE);
-   m_pManager->setTopChild(this,FALSE); //Do not focus by now...
+   m_pCaption->setActive(true);
+   m_pManager->setTopChild(this,false); //Do not focus by now...
 }
 
 //============= setMinimumSize ===============//
@@ -1092,15 +1091,15 @@ QPopupMenu* QextMdiChildFrm::systemMenu()
       m_pSystemMenu->insertItem(tr("M&inimize"),this, SLOT(minimizePressed()));
       m_pSystemMenu->insertItem(tr("M&aximize"),this, SLOT(maximizePressed()));
       if( state() == Normal)
-         m_pSystemMenu->setItemEnabled(m_pSystemMenu->idAt(0),FALSE);
+         m_pSystemMenu->setItemEnabled(m_pSystemMenu->idAt(0),false);
       else if( state() == Maximized) {
-         m_pSystemMenu->setItemEnabled(m_pSystemMenu->idAt(1),FALSE);
-         m_pSystemMenu->setItemEnabled(m_pSystemMenu->idAt(2),FALSE);
-         m_pSystemMenu->setItemEnabled(m_pSystemMenu->idAt(4),FALSE);
+         m_pSystemMenu->setItemEnabled(m_pSystemMenu->idAt(1),false);
+         m_pSystemMenu->setItemEnabled(m_pSystemMenu->idAt(2),false);
+         m_pSystemMenu->setItemEnabled(m_pSystemMenu->idAt(4),false);
       }
       else if( state() == Minimized) {
-         m_pSystemMenu->setItemEnabled(m_pSystemMenu->idAt(2),FALSE);
-         m_pSystemMenu->setItemEnabled(m_pSystemMenu->idAt(3),FALSE);
+         m_pSystemMenu->setItemEnabled(m_pSystemMenu->idAt(2),false);
+         m_pSystemMenu->setItemEnabled(m_pSystemMenu->idAt(3),false);
       }
    }
    else  {
@@ -1127,7 +1126,7 @@ QPopupMenu* QextMdiChildFrm::systemMenu()
 void QextMdiChildFrm::showSystemMenu()
 {
    if (QextMdiMainFrm::frameDecorOfAttachedViews() != QextMdi::Win95Look) {
-      m_pUnixIcon->setDown( FALSE);
+      m_pUnixIcon->setDown( false);
    }
    QPoint popupmenuPosition;
    //qDebug("%d,%d,%d,%d,%d",m_pIcon->pos().x(),x(),m_pIcon->pos().y(),m_pIcon->height(),y());
@@ -1163,7 +1162,7 @@ void QextMdiChildFrm::switchToMinimizeLayout()
 void QextMdiChildFrm::slot_resizeViaSystemMenu()
 {
    grabMouse();
-   m_bResizing = TRUE;
+   m_bResizing = true;
    m_iResizeCorner = QEXTMDI_RESIZE_BOTTOMLEFT;
    setResizeCursor( m_iResizeCorner);
 }
@@ -1211,33 +1210,33 @@ void QextMdiChildFrm::redecorateButtons()
    }
 
 #if QT_VERSION > 209
-   m_pUnixIcon->setAutoRaise(TRUE);
+   m_pUnixIcon->setAutoRaise(true);
    if (QextMdiMainFrm::frameDecorOfAttachedViews() == QextMdi::KDE1Look) {
-      m_pMinimize->setAutoRaise(TRUE);
-      m_pMaximize->setAutoRaise(TRUE);
-      m_pClose->setAutoRaise(TRUE);
-      m_pUndock->setAutoRaise(TRUE);
+      m_pMinimize->setAutoRaise(true);
+      m_pMaximize->setAutoRaise(true);
+      m_pClose->setAutoRaise(true);
+      m_pUndock->setAutoRaise(true);
    }
    else {
-      m_pMinimize->setAutoRaise(FALSE);
-      m_pMaximize->setAutoRaise(FALSE);
-      m_pClose->setAutoRaise(FALSE);
-      m_pUndock->setAutoRaise(FALSE);
+      m_pMinimize->setAutoRaise(false);
+      m_pMaximize->setAutoRaise(false);
+      m_pClose->setAutoRaise(false);
+      m_pUndock->setAutoRaise(false);
    }
 #endif
 
-   if (m_pClient && m_pClient->icon()) {
-      m_pWinIcon->setPixmap( *(m_pClient)->icon());
-      m_pUnixIcon->setPixmap( *(m_pClient)->icon());
+   if (m_pClient && !m_pClient->windowIcon().isNull()) {
+      m_pWinIcon->setPixmap( m_pClient->windowIcon().pixmap(22,22));
+      m_pUnixIcon->setIcon( m_pClient->windowIcon());
    }
    else {
       m_pWinIcon->setPixmap( *m_pIconButtonPixmap);
-      m_pUnixIcon->setPixmap( *m_pIconButtonPixmap);
+      m_pUnixIcon->setIcon( *m_pIconButtonPixmap);
    }
-   m_pClose->setPixmap( *m_pCloseButtonPixmap);
-   m_pMinimize->setPixmap( *m_pMinButtonPixmap);
-   m_pMaximize->setPixmap( *m_pMaxButtonPixmap);
-   m_pUndock->setPixmap( *m_pUndockButtonPixmap);
+   m_pClose->setIcon( *m_pCloseButtonPixmap);
+   m_pMinimize->setIcon( *m_pMinButtonPixmap);
+   m_pMaximize->setIcon( *m_pMaxButtonPixmap);
+   m_pUndock->setIcon( *m_pUndockButtonPixmap);
 }
 
 QRect QextMdiChildFrm::mdiAreaContentsRect() const

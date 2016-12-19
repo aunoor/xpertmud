@@ -27,8 +27,8 @@
 //
 //----------------------------------------------------------------------------
 
-#include <qdatetime.h>
-#include <qobjectlist.h>
+#include <QDateTime>
+//#include <qobjectlist.h>
 
 #include "qextmdichildview.h"
 #include "qextmdimainfrm.h"
@@ -38,16 +38,17 @@
 //============ QextMdiChildView ============//
 
 QextMdiChildView::QextMdiChildView( const QString& caption, QWidget* parentWidget, const char* name, WFlags f)
-: QWidget(parentWidget, name, f)
+: QWidget(parentWidget, f)
   ,m_focusedChildWidget(0L)
   ,m_firstFocusableChildWidget(0L)
   ,m_lastFocusableChildWidget(0L)
-  ,m_stateChanged(TRUE)
-  ,m_bToolView(FALSE)
-  ,m_bInterruptActivation(FALSE)
-  ,m_bMainframesActivateViewIsPending(FALSE)
-  ,m_bFocusInEventIsPending(FALSE)
+  ,m_stateChanged(true)
+  ,m_bToolView(false)
+  ,m_bInterruptActivation(false)
+  ,m_bMainframesActivateViewIsPending(false)
+  ,m_bFocusInEventIsPending(false)
 {
+   setObjectName(name);
    setGeometry( 0, 0, 0, 0);  // reset
    if(caption != 0L) {
       m_szCaption = caption;
@@ -69,11 +70,11 @@ QextMdiChildView::QextMdiChildView( QWidget* parentWidget, const char* name, WFl
   ,m_focusedChildWidget(0L)
   ,m_firstFocusableChildWidget(0L)
   ,m_lastFocusableChildWidget(0L)
-  ,m_stateChanged(TRUE)
-  ,m_bToolView(FALSE)
-  ,m_bInterruptActivation(FALSE)
-  ,m_bMainframesActivateViewIsPending(FALSE)
-  ,m_bFocusInEventIsPending(FALSE)
+  ,m_stateChanged(true)
+  ,m_bToolView(false)
+  ,m_bInterruptActivation(false)
+  ,m_bMainframesActivateViewIsPending(false)
+  ,m_bFocusInEventIsPending(false)
 {
    setGeometry( 0, 0, 0, 0);  // reset
    m_szCaption = QString(tr("Unnamed"));
@@ -217,7 +218,7 @@ void QextMdiChildView::showMinimized()
 }
 
 //slot:
-void QextMdiChildView::minimize() { minimize(TRUE); }
+void QextMdiChildView::minimize() { minimize(true); }
 
 //============= maximize ==============//
 
@@ -226,7 +227,7 @@ void QextMdiChildView::maximize(bool bAnimate)
    if(mdiParent()) {
       if(!isMaximized()) {
          mdiParent()->setState(QextMdiChildFrm::Maximized,bAnimate);
-         emit mdiParentNowMaximized(TRUE);
+         emit mdiParentNowMaximized(true);
       }
    }
    else {
@@ -242,7 +243,7 @@ void QextMdiChildView::showMaximized()
 }
 
 //slot:
-void QextMdiChildView::maximize() { maximize(TRUE); }
+void QextMdiChildView::maximize() { maximize(true); }
 
 //============== restoreGeometry ================//
 
@@ -273,7 +274,7 @@ void  QextMdiChildView::setRestoreGeometry(const QRect& newRestGeo)
 
 void QextMdiChildView::attach()
 {
-   emit attachWindow(this,TRUE);
+   emit attachWindow(this,true);
 }
 
 //============== detach =================//
@@ -286,7 +287,7 @@ void QextMdiChildView::detach()
   if(mdiParent()) {
     mdiParent()->restorePressed();
   }
-   emit detachWindow(this, TRUE);
+   emit detachWindow(this, true);
 }
 
 //=============== isMinimized ? =================//
@@ -319,7 +320,7 @@ void QextMdiChildView::restore()
 {
    if(mdiParent()) {
       if(isMaximized()) {
-         emit mdiParentNowMaximized(FALSE);
+         emit mdiParentNowMaximized(false);
       }
       if(isMinimized()||isMaximized()) {
          mdiParent()->setState(QextMdiChildFrm::Normal);
@@ -353,8 +354,8 @@ void QextMdiChildView::youAreDetached()
    setCaption(m_szCaption);
 
    setTabCaption(m_sTabCaption);
-   if(myIconPtr())setIcon(*(myIconPtr()));
-   setFocusPolicy(QWidget::StrongFocus);
+   if(myIconPtr()) setWindowIcon(*(myIconPtr()));
+   setFocusPolicy(Qt::StrongFocus);
 
    emit isDetachedNow();
 }
@@ -370,7 +371,7 @@ void QextMdiChildView::setCaption(const QString& szCaption)
    }
    else {
      //  sorry have to call the parent one
-     QWidget::setCaption(m_szCaption);
+     QWidget::setWindowTitle(m_szCaption);
    }
    emit windowCaptionChanged(m_szCaption);
 }
@@ -405,9 +406,9 @@ void QextMdiChildView::focusInEvent(QFocusEvent *e)
       return;
    }
 
-   m_bFocusInEventIsPending = TRUE;
+   m_bFocusInEventIsPending = true;
    activate();
-   m_bFocusInEventIsPending = FALSE;
+   m_bFocusInEventIsPending = false;
 
    emit gotFocus(this);
 }
@@ -417,11 +418,11 @@ void QextMdiChildView::focusInEvent(QFocusEvent *e)
 void QextMdiChildView::activate()
 {
    // avoid circularity
-   static bool s_bActivateIsPending = FALSE;
+   static bool s_bActivateIsPending = false;
    if(s_bActivateIsPending) {
       return;
    }
-   s_bActivateIsPending = TRUE;
+   s_bActivateIsPending = true;
 
    // raise the view and push the taskbar button
    if(!m_bMainframesActivateViewIsPending) {
@@ -430,7 +431,7 @@ void QextMdiChildView::activate()
 
    // if this method was called directly, check if the mainframe wants that we interrupt
    if(m_bInterruptActivation) {
-      m_bInterruptActivation = FALSE;
+      m_bInterruptActivation = false;
    }
    else {
       if(!m_bFocusInEventIsPending) {
@@ -449,7 +450,7 @@ void QextMdiChildView::activate()
          m_focusedChildWidget = m_firstFocusableChildWidget;
       }
    }
-   s_bActivateIsPending = FALSE;
+   s_bActivateIsPending = false;
 }
 
 //============= focusOutEvent ===============//
@@ -468,7 +469,7 @@ void QextMdiChildView::resizeEvent(QResizeEvent* e)
    QWidget::resizeEvent( e);
 
    if(m_stateChanged) {
-      m_stateChanged = FALSE;
+      m_stateChanged = false;
       if(isMaximized()) {
          //qDebug("is maximized now");
          emit isMaximizedNow();
@@ -549,11 +550,11 @@ bool QextMdiChildView::eventFilter(QObject *obj, QEvent *e )
          delete list;   // delete the list, not the objects
       }
       if (!isAttached()) {   // is toplevel, for attached views activation is done by main frame event filter
-         static bool m_bActivationIsPending = FALSE;
+         static bool m_bActivationIsPending = false;
          if(!m_bActivationIsPending) {
-            m_bActivationIsPending = TRUE;
+            m_bActivationIsPending = true;
             activate(); // sets the focus
-            m_bActivationIsPending = FALSE;
+            m_bActivationIsPending = false;
          }
       }
    }
@@ -570,9 +571,9 @@ bool QextMdiChildView::eventFilter(QObject *obj, QEvent *e )
             QWidget* widg = (QWidget*)obj;
             ++it;
             widg->removeEventFilter(this);
-            if((widg->focusPolicy() == QWidget::StrongFocus) ||
-               (widg->focusPolicy() == QWidget::TabFocus   ) ||
-               (widg->focusPolicy() == QWidget::WheelFocus ))
+            if((widg->focusPolicy() == Qt::StrongFocus) ||
+               (widg->focusPolicy() == Qt::TabFocus   ) ||
+               (widg->focusPolicy() == Qt::WheelFocus ))
             {
                if(m_firstFocusableChildWidget == widg) {
                   m_firstFocusableChildWidget = 0L;   // reset first widget
@@ -598,7 +599,7 @@ bool QextMdiChildView::eventFilter(QObject *obj, QEvent *e )
 #else
          if (pNewWidget->testWFlags(Qt::WType_Dialog | Qt::WShowModal))
 #endif
-             return FALSE;
+             return false;
          QObjectList *list = pNewWidget->queryList( "QWidget" );
          list->insert(0, pNewChild);         // add the new child to the list too, just to save code
          QObjectListIt it( *list );          // iterate over all new child widgets
@@ -608,9 +609,9 @@ bool QextMdiChildView::eventFilter(QObject *obj, QEvent *e )
             ++it;
             widg->installEventFilter(this);
             connect(widg, SIGNAL(destroyed()), this, SLOT(slot_childDestroyed()));
-            if((widg->focusPolicy() == QWidget::StrongFocus) ||
-               (widg->focusPolicy() == QWidget::TabFocus   ) ||
-               (widg->focusPolicy() == QWidget::WheelFocus ))
+            if((widg->focusPolicy() == Qt::StrongFocus) ||
+               (widg->focusPolicy() == Qt::TabFocus   ) ||
+               (widg->focusPolicy() == Qt::WheelFocus ))
             {
                if(m_firstFocusableChildWidget == 0) {
                   m_firstFocusableChildWidget = widg;  // first widge
@@ -622,7 +623,7 @@ bool QextMdiChildView::eventFilter(QObject *obj, QEvent *e )
          delete list;                        // delete the list, not the objects
       }
    }
-   return FALSE;                           // standard event processing
+   return false;                           // standard event processing
 }
 
 /** Switches interposing in event loop of all current child widgets off. */

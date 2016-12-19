@@ -35,6 +35,7 @@
 #include <QLabel>
 #include <QDateTime>
 #include <QLayout>
+#include <QEvent>
 
 #include "qextmdichildfrmcaption.h"
 
@@ -50,7 +51,7 @@ class DLL_IMP_EXP_QEXTMDICLASS QextMdiWin32IconButton : public QLabel
 {
    Q_OBJECT
 public:
-   QextMdiWin32IconButton( QWidget* parent, const char* name = 0);
+   QextMdiWin32IconButton( QWidget* parent, const QString name = QString());
    virtual void mousePressEvent( QMouseEvent*);
 
 signals:
@@ -187,10 +188,10 @@ protected:
    /** 
    * Imitates a system menu for child frame windows 
    */
-   QPopupMenu*             m_pSystemMenu;
+   QMenu*                  m_pSystemMenu;
    QSize                   m_oldClientMinSize;
    QSize                   m_oldClientMaxSize;
-//   QLayout::ResizeMode     m_oldLayoutResizeMode;
+   QLayout::SizeConstraint m_oldLayoutResizeMode;
    QTime                   m_timeMeasure;
 
 // methods
@@ -265,7 +266,7 @@ public:
    /**
    * Returns the system menu.
    */
-   QPopupMenu* systemMenu();
+   QMenu*        systemMenu();
    /**
    * Returns the caption bar height 
    */

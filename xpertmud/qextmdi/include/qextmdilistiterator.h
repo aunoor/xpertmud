@@ -33,23 +33,25 @@ class QextMdiListIterator : public QextMdiIterator<Item*> {
 public:
    QextMdiListIterator(QList<Item>& list) {
       m_iterator = list.begin();
+      m_list = &list;
    }
    virtual void first() {
-      m_iterator->toFirst();
+      m_iterator->list.begin();
    }
    virtual void last() {
       m_iterator->toLast();
    }
    virtual void next()  { ++(m_iterator); }
    virtual void prev()  { --(m_iterator); }
-   virtual bool isDone() const { return m_iterator->current() == NULL; }
-   virtual Item* currentItem() const { return m_iterator->current(); }
+   virtual bool isDone() const { return m_iterator->aa; }
+   virtual Item* currentItem() const { return *m_iterator; }
 
    virtual ~QextMdiListIterator() {
    }
   
 private:
-   QList<Item>::iterator m_iterator;
+   typename QList<Item>::iterator m_iterator;
+   QList<Item> *m_list;
 };
 
 #endif // _QEXTMDILISTITERATOR_H_

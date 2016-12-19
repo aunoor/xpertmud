@@ -32,6 +32,7 @@
 
 #include <QMenuBar>
 #include <QMenu>
+#include <QPointer>
 #include <dummykpartsdockmainwindow.h>
 
 
@@ -204,14 +205,14 @@ class QextMdiMainFrm : public DockMainWindow
 protected:
    QextMdiChildArea        *m_pMdi;
    QextMdiTaskBar          *m_pTaskBar;
-   QList<QextMdiChildView> *m_pWinList;
+   QList<QextMdiChildView*> *m_pWinList;
    QextMdiChildView        *m_pCurrentWindow;
-   QPopupMenu              *m_pWindowPopup;
-   QPopupMenu              *m_pTaskBarPopup;
-   QPopupMenu              *m_pWindowMenu;
-   QPopupMenu              *m_pDockMenu;
-   QPopupMenu              *m_pMdiModeMenu;
-   QPopupMenu              *m_pPlacingMenu;
+   QMenu                   *m_pWindowPopup;
+   QMenu                   *m_pTaskBarPopup;
+   QMenu                   *m_pWindowMenu;
+   QMenu                   *m_pDockMenu;
+   QMenu                   *m_pMdiModeMenu;
+   QMenu                   *m_pPlacingMenu;
    QMenuBar                *m_pMainMenuBar;
 
    QPixmap                 *m_pUndockButtonPixmap;
@@ -231,8 +232,8 @@ protected:
    int                     m_oldMainFrmMaxHeight;
    static QextMdi::FrameDecor   m_frameDecoration;
    bool                    m_bSDIApplication;
-   QGuardedPtr<KDockWidget> m_pDockbaseAreaOfDocumentViews;
-   QGuardedPtr<KDockWidget> m_pDockbaseOfTabPage;
+   QPointer<KDockWidget>   m_pDockbaseAreaOfDocumentViews;
+   QPointer<KDockWidget>   m_pDockbaseOfTabPage;
    QDomDocument*           m_pTempDockSession;
    bool                    m_bClearingOfWindowMenuBlocked;
 
@@ -242,7 +243,7 @@ public:
    /**
    * Constructor.
    */
-   QextMdiMainFrm( QWidget* parentWidget, const char* name = "", WFlags flags = WType_TopLevel | WDestructiveClose);
+   QextMdiMainFrm( QWidget* parentWidget, const QString name = QString(), Qt::WindowFlags flags = Qt::Window, QList<Qt::WidgetAttribute> a = QList<Qt::WidgetAttribute>() << Qt::WA_DeleteOnClose);
    /**
    * Destructor.
    */
@@ -266,12 +267,12 @@ public:
    * Undock/Dock, Restore/Maximize/Minimize, Close and an empty sub-popup ( @ref windowPopup() )
    * menu called Operations.
    */
-   virtual QPopupMenu * taskBarPopup(QextMdiChildView *pWnd,bool bIncludeWindowPopup = FALSE);
+   virtual QMenu * taskBarPopup(QextMdiChildView *pWnd,bool bIncludeWindowPopup = false);
    /**
    * Returns a popup menu with only a title "Window". You can fill it with own operations entries
    * on the MDI view. This popup menu is inserted as last menu item in @ref taskBarPopup() .
    */
-   virtual QPopupMenu * windowPopup(QextMdiChildView *pWnd,bool bIncludeTaskbarPopup = TRUE);
+   virtual QMenu * windowPopup(QextMdiChildView *pWnd,bool bIncludeTaskbarPopup = true);
    /**
    * Called in the constructor (forces a resize of all MDI views)
    */
@@ -311,35 +312,29 @@ public:
    */
    virtual void setUndockPositioningOffset( QPoint offset) { m_undockPositioningOffset = offset; };
    /**
-   * If you don't want to know about the inner structure of the QextMDI system, you can use
-   * this iterator to handle with the MDI view list in a more abstract way.
-   * The iterator hides what special data structure is used in QextMDI.
-   */
-   QextMdiIterator<QextMdiChildView*>* createIterator() {
-      if ( m_pWinList == 0L) {
-         return new QextMdiNullIterator<QextMdiChildView*>();
-      } else {
-         return new QextMdiListIterator<QextMdiChildView>( *m_pWinList);
-      }
-   }
-   /**
-   * Deletes an QextMdiIterator created in the QextMDI library (needed for the windows dll problem).
-   */
-   void deleteIterator(QextMdiIterator<QextMdiChildView*>* pIt) { delete pIt; }
-   /**
    * Returns a popup menu that contains the MDI controlled view list.
    * Additionally, this menu provides some placing actions for these views.
    * Usually, you insert this popup menu in your main menubar as "Window" menu.
    */
-   QPopupMenu* windowMenu() { return m_pWindowMenu; };
+   QMenu* windowMenu() { return m_pWindowMenu; };
    /**
    * Sets a background colour for the MDI view area widget.
    */
-   virtual void setBackgroundColor( const QColor &c) { m_pMdi->setBackgroundColor( c); };
+   virtual void setBackgroundColor( const QColor &c) {
+      QPalette pal(palette());
+      pal.setColor(QPalette::Background, c);
+      m_pMdi->setAutoFillBackground(true);
+      m_pMdi->setPalette(pal);
+   };
    /**
    * Sets a background pixmap for the MDI view area widget.
    */
-   virtual void setBackgroundPixmap( const QPixmap &pm) { m_pMdi->setBackgroundPixmap( pm); };
+   virtual void setBackgroundPixmap( const QPixmap &pm) {
+      QPalette pal(palette());
+      pal.setBrush(QPalette::Background, QBrush(pm));
+      m_pMdi->setAutoFillBackground(true);
+      m_pMdi->setPalette(pal);
+   };
    /**
    * Sets a size that is used as the default size for a newly to the MDI system added @ref QextMdiChildView .
    *  By default this size is 600x400. So all non-resized added MDI views appear in that size.
@@ -365,11 +360,7 @@ public:
    * If no such menu is given, QextMDI simply overlays the buttons
    * at the upper right-hand side of the main widget.
    */
-#ifndef NO_KDE2
-   virtual void setMenuForSDIModeSysButtons( KMenuBar* = 0);
-#else
    virtual void setMenuForSDIModeSysButtons( QMenuBar* = 0);
-#endif
    /**
    * @return the decoration of the window frame of docked (attached) MDI views
    */
@@ -392,11 +383,7 @@ public:
    /**
    *
    */
-#if QT_VERSION < 300
-   void findRootDockWidgets(QList<KDockWidget>* pRootDockWidgetList, QValueList<QRect>* pPositionList);
-#else
-   void findRootDockWidgets(QPtrList<KDockWidget>* pRootDockWidgetList, QValueList<QRect>* pPositionList);
-#endif
+   void findRootDockWidgets(QList<KDockWidget*>* pRootDockWidgetList, QList<QRect>* pPositionList);
 
 public slots:
    /**
@@ -426,7 +413,7 @@ public slots:
    * Removes a QextMdiChildView from the MDI system and from the main frame`s control.
    * Note: The view will be deleted!
    */
-   virtual void closeWindow(QextMdiChildView *pWnd, bool layoutTaskBar = TRUE);
+   virtual void closeWindow(QextMdiChildView *pWnd, bool layoutTaskBar = true);
    /**
    * Switches the QextMdiTaskBar on and off.
    */
@@ -436,12 +423,12 @@ public slots:
     * Doesn't work on QextMdiChildView which aren't added to the MDI system.
     * Use addWindow() for that.
     */
-   virtual void attachWindow(QextMdiChildView *pWnd,bool bShow=TRUE);
+   virtual void attachWindow(QextMdiChildView *pWnd,bool bShow=true);
    /**
     * Makes a docked QextMdiChildView undocked.
     * The view window still remains under the main frame's MDI control.
     */
-   virtual void detachWindow(QextMdiChildView *pWnd,bool bShow=TRUE);
+   virtual void detachWindow(QextMdiChildView *pWnd,bool bShow=true);
    /** 
    * Someone wants that the MDI view to be closed. This method sends a QextMdiViewCloseEvent to itself
    * to break the function call stack. See also @ref event() .

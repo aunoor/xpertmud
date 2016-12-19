@@ -66,6 +66,7 @@ qextmdi/include/qextmdiiterator.h
 qextmdi/include/qextmdilistiterator.h
 qextmdi/include/qextmdinulliterator.h
 qextmdi/include/qextmdimainfrm.h
+qextmdi/res/*.xpm
 )
 
 #file(GLOB SRCS xpertmud/*.cc

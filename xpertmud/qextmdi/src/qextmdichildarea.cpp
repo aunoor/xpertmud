@@ -25,10 +25,13 @@
 //----------------------------------------------------------------------------
 
 #include <math.h>
-#include <QMenu>
 
 #include "qextmdidefines.h"
 #include "qextmdichildarea.h"
+
+#include <QFocusEvent>
+#include <QDesktopWidget>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // QextMdiChildArea
@@ -37,23 +40,19 @@
 //============ QextMdiChildArea ============//
 
 QextMdiChildArea::QextMdiChildArea(QWidget *parent)
-:QFrame(parent, "qextmdi_childarea")
+:QFrame(parent)
 {
+   setObjectName("qextmdi_childarea");
    setFrameStyle(QFrame::Panel|QFrame::Sunken);
    m_captionFont = QFont();//F.B.QFont("clean",16);
    QFontMetrics fm(m_captionFont);
    m_captionFontLineSpacing = fm.lineSpacing();
-   m_captionActiveBackColor = colorGroup().highlight();//QColor(0,0,128);
-   m_captionActiveForeColor = colorGroup().highlightedText();//QColor(255,255,255);
+   m_captionActiveBackColor = palette().highlight().color();//QColor(0,0,128);
+   m_captionActiveForeColor = palette().highlightedText().color();//QColor(255,255,255);
    m_captionInactiveBackColor = QColor(160,160,160);
    m_captionInactiveForeColor = QColor( 55, 55, 55);
-#if QT_VERSION < 300
-   m_pZ = new QList<QextMdiChildFrm>;
-#else
-   m_pZ = new QPtrList<QextMdiChildFrm>;
-#endif
-   m_pZ->setAutoDelete(TRUE);
-   setFocusPolicy(ClickFocus);
+   m_pZ = new QList<QextMdiChildFrm*>;
+   setFocusPolicy(Qt::ClickFocus);
    m_defaultChildFrmSize = QSize(400,300);
 }
 
@@ -61,6 +60,7 @@ QextMdiChildArea::QextMdiChildArea(QWidget *parent)
 
 QextMdiChildArea::~QextMdiChildArea()
 {
+   qDeleteAll(*m_pZ);
    delete m_pZ; //This will destroy all the widgets inside.
 }
 
@@ -79,8 +79,8 @@ void QextMdiChildArea::manageChild(QextMdiChildFrm *lpC,bool bShow,bool bCascade
       if(top){ //Maximize if needed
          if(top->state() == QextMdiChildFrm::Maximized){
             emit sysButtonConnectionsMustChange( top,lpC);
-            top->setState(QextMdiChildFrm::Normal,FALSE);
-            lpC->setState(QextMdiChildFrm::Maximized,FALSE);
+            top->setState(QextMdiChildFrm::Normal, false);
+            lpC->setState(QextMdiChildFrm::Maximized, false);
          }
       }
       lpC->show();
@@ -96,15 +96,14 @@ void QextMdiChildArea::destroyChild(QextMdiChildFrm *lpC,bool bFocusTopChild)
 
    // destroy the old one
    QObject::disconnect(lpC);
-   lpC->blockSignals(TRUE);
-   m_pZ->setAutoDelete(FALSE);
-   m_pZ->removeRef(lpC);
+   lpC->blockSignals(true);
+   m_pZ->removeAll(lpC);
 
    // focus the next new childframe
    QextMdiChildFrm* newTopChild = topChild();
    if (bWasMaximized){
       if (newTopChild) {
-         newTopChild->setState(QextMdiChildFrm::Maximized,FALSE);
+         newTopChild->setState(QextMdiChildFrm::Maximized,false);
          emit sysButtonConnectionsMustChange(lpC, newTopChild);
       }
       else {
@@ -112,7 +111,6 @@ void QextMdiChildArea::destroyChild(QextMdiChildFrm *lpC,bool bFocusTopChild)
       }
    }
    delete lpC;
-   m_pZ->setAutoDelete(TRUE);
 
    if (bFocusTopChild)
       focusTopChild();
@@ -127,14 +125,13 @@ void QextMdiChildArea::destroyChildButNotItsView(QextMdiChildFrm *lpC,bool bFocu
    // destroy the old one
    QObject::disconnect(lpC);
    lpC->unsetClient();
-   m_pZ->setAutoDelete(FALSE);
-   m_pZ->removeRef(lpC);
+   m_pZ->removeAll(lpC);
 
    // focus the next new childframe
    QextMdiChildFrm* newTopChild = topChild();
    if (bWasMaximized){
       if (newTopChild) {
-         newTopChild->setState(QextMdiChildFrm::Maximized,FALSE);
+         newTopChild->setState(QextMdiChildFrm::Maximized,false);
          emit sysButtonConnectionsMustChange(lpC, newTopChild);
       }
       else {
@@ -142,7 +139,6 @@ void QextMdiChildArea::destroyChildButNotItsView(QextMdiChildFrm *lpC,bool bFocu
       }
    }
    delete lpC;
-   m_pZ->setAutoDelete(TRUE);
 
    if (bFocusTopChild)
       focusTopChild();
@@ -153,13 +149,12 @@ void QextMdiChildArea::destroyChildButNotItsView(QextMdiChildFrm *lpC,bool bFocu
 void QextMdiChildArea::setTopChild(QextMdiChildFrm *lpC,bool bSetFocus)
 {
    if(m_pZ->last() != lpC){
-      m_pZ->setAutoDelete(FALSE);
       if (lpC) {
-         m_pZ->removeRef(lpC);
+         m_pZ->removeAll(lpC);
       }
       //disable the labels of all the other children
-      for(QextMdiChildFrm *pC=m_pZ->first();pC;pC=m_pZ->next()){
-         pC->m_pCaption->setActive(FALSE);
+      foreach(QextMdiChildFrm *pC, *m_pZ) {
+         pC->m_pCaption->setActive(false);
       }
       if (!lpC) {
          return;
@@ -169,7 +164,6 @@ void QextMdiChildArea::setTopChild(QextMdiChildFrm *lpC,bool bSetFocus)
       if (pMaximizedChild->m_state != QextMdiChildFrm::Maximized) {
          pMaximizedChild = 0L;
       }
-      m_pZ->setAutoDelete(TRUE);
       m_pZ->append(lpC);
       int nChildAreaMinW = 0,               nChildAreaMinH = 0;
       int nChildAreaMaxW = QWIDGETSIZE_MAX, nChildAreaMaxH = QWIDGETSIZE_MAX;
@@ -183,13 +177,13 @@ void QextMdiChildArea::setTopChild(QextMdiChildFrm *lpC,bool bSetFocus)
       setMinimumSize(nChildAreaMinW, nChildAreaMinH);
       setMaximumSize(nChildAreaMaxW, nChildAreaMaxH);
       if (pMaximizedChild) {
-         const bool bDontAnimate = FALSE;
+         const bool bDontAnimate = false;
          // first maximize the new view
          lpC->setState(QextMdiChildFrm::Maximized, bDontAnimate);
          qApp->sendPostedEvents();
          // then restore the old maximized view in background
          pMaximizedChild->setState(QextMdiChildFrm::Normal, bDontAnimate);
-         qApp->processOneEvent();
+         qApp->processEvents();
          emit sysButtonConnectionsMustChange( pMaximizedChild, lpC);
       }
       else {
@@ -198,7 +192,7 @@ void QextMdiChildArea::setTopChild(QextMdiChildFrm *lpC,bool bSetFocus)
       if (bSetFocus) {
 //TEST         if(!lpC->hasFocus())lpC->setFocus();
       }
-      QFocusEvent::setReason(QFocusEvent::Other);
+      ///????: QFocusEvent::setReason(QFocusEvent::Other);
       //lpC->m_pClient->setFocus();
    }
 }
@@ -229,7 +223,7 @@ void QextMdiChildArea::resizeEvent(QResizeEvent* e)
 void QextMdiChildArea::mousePressEvent(QMouseEvent *e)
 {
    //Popup the window menu
-   if(e->button() & RightButton)
+   if(e->button() & Qt::RightButton)
       emit popupWindowMenu( mapToGlobal( e->pos()));
 }
 
@@ -243,9 +237,9 @@ QPoint QextMdiChildArea::getCascadePoint(int indexOfWindow)
    QPoint pnt(0,0);
    if(indexOfWindow==0)return pnt;
 
-   bool bTopLevelMode = FALSE;
+   bool bTopLevelMode = false;
    if( height() == 1)	// hacky?!
-   		bTopLevelMode = TRUE;
+   		bTopLevelMode = true;
 
    QextMdiChildFrm *lpC=m_pZ->first();
    int step=(lpC ? lpC->m_pCaption->heightHint()+QEXTMDI_MDI_CHILDFRM_BORDER : 20);
@@ -271,18 +265,16 @@ QPoint QextMdiChildArea::getCascadePoint(int indexOfWindow)
 
 void QextMdiChildArea::childMinimized(QextMdiChildFrm *lpC,bool bWasMaximized)
 {
-   if(m_pZ->findRef(lpC) == -1)return;
+   if(m_pZ->indexOf(lpC) == -1)return;
    if(m_pZ->count() > 1){
-      m_pZ->setAutoDelete(FALSE);
-      m_pZ->removeRef(lpC);
-      m_pZ->setAutoDelete(TRUE);
+      m_pZ->removeAll(lpC);
       m_pZ->insert(0,lpC);
       if(bWasMaximized){
          // Need to maximize the top child
          lpC = m_pZ->last();
          if(!lpC)return; //??
          if(lpC->m_state==QextMdiChildFrm::Minimized)return;
-         lpC->setState(QextMdiChildFrm::Maximized,FALSE); //do not animate the change
+         lpC->setState(QextMdiChildFrm::Maximized,false); //do not animate the change
       }
       focusTopChild();
    } else {
@@ -300,8 +292,8 @@ void QextMdiChildArea::focusTopChild()
       return;
    }
    //disable the labels of all the other children
-   for(QextMdiChildFrm *pC=m_pZ->first();pC;pC=m_pZ->next()){
-      if(pC != lpC)pC->m_pCaption->setActive(FALSE);
+   foreach(QextMdiChildFrm *pC, *m_pZ) {
+      if(pC != lpC)pC->m_pCaption->setActive(false);
    }
    lpC->raise();
    if(!lpC->hasFocus()) {
@@ -318,12 +310,9 @@ void QextMdiChildArea::focusTopChild()
 void QextMdiChildArea::cascadeWindows()
 {
    int idx=0;
-#if QT_VERSION < 300
-   QList<QextMdiChildFrm> list(*m_pZ);
-#else
-   QPtrList<QextMdiChildFrm> list(*m_pZ);
-#endif
-   list.setAutoDelete(FALSE);
+
+   QList<QextMdiChildFrm*> list(*m_pZ);
+
    while(!list.isEmpty()){
       QextMdiChildFrm *lpC=list.first();
       if(lpC->m_state != QextMdiChildFrm::Minimized){
@@ -341,13 +330,8 @@ void QextMdiChildArea::cascadeWindows()
 void QextMdiChildArea::cascadeMaximized()
 {
    int idx=0;
-#if QT_VERSION < 300
-   QList<QextMdiChildFrm> list(*m_pZ);
-#else
-   QPtrList<QextMdiChildFrm> list(*m_pZ);
-#endif
+   QList<QextMdiChildFrm*> list(*m_pZ);
 
-   list.setAutoDelete(FALSE);
    while(!list.isEmpty()){
       QextMdiChildFrm *lpC=list.first();
       if(lpC->m_state != QextMdiChildFrm::Minimized){
@@ -368,12 +352,7 @@ void QextMdiChildArea::cascadeMaximized()
 void QextMdiChildArea::expandVertical()
 {
    int idx=0;
-#if QT_VERSION < 300
-   QList<QextMdiChildFrm> list(*m_pZ);
-#else
-   QPtrList<QextMdiChildFrm> list(*m_pZ);
-#endif
-   list.setAutoDelete(FALSE);
+   QList<QextMdiChildFrm*> list(*m_pZ);
    while(!list.isEmpty()){
       QextMdiChildFrm *lpC=list.first();
       if(lpC->m_state != QextMdiChildFrm::Minimized){
@@ -389,12 +368,7 @@ void QextMdiChildArea::expandVertical()
 void QextMdiChildArea::expandHorizontal()
 {
    int idx=0;
-#if QT_VERSION < 300
-   QList<QextMdiChildFrm> list(*m_pZ);
-#else
-   QPtrList<QextMdiChildFrm> list(*m_pZ);
-#endif
-   list.setAutoDelete(FALSE);
+   QList<QextMdiChildFrm*> list(*m_pZ);
    while(!list.isEmpty()){
       QextMdiChildFrm *lpC=list.first();
       if(lpC->m_state != QextMdiChildFrm::Minimized){
@@ -412,7 +386,7 @@ void QextMdiChildArea::expandHorizontal()
 int QextMdiChildArea::getVisibleChildCount()
 {
    int cnt=0;
-   for(QextMdiChildFrm *lpC=m_pZ->first();lpC;lpC=m_pZ->next()){
+   foreach(QextMdiChildFrm *lpC, *m_pZ) {
       if ((lpC->m_state != QextMdiChildFrm::Minimized) &&
           (lpC->isVisible())) cnt++;
    }
@@ -460,7 +434,7 @@ void QextMdiChildArea::tileAllInternal(int maxWnds)
    int curRow=1;
    int curCol=1;
    int curWin=1;
-   for (QextMdiChildFrm *lpC=m_pZ->first();lpC;lpC=m_pZ->next()) {
+   foreach(QextMdiChildFrm *lpC, *m_pZ) {
       if (lpC->m_state!=QextMdiChildFrm::Minimized) {
          //restore the window
          if (lpC->m_state==QextMdiChildFrm::Maximized)
@@ -524,7 +498,7 @@ void QextMdiChildArea::tileAnodine()
    // it's great when a kick-ass theory works!!!                      // Pragma :)
    int xQuantum=width()/numCols;
    int yQuantum=height()/numRows[numCurCol];
-   for(QextMdiChildFrm *lpC=m_pZ->first();lpC;lpC=m_pZ->next()){
+   foreach(QextMdiChildFrm *lpC, *m_pZ) {
       if(lpC->m_state != QextMdiChildFrm::Minimized){
          if(lpC->m_state==QextMdiChildFrm::Maximized)lpC->restorePressed();
          lpC->setGeometry(curX,curY,xQuantum,yQuantum);
@@ -563,7 +537,7 @@ void QextMdiChildArea::tileVertically()
    int posX = 0;
    int countVisible = 0;
    
-   for(QextMdiChildFrm *lpC=m_pZ->first();lpC;lpC=m_pZ->next()){
+   foreach(QextMdiChildFrm *lpC, *m_pZ) {
       if(lpC->m_state != QextMdiChildFrm::Minimized){
          if(lpC->m_state==QextMdiChildFrm::Maximized)lpC->restorePressed();
          countVisible++;
@@ -587,7 +561,7 @@ void QextMdiChildArea::layoutMinimizedChildren()
 {
    int posX = 0;
    int posY = height();
-   for(QextMdiChildFrm* child = m_pZ->first(); child ; child = m_pZ->next())
+   foreach(QextMdiChildFrm* child, *m_pZ)
    {
       if( child->state() == QextMdiChildFrm::Minimized) {
          if( ( posX > 0) && ( posX + child->width() > width()) )
@@ -608,7 +582,7 @@ void QextMdiChildArea::setMdiCaptionFont(const QFont &fnt)
    QFontMetrics fm(m_captionFont);
    m_captionFontLineSpacing = fm.lineSpacing();
 
-   for (QextMdiChildFrm *pC = m_pZ->first(); pC; pC = m_pZ->next()) {
+   foreach(QextMdiChildFrm *pC, *m_pZ) {
       pC->doResize();
    }
 }

@@ -26,19 +26,11 @@
 //
 //----------------------------------------------------------------------------
 
-#include <qcursor.h>
-#include <qclipboard.h>
-#include <qobjectlist.h>
-#ifndef NO_KDE2
-#include <kmenubar.h>
-#if (QT_VERSION >= 300)
-#include <kapplication.h>
-#include <qtabwidget.h>
-#endif
-#endif
-#include <qtoolbutton.h>
-#include <qlayout.h>
-#include <qtimer.h>
+#include <QCursor>
+#include <QClipboard>
+#include <QToolButton>
+#include <QLayout>
+#include <QTimer>
 
 #include "qextmdimainfrm.h"
 #include "qextmditaskbar.h"
@@ -64,10 +56,8 @@
 #include "kde2laptop_closebutton.xpm"
 #include "kde2laptop_closebutton_menu.xpm"
 
-#ifndef NO_KDE2
-#include <X11/X.h>
-#include <X11/Xlib.h>
-#endif
+#include <QResizeEvent>
+#include <QFocusEvent>
 
 //using namespace KParts;
 
@@ -80,8 +70,8 @@ QextMdi::FrameDecor QextMdiMainFrm::m_frameDecoration = QextMdi::KDE2Look;
 QextMdi::MdiMode QextMdiMainFrm::m_mdiMode = QextMdi::ChildframeMode;
 
 //============ constructor ============//
- QextMdiMainFrm::QextMdiMainFrm(QWidget* parentWidget, const char* name, WFlags flags)
-: DockMainWindow( parentWidget, name, flags)
+ QextMdiMainFrm::QextMdiMainFrm(QWidget* parentWidget, const QString name, Qt::WindowFlags flags, QList<Qt::WidgetAttribute> a)
+: DockMainWindow( parentWidget, name, flags, a)
    ,m_pMdi(0L)
    ,m_pTaskBar(0L)
    ,m_pWinList(0L)
@@ -101,26 +91,21 @@ QextMdi::MdiMode QextMdiMainFrm::m_mdiMode = QextMdi::ChildframeMode;
    ,m_pMinimize(0L)
    ,m_pRestore(0L)
    ,m_pClose(0L)
-   ,m_bMaximizedChildFrmMode(FALSE)
+   ,m_bMaximizedChildFrmMode(false)
    ,m_oldMainFrmHeight(0)
    ,m_oldMainFrmMinHeight(0)
    ,m_oldMainFrmMaxHeight(0)
-   ,m_bSDIApplication(FALSE)
+   ,m_bSDIApplication(false)
    ,m_pDockbaseAreaOfDocumentViews(0L)
    ,m_pDockbaseOfTabPage(0L)
    ,m_pTempDockSession(0L)
-   ,m_bClearingOfWindowMenuBlocked(FALSE)
+   ,m_bClearingOfWindowMenuBlocked(false)
    ,m_pDragEndTimer(0L)
 {
    // Create the local list of windows
-#if QT_VERSION < 300
-   m_pWinList = new QList<QextMdiChildView>;
-#else
-   m_pWinList = new QPtrList<QextMdiChildView>;
-#endif
-   m_pWinList->setAutoDelete(FALSE);
+   m_pWinList = new QList<QextMdiChildView*>;
    // This seems to be needed (re-check it after Qt2.0 comed out)
-   setFocusPolicy(ClickFocus);
+   setFocusPolicy(Qt::ClickFocus);
 
    // create the central widget
    createMdiManager();
@@ -137,20 +122,26 @@ QextMdi::MdiMode QextMdiMainFrm::m_mdiMode = QextMdi::ChildframeMode;
    // Apply options for the MDI manager
    applyOptions();
 
-   m_pTaskBarPopup=new QPopupMenu( this, "taskbar_popup_menu");
-   m_pWindowPopup=new QPopupMenu( this, "window_popup_menu");
+   m_pTaskBarPopup=new QMenu( this);
+   m_pTaskBarPopup->setObjectName("taskbar_popup_menu");
+   m_pWindowPopup=new QMenu( this);
+   m_pWindowPopup->setObjectName("window_popup_menu");
 
-   m_pWindowMenu = new QPopupMenu( this, "window_menu");
-   m_pWindowMenu->setCheckable( TRUE);
+   m_pWindowMenu = new QMenu( this);
+   m_pWindowMenu->setObjectName("window_menu");
+   ///m_pWindowMenu->setCheckable(true);
    QObject::connect( m_pWindowMenu, SIGNAL(aboutToShow()), this, SLOT(fillWindowMenu()) );
 
-   m_pDockMenu = new QPopupMenu( this, "dock_menu");
-   m_pDockMenu->setCheckable( TRUE);
+   m_pDockMenu = new QMenu( this );
+   m_pDockMenu->setObjectName("dock_menu");
+   //m_pDockMenu->setCheckable( true);
 
-   m_pMdiModeMenu = new QPopupMenu( this, "mdimode_menu");
-   m_pMdiModeMenu->setCheckable( TRUE);
+   m_pMdiModeMenu = new QMenu( this );
+   m_pMdiModeMenu->setObjectName("mdimode_menu");
+   //m_pMdiModeMenu->setCheckable( true);
 
-   m_pPlacingMenu = new QPopupMenu( this, "placing_menu");
+   m_pPlacingMenu = new QMenu( this );
+   m_pPlacingMenu->setObjectName("placing_menu");
 
    m_pDockbaseOfTabPage = m_pDockbaseAreaOfDocumentViews;
 
@@ -167,8 +158,9 @@ QextMdiMainFrm::~QextMdiMainFrm()
 {
    // safely close the windows so properties are saved...
    QextMdiChildView *pWnd = 0L;
-   while((pWnd = m_pWinList->first()))closeWindow(pWnd, FALSE); // without re-layout taskbar!
+   while((pWnd = m_pWinList->first()))closeWindow(pWnd, false); // without re-layout taskbar!
    emit lastChildViewClosed();
+   qDeleteAll(*m_pWinList);
    delete m_pWinList;
    delete m_pDragEndTimer;
 
@@ -214,11 +206,7 @@ void QextMdiMainFrm::createMdiManager()
 //============ createTaskBar ==============//
 void QextMdiMainFrm::createTaskBar()
 {
-#if QT_VERSION < 300
-   m_pTaskBar = new QextMdiTaskBar(this,QMainWindow::Bottom);
-#else
-   m_pTaskBar = new QextMdiTaskBar(this,QMainWindow::DockBottom);
-#endif
+   m_pTaskBar = new QextMdiTaskBar(this,Qt::BottomToolBarArea);
    m_pTaskBar->installEventFilter( this);
 }
 
@@ -279,8 +267,8 @@ void QextMdiMainFrm::addWindow( QextMdiChildView* pWnd, int flags)
 
    // embed the view depending on the current MDI mode
    if (m_mdiMode == QextMdi::TabPageMode) {
-      const QPixmap& wndIcon = pWnd->icon() ? *(pWnd->icon()) : QPixmap();
-      KDockWidget* pCover = createDockWidget( pWnd->name(),
+      const QPixmap& wndIcon = pWnd->windowIcon().isNull() ? QPixmap(): pWnd->windowIcon().pixmap(22,22);
+      KDockWidget* pCover = createDockWidget( pWnd->objectName(),
                                               wndIcon,
                                               0L,  // parent
                                               pWnd->caption(),
@@ -367,34 +355,35 @@ void QextMdiMainFrm::addToolWindow( QWidget* pWnd, KDockWidget::DockPosition pos
       pToolView = (QextMdiChildView*) pWnd;
    }
    else {
-      pToolView = new QextMdiChildView( pWnd->caption());
-      QHBoxLayout* pLayout = new QHBoxLayout( pToolView, 0, -1, "internal_qextmdichildview_layout");
-      pWnd->reparent( pToolView, QPoint(0,0));
-      pToolView->setName( pWnd->name());
+      pToolView = new QextMdiChildView( pWnd->windowTitle());
+      QHBoxLayout* pLayout = new QHBoxLayout( pToolView );
+      pLayout->setObjectName("internal_qextmdichildview_layout");
+      pWnd->setParent(pToolView);
+      pWnd->move(0, 0);
+      pToolView->setObjectName( pWnd->objectName());
       pToolView->setFocusPolicy( pWnd->focusPolicy());
-      const QPixmap& wndIcon = pWnd->icon() ? *(pWnd->icon()) : QPixmap();
-      pToolView->setIcon( wndIcon);
-      pToolView->setCaption( pWnd->caption());
+      const QIcon wndIcon = !pWnd->windowIcon().isNull() ? pWnd->windowIcon() : QPixmap();
+      pToolView->setWindowIcon( wndIcon);
+      pToolView->setCaption( pWnd->windowTitle());
       QApplication::sendPostedEvents();
       pLayout->addWidget( pWnd);
    }
 
    // if docking is not desired, add the toolview as stay-on-top toplevel view
    if (pos == KDockWidget::DockNone) {
-#if QT_VERSION < 300
-      pToolView->reparent(this, WType_TopLevel | WStyle_Dialog, r.topLeft(), pToolView->isVisible());
-#else
-      pToolView->reparent(this, Qt::WType_TopLevel | Qt::WType_Dialog, r.topLeft(), pToolView->isVisible());
-#endif
+      pToolView->setParent(this);
+      pToolView->setWindowFlags(Qt::Window | Qt::Dialog);
+      pToolView->move(r.topLeft());
+      pToolView->setVisible(pToolView->isVisible());
       QObject::connect( pToolView, SIGNAL(childWindowCloseRequest(QextMdiChildView*)), this, SLOT(childWindowCloseRequest(QextMdiChildView*)) );
       QObject::connect( pToolView, SIGNAL(focusInEventOccurs(QextMdiChildView*)), this, SLOT(activateView(QextMdiChildView*)) );
       m_pWinList->append(pToolView);
-      pToolView->m_bToolView = TRUE;
+      pToolView->m_bToolView = true;
       pToolView->setGeometry(r);
    }
    else {   // add (and dock) the toolview as DockWidget view
-      const QPixmap& wndIcon = pWnd->icon() ? *(pWnd->icon()) : QPixmap();
-      KDockWidget* pCover = createDockWidget( pToolView->name(),
+      const QPixmap& wndIcon = !pWnd->windowIcon().isNull() ? pWnd->windowIcon().pixmap(22,22) : QPixmap();
+      KDockWidget* pCover = createDockWidget( pToolView->objectName(),
                                               wndIcon,
                                               0L,  // parent
                                               pToolView->caption(),
@@ -425,7 +414,7 @@ void QextMdiMainFrm::attachWindow(QextMdiChildView *pWnd, bool bShow)
    pWnd->installEventFilter(this);
 
    // decide whether window shall be cascaded
-   bool bCascade = FALSE;
+   bool bCascade = false;
    QApplication::sendPostedEvents();
    QRect frameGeo = pWnd->frameGeometry();
    QPoint topLeftScreen = pWnd->mapToGlobal(QPoint(0,0));
@@ -434,7 +423,7 @@ void QextMdiMainFrm::attachWindow(QextMdiChildView *pWnd, bool bShow)
    if ( (topLeftMdiChildArea.x() < 0) || (topLeftMdiChildArea.y() < 0) ||
         (topLeftMdiChildArea.x()+frameGeo.width() > childAreaGeo.width()) ||
         (topLeftMdiChildArea.y()+frameGeo.height() > childAreaGeo.height()) ) {
-      bCascade = TRUE;
+      bCascade = true;
    }
 
    // create frame and insert child view
@@ -454,7 +443,7 @@ void QextMdiMainFrm::attachWindow(QextMdiChildView *pWnd, bool bShow)
       switchToChildframeMode();
    }
 
-   m_pMdi->manageChild(lpC,FALSE,bCascade);
+   m_pMdi->manageChild(lpC,false,bCascade);
    if (m_pMdi->topChild() && m_pMdi->topChild()->isMaximized()) {
       QRect r = lpC->geometry();
       lpC->setGeometry(-lpC->m_pClient->x(), -lpC->m_pClient->y(),
@@ -486,13 +475,13 @@ void QextMdiMainFrm::detachWindow(QextMdiChildView *pWnd, bool bShow)
          if (lpC) {
             if (lpC->icon()) {
                QPixmap pixm(*(lpC->icon()));
-               pWnd->setIcon(pixm);
+               pWnd->setWindowIcon(pixm);
             }
             QString capt(lpC->caption());
             if (!bShow)
                lpC->hide();
             lpC->unsetClient( m_undockPositioningOffset);
-            m_pMdi->destroyChildButNotItsView(lpC,FALSE); //Do not focus the new top child , we loose focus...
+            m_pMdi->destroyChildButNotItsView(lpC,false); //Do not focus the new top child , we loose focus...
             pWnd->setCaption(capt);
          }
       }
@@ -532,7 +521,7 @@ void QextMdiMainFrm::detachWindow(QextMdiChildView *pWnd, bool bShow)
 void QextMdiMainFrm::removeWindowFromMdi(QextMdiChildView *pWnd)
 {
    //Closes a child window. sends no close event : simply deletes it
-   if (!(m_pWinList->removeRef(pWnd)))
+   if (!(m_pWinList->removeAll(pWnd)))
       return;
    if (m_pWinList->count() == 0)
      m_pCurrentWindow = 0L;
@@ -566,7 +555,9 @@ void QextMdiMainFrm::removeWindowFromMdi(QextMdiChildView *pWnd)
          m_pDockbaseOfTabPage = m_pDockbaseAreaOfDocumentViews;
       }
       KDockWidget* pDockW = (KDockWidget*) pWnd->parentWidget();
-      pWnd->reparent(0L, QPoint(0,0));
+      //pWnd->reparent(0L, QPoint(0,0));
+      pWnd->setParent(NULL);
+      pWnd->move(0,0);
       pDockW->setWidget(0L);
       if (pDockW == m_pDockbaseOfTabPage) {
 #if !defined(NO_KDE2) && (QT_VERSION >= 300)
@@ -594,7 +585,8 @@ void QextMdiMainFrm::removeWindowFromMdi(QextMdiChildView *pWnd)
    else {
       // is not attached
       if (m_pMdi->getVisibleChildCount() > 0) {
-         setActiveWindow();
+         ///setActiveWindow(); //????
+         activateWindow();
          m_pCurrentWindow = 0L;
          QextMdiChildView* pView = m_pMdi->topChild()->m_pClient;
          if (pView) {
@@ -608,7 +600,7 @@ void QextMdiMainFrm::removeWindowFromMdi(QextMdiChildView *pWnd)
    }
 
    if (pWnd->isToolView())
-      pWnd->m_bToolView = FALSE;
+      pWnd->m_bToolView = false;
 
    if (!m_pCurrentWindow)
       emit lastChildViewClosed();
@@ -618,7 +610,7 @@ void QextMdiMainFrm::removeWindowFromMdi(QextMdiChildView *pWnd)
 void QextMdiMainFrm::closeWindow(QextMdiChildView *pWnd, bool layoutTaskBar)
 {
    //Closes a child window. sends no close event : simply deletes it
-   m_pWinList->removeRef(pWnd);
+   m_pWinList->removeAll(pWnd);
    if (m_pWinList->count() == 0)
       m_pCurrentWindow = 0L;
 
@@ -640,7 +632,8 @@ void QextMdiMainFrm::closeWindow(QextMdiChildView *pWnd, bool layoutTaskBar)
          m_pDockbaseOfTabPage = m_pDockbaseAreaOfDocumentViews;
       }
       KDockWidget* pDockW = (KDockWidget*) pWnd->parentWidget();
-      pWnd->reparent(0L, QPoint(0,0));
+      pWnd->setParent(NULL);
+      pWnd->move(0, 0);
       pDockW->setWidget(0L);
       if (pDockW == m_pDockbaseOfTabPage) {
 #if !defined(NO_KDE2) && (QT_VERSION >= 300)
@@ -668,7 +661,8 @@ void QextMdiMainFrm::closeWindow(QextMdiChildView *pWnd, bool layoutTaskBar)
       delete pWnd;
       // is not attached
       if (m_pMdi->getVisibleChildCount() > 0) {
-         setActiveWindow();
+         //setActiveWindow();
+         activateWindow();
          m_pCurrentWindow = 0L;
          QextMdiChildView* pView = m_pMdi->topChild()->m_pClient;
          if (pView) {
@@ -688,8 +682,8 @@ void QextMdiMainFrm::closeWindow(QextMdiChildView *pWnd, bool layoutTaskBar)
 //================== findWindow =================//
 QextMdiChildView * QextMdiMainFrm::findWindow(const QString& caption)
 {
-   for(QextMdiChildView *w=m_pWinList->first();w;w=m_pWinList->next()){
-      if(QString(w->caption()) == QString(caption))return w;   //F.B.
+   foreach(QextMdiChildView *w, *m_pWinList) {
+      if(QString(w->caption()) == QString(caption)) return w;   //F.B.
    }
    return 0L;
 }
@@ -703,55 +697,54 @@ QextMdiChildView * QextMdiMainFrm::activeWindow()
 //================== windowExists ? =================//
 bool QextMdiMainFrm::windowExists(QextMdiChildView *pWnd)
 {
-   for(QextMdiChildView *w=m_pWinList->first();w;w=m_pWinList->next()){
-      if(w == pWnd)return TRUE;
-   }
-   return FALSE;
+   return m_pWinList->contains(pWnd);
 }
 
-QPopupMenu * QextMdiMainFrm::windowPopup(QextMdiChildView * pWnd,bool bIncludeTaskbarPopup)
+QMenu * QextMdiMainFrm::windowPopup(QextMdiChildView * pWnd,bool bIncludeTaskbarPopup)
 {
    m_pWindowPopup->clear();
    if(bIncludeTaskbarPopup){
-      m_pWindowPopup->insertItem(tr("Window"),taskBarPopup(pWnd,FALSE));
-      m_pWindowPopup->insertSeparator();
+      QAction *ta=m_pWindowPopup->addMenu(taskBarPopup(pWnd,false));
+      ta->setText(tr("Window"));
+      m_pWindowPopup->addSeparator();
    }
    return m_pWindowPopup;
 }
 
 //================ taskBarPopup =================//
-QPopupMenu * QextMdiMainFrm::taskBarPopup(QextMdiChildView *pWnd,bool /*bIncludeWindowPopup*/)
+QMenu * QextMdiMainFrm::taskBarPopup(QextMdiChildView *pWnd,bool /*bIncludeWindowPopup*/)
 {
    //returns the g_pTaskBarPopup filled according to the QextMdiChildView state
    m_pTaskBarPopup->clear();
    if(pWnd->isAttached()){
-      m_pTaskBarPopup->insertItem(tr("Undock"),pWnd,SLOT(detach()));
-      m_pTaskBarPopup->insertSeparator();
-      if(pWnd->isMinimized() || pWnd->isMaximized())
-         m_pTaskBarPopup->insertItem(tr("Restore"),pWnd,SLOT(restore()));
-      if(!pWnd->isMaximized())m_pTaskBarPopup->insertItem(tr("Maximize"),pWnd,SLOT(maximize()));
-      if(!pWnd->isMinimized())m_pTaskBarPopup->insertItem(tr("Minimize"),pWnd,SLOT(minimize()));
-   } else m_pTaskBarPopup->insertItem(tr("Dock"),pWnd,SLOT(attach()));
-   m_pTaskBarPopup->insertSeparator();
-   m_pTaskBarPopup->insertItem(tr("Close"),pWnd,SLOT(close()));
+      m_pTaskBarPopup->addAction(tr("Undock"),pWnd,SLOT(detach()));
+      m_pTaskBarPopup->addSeparator();
+      if(pWnd->isMinimized() || pWnd->isMaximized()) {
+        m_pTaskBarPopup->addAction(tr("Restore"), pWnd, SLOT(restore()));
+      }
+      if(!pWnd->isMaximized())m_pTaskBarPopup->addAction(tr("Maximize"),pWnd,SLOT(maximize()));
+      if(!pWnd->isMinimized())m_pTaskBarPopup->addAction(tr("Minimize"),pWnd,SLOT(minimize()));
+   } else m_pTaskBarPopup->addAction(tr("Dock"),pWnd,SLOT(attach()));
+   m_pTaskBarPopup->addSeparator();
+   m_pTaskBarPopup->addAction(tr("Close"),pWnd,SLOT(close()));
    // the window has a view...get the window popup
-   m_pTaskBarPopup->insertSeparator();
+   m_pTaskBarPopup->addSeparator();
    
    if(pWnd->isVisible()) {
-     m_pTaskBarPopup->insertItem(tr("Hide"), pWnd, SLOT(hide()));
+     m_pTaskBarPopup->addAction(tr("Hide"), pWnd, SLOT(hide()));
    } else {
-     m_pTaskBarPopup->insertItem(tr("Show"), pWnd, SLOT(show()));
+     m_pTaskBarPopup->addAction(tr("Show"), pWnd, SLOT(show()));
    }
 
-   //   m_pTaskBarPopup->insertItem(tr("Operations"),windowPopup(pWnd,FALSE));  //alvoid recursion
+   //   m_pTaskBarPopup->insertItem(tr("Operations"),windowPopup(pWnd,false));  //alvoid recursion
    return m_pTaskBarPopup;
 }
 
 void QextMdiMainFrm::activateView(QextMdiChildView* pWnd)
 {
-   pWnd->m_bMainframesActivateViewIsPending = TRUE;
+   pWnd->m_bMainframesActivateViewIsPending = true;
 
-	 bool bActivateNecessary = TRUE;
+	 bool bActivateNecessary = true;
    if (m_pCurrentWindow != pWnd) {
      if(m_pCurrentWindow != NULL) {
        if(!m_pCurrentWindow->parentWidget()) {
@@ -763,10 +756,10 @@ void QextMdiMainFrm::activateView(QextMdiChildView* pWnd)
       m_pCurrentWindow = pWnd;
    }
    else {
-      bActivateNecessary = FALSE;
+      bActivateNecessary = false;
 			// if this method is called as answer to view->activate(),
 			// interrupt it because it's not necessary
-      pWnd->m_bInterruptActivation = TRUE;
+      pWnd->m_bInterruptActivation = true;
    }
 
    if (m_pTaskBar) {
@@ -789,7 +782,7 @@ void QextMdiMainFrm::activateView(QextMdiChildView* pWnd)
 	         pWnd->activate();
          m_pMdi->setTopChild(0L); // lose focus in the mainframe window
          if (!pWnd->isActiveWindow()) {
-            pWnd->setActiveWindow();
+            pWnd->activateWindow();
          }
          pWnd->raise();
 //         if (!pWnd->hasFocus()) {
@@ -797,14 +790,14 @@ void QextMdiMainFrm::activateView(QextMdiChildView* pWnd)
 //         }
       }
    }
-   pWnd->m_bMainframesActivateViewIsPending = FALSE;
+   pWnd->m_bMainframesActivateViewIsPending = false;
 }
 
 void QextMdiMainFrm::taskbarButtonRightClicked(QextMdiChildView *pWnd)
 {
   //   activateView( pWnd); // set focus
   //   QApplication::sendPostedEvents();
-   taskBarPopup( pWnd, TRUE)->popup( QCursor::pos());
+   taskBarPopup( pWnd, true)->popup( QCursor::pos());
 }
 
 void QextMdiMainFrm::childWindowCloseRequest(QextMdiChildView *pWnd)
@@ -819,7 +812,7 @@ bool QextMdiMainFrm::event( QEvent* e)
       QextMdiChildView* pWnd = (QextMdiChildView*)((QextMdiViewCloseEvent*)e)->data();
       if( pWnd != 0L)
          closeWindow( pWnd);
-      return TRUE;
+      return true;
    }
    // A hack little hack: If MDI child views are moved implicietly by moving 
    // the main widget the should know this too. Unfortunately there seems to
@@ -842,13 +835,15 @@ bool QextMdiMainFrm::event( QEvent* e)
       }
       else {
          // this is the first move -> send the drag begin to all concerned views 
-         QextMdiChildView* pView;
-         for (m_pWinList->first(); (pView = m_pWinList->current()) != 0L; m_pWinList->next()) {
+         //QextMdiChildView* pView;
+         //for (m_pWinList->first(); (pView = m_pWinList->current()) != 0L; m_pWinList->next()) {
+         foreach(QextMdiChildView* pView, *m_pWinList) {
             QextMdiChildFrmDragBeginEvent    dragBeginEvent(0L);
             QApplication::sendEvent(pView, &dragBeginEvent);
          }
       }
-      m_pDragEndTimer->start(200, true); // single shot after 200 ms
+       m_pDragEndTimer->setSingleShot(true);
+      m_pDragEndTimer->start(200); // single shot after 200 ms
    }
 
    return DockMainWindow::event( e);
@@ -858,17 +853,17 @@ bool QextMdiMainFrm::eventFilter(QObject *obj, QEvent *e )
 {
    if( e->type() == QEvent::FocusIn) {
       QFocusEvent* pFE = (QFocusEvent*) e;
-      if (pFE->reason() == QFocusEvent::ActiveWindow) {
+      if (pFE->reason() == Qt::ActiveWindowFocusReason) {
          if (m_pCurrentWindow && !m_pCurrentWindow->isHidden() && !m_pCurrentWindow->isAttached() && m_pMdi->topChild()) {
-            return TRUE;   // eat the event
+            return true;   // eat the event
          }
       }
       if (m_pMdi) {
-         static bool bFocusTCIsPending = FALSE;
+         static bool bFocusTCIsPending = false;
          if (!bFocusTCIsPending) {
-            bFocusTCIsPending = TRUE;
+            bFocusTCIsPending = true;
             m_pMdi->focusTopChild();
-            bFocusTCIsPending = FALSE;
+            bFocusTCIsPending = false;
          }
       }
    }
@@ -881,7 +876,7 @@ bool QextMdiMainFrm::eventFilter(QObject *obj, QEvent *e )
  */
 void QextMdiMainFrm::closeAllViews()
 {
-   for(QextMdiChildView *w = m_pWinList->first();w;w= m_pWinList->next()){
+   foreach(QextMdiChildView *w, *m_pWinList){
       w->close();
    }
 }
@@ -891,7 +886,7 @@ void QextMdiMainFrm::closeAllViews()
  */
 void QextMdiMainFrm::iconifyAllViews()
 {
-   for(QextMdiChildView *w = m_pWinList->first();w;w= m_pWinList->next()){
+   foreach(QextMdiChildView *w, *m_pWinList){
       if(!w->isToolView())
          w->minimize();
    }
@@ -908,11 +903,7 @@ void QextMdiMainFrm::closeActiveView()
 }
 
 /** find the root dockwidgets and store their geometry */
-#if QT_VERSION < 300
-void QextMdiMainFrm::findRootDockWidgets(QList<KDockWidget>* pRootDockWidgetList, QValueList<QRect>* pPositionList)
-#else
-void QextMdiMainFrm::findRootDockWidgets(QPtrList<KDockWidget>* pRootDockWidgetList, QValueList<QRect>* pPositionList)
-#endif
+void QextMdiMainFrm::findRootDockWidgets(QList<KDockWidget*>* pRootDockWidgetList, QList<QRect>* pPositionList)
 {
    if (!pRootDockWidgetList) return;
    if (!pPositionList) return;
@@ -942,17 +933,13 @@ void QextMdiMainFrm::findRootDockWidgets(QPtrList<KDockWidget>* pRootDockWidgetL
       }
       if (pRootDockW) {
          // if that oldest ancestor is not already in the list, append it
-         bool found = FALSE;
-#if QT_VERSION < 300
-         QListIterator<KDockWidget> it2( *pRootDockWidgetList);
-#else
+         bool found = false;
          QPtrListIterator<KDockWidget> it2( *pRootDockWidgetList);
-#endif
          if (!pRootDockWidgetList->isEmpty()) {
             for ( ; it2.current() && !found; ++it2 ) {
                KDockWidget* pDockW = it2.current();
                if (pDockW == pRootDockW)
-                  found = TRUE;
+                  found = true;
             }
             if (!found) {
                pRootDockWidgetList->append( pDockW);
@@ -991,12 +978,8 @@ void QextMdiMainFrm::switchToToplevelMode()
    setUndockPositioningOffset( QPoint( 0, (m_pTaskBar ? m_pTaskBar->height() : 0) + frameBorderWidth));
 
    // 1.) select the dockwidgets to be undocked and store their geometry
-#if QT_VERSION < 300
-   QList<KDockWidget> rootDockWidgetList;
-#else
-   QPtrList<KDockWidget> rootDockWidgetList;
-#endif
-   QValueList<QRect> positionList;
+   QList<KDockWidget*> rootDockWidgetList;
+   QList<QRect> positionList;
    findRootDockWidgets(&rootDockWidgetList, &positionList);
 
    // 2.) undock the MDI views of QextMDI
@@ -1008,11 +991,7 @@ void QextMdiMainFrm::switchToToplevelMode()
    }
 
    // 3.) undock all these found oldest ancestors (being KDockWidgets)
-#if QT_VERSION < 300
-   QListIterator<KDockWidget> it3( rootDockWidgetList);
-#else
    QPtrListIterator<KDockWidget> it3( rootDockWidgetList);
-#endif
    for (; it3.current(); ++it3 ) {
        KDockWidget* pDockW = it3.current();
        pDockW->undock();
@@ -1045,11 +1024,7 @@ void QextMdiMainFrm::switchToToplevelMode()
    }
 
    // 5. show the child views again
-#if QT_VERSION < 300
-   QListIterator<QextMdiChildView> it( *m_pWinList);
-#else
    QPtrListIterator<QextMdiChildView> it( *m_pWinList);
-#endif
    for( it.toFirst(); it.current(); ++it) {
       QextMdiChildView* pView = it.current();
 #ifndef NO_KDE2
@@ -1060,7 +1035,7 @@ void QextMdiMainFrm::switchToToplevelMode()
    }
 
    // 6.) reset all memorized positions of the undocked ones and show them again
-   QValueList<QRect>::Iterator it5;
+   QList<QRect>::Iterator it5;
    for (it3.toFirst(), it5 = positionList.begin() ; it3.current(), it5 != positionList.end(); ++it3, ++it5 ) {
        KDockWidget* pDockW = it3.current();
        pDockW->setGeometry( (*it5));
@@ -1085,22 +1060,14 @@ void QextMdiMainFrm::switchToChildframeMode()
    if (m_mdiMode == QextMdi::ChildframeMode)
       return;
 
-#if QT_VERSION < 300
-   QList<KDockWidget> rootDockWidgetList;
-#else
-   QPtrList<KDockWidget> rootDockWidgetList;
-#endif
+   QList<KDockWidget*> rootDockWidgetList;
    if (m_mdiMode == QextMdi::TabPageMode) {
       // select the dockwidgets to be undocked and store their geometry
-      QValueList<QRect> positionList;
+      QList<QRect> positionList;
       findRootDockWidgets(&rootDockWidgetList, &positionList);
 
       // undock all these found oldest ancestors (being KDockWidgets)
-#if QT_VERSION < 300
-      QListIterator<KDockWidget> it3( rootDockWidgetList);
-#else
       QPtrListIterator<KDockWidget> it3( rootDockWidgetList);
-#endif
       for (; it3.current(); ++it3 ) {
           KDockWidget* pDockW = it3.current();
           pDockW->undock();
@@ -1129,11 +1096,7 @@ void QextMdiMainFrm::switchToChildframeMode()
    }
    m_pDockbaseAreaOfDocumentViews->show();
    if (m_mdiMode == QextMdi::TabPageMode) {
-#if QT_VERSION < 300
-      QListIterator<KDockWidget> it4( rootDockWidgetList);
-#else
       QPtrListIterator<KDockWidget> it4( rootDockWidgetList);
-#endif
       for (; it4.current(); ++it4 ) {
          KDockWidget* pDockW = it4.current();
          pDockW->dockBack();
@@ -1149,16 +1112,12 @@ void QextMdiMainFrm::switchToChildframeMode()
    QextMdi::MdiMode oldMdiMode = m_mdiMode;
    m_mdiMode = QextMdi::ChildframeMode;
 
-#if QT_VERSION < 300
-   QListIterator<QextMdiChildView> it( *m_pWinList);
-#else
    QPtrListIterator<QextMdiChildView> it( *m_pWinList);
-#endif
    for( ; it.current(); ++it) {
       QextMdiChildView* pView = it.current();
       if( !pView->isToolView())
          if( !pView->isAttached())
-            attachWindow( pView, TRUE);
+            attachWindow( pView, true);
    }
    for( it.toFirst(); it.current(); ++it) {
       QextMdiChildView* pView = it.current();
@@ -1185,11 +1144,7 @@ void QextMdiMainFrm::finishChildframeMode()
    writeDockConfig( curDockState);
 
    // detach all non-tool-views to toplevel
-#if QT_VERSION < 300
-   QListIterator<QextMdiChildView> it( *m_pWinList);
-#else
    QPtrListIterator<QextMdiChildView> it( *m_pWinList);
-#endif
    for( ; it.current(); ++it) {
       QextMdiChildView* pView = it.current();
       if( pView->isToolView())
@@ -1197,7 +1152,7 @@ void QextMdiMainFrm::finishChildframeMode()
       if( pView->isAttached()) {
          if( pView->isMaximized())
             pView->mdiParent()->setGeometry( 0, 0, m_pMdi->width(), m_pMdi->height());
-         detachWindow( pView, FALSE);
+         detachWindow( pView, false);
 	 
       }
    }
@@ -1245,17 +1200,13 @@ void QextMdiMainFrm::switchToTabPageMode()
 
    // tabify all MDI views covered by a KDockWidget
    KDockWidget* pCover = 0L;
-#if QT_VERSION < 300
-   QListIterator<QextMdiChildView> it4( *m_pWinList);
-#else
    QPtrListIterator<QextMdiChildView> it4( *m_pWinList);
-#endif
    for( ; it4.current(); ++it4) {
       QextMdiChildView* pView = it4.current();
       if( pView->isToolView())
          continue;
-      const QPixmap& wndIcon = pView->icon() ? *(pView->icon()) : QPixmap();
-      pCover = createDockWidget( pView->name(),
+      const QPixmap& wndIcon = !pView->windowIcon().isNull() ? pView->windowIcon().pixmap(22,22) : QPixmap();
+      pCover = createDockWidget( pView->objectName(),
                                  wndIcon,
                                  0L,  // parent
                                  pView->caption(),
@@ -1268,7 +1219,8 @@ void QextMdiMainFrm::switchToTabPageMode()
       // update the dockbase
       pCover->setEnableDocking(KDockWidget::DockNone);
       if (m_pDockbaseOfTabPage == m_pDockbaseAreaOfDocumentViews) {
-         m_pMdi->reparent(0,QPoint(0,0));
+         m_pMdi->setParent(NULL);
+         m_pMdi->move(0, 0);
          m_pDockbaseAreaOfDocumentViews->close();
          delete m_pDockbaseAreaOfDocumentViews;
          m_pDockbaseAreaOfDocumentViews = 0L;
@@ -1296,7 +1248,7 @@ void QextMdiMainFrm::switchToTabPageMode()
       //pRemActiveWindow->setFocus();
    }
 
-   m_pTaskBar->switchOn(FALSE);
+   m_pTaskBar->switchOn(false);
    //qDebug("TabPageMode on");
 }
 
@@ -1304,11 +1256,7 @@ void QextMdiMainFrm::finishTabPageMode()
 {
    // if tabified, release all views from their docking covers
    if (m_mdiMode == QextMdi::TabPageMode) {
-#if QT_VERSION < 300
-      QListIterator<QextMdiChildView> it( *m_pWinList);
-#else
       QPtrListIterator<QextMdiChildView> it( *m_pWinList);
-#endif
       for( ; it.current(); ++it) {
          QextMdiChildView* pView = it.current();
          if( pView->isToolView())
@@ -1318,8 +1266,8 @@ void QextMdiMainFrm::finishTabPageMode()
          QSize sz = pView->size();
          QWidget* pParent = pView->parentWidget();
          QPoint p(pParent->mapToGlobal(pParent->pos())-pParent->pos()+m_undockPositioningOffset);
-         pView->reparent(0,0,p);
-         pView->reparent(0,0,p);
+         pView->setParent(0);
+         pView->move(p);
          pView->resize(sz);
          pView->setMinimumSize(mins.width(),mins.height());
          pView->setMaximumSize(maxs.width(),maxs.height());
@@ -1330,7 +1278,7 @@ void QextMdiMainFrm::finishTabPageMode()
             setCentralWidget(0L); // avoid dangling pointer
          }
       }
-      m_pTaskBar->switchOn(TRUE);
+      m_pTaskBar->switchOn(true);
    }
 }
 
@@ -1341,11 +1289,7 @@ void QextMdiMainFrm::finishTabPageMode()
  *             Otherwise only signals can be emitted to tell the outside that
  *             someone must do this job itself.
  */
-#ifndef NO_KDE2
-void QextMdiMainFrm::setMenuForSDIModeSysButtons( KMenuBar* pMenuBar)
-#else
 void QextMdiMainFrm::setMenuForSDIModeSysButtons( QMenuBar* pMenuBar)
-#endif
 {
    if (m_bSDIApplication)  // there are no buttons in the menubar in this mode (although the view is always maximized)
       return;
@@ -1362,10 +1306,10 @@ void QextMdiMainFrm::setMenuForSDIModeSysButtons( QMenuBar* pMenuBar)
       m_pMinimize = new QToolButton( pMenuBar);
    if (!m_pClose)
       m_pClose = new QToolButton( pMenuBar);
-   m_pUndock->setAutoRaise(FALSE);
-   m_pMinimize->setAutoRaise(FALSE);
-   m_pRestore->setAutoRaise(FALSE);
-   m_pClose->setAutoRaise(FALSE);
+   m_pUndock->setAutoRaise(false);
+   m_pMinimize->setAutoRaise(false);
+   m_pRestore->setAutoRaise(false);
+   m_pClose->setAutoRaise(false);
 
    setSysButtonsAtMenuPosition();
 
@@ -1386,10 +1330,10 @@ void QextMdiMainFrm::setMenuForSDIModeSysButtons( QMenuBar* pMenuBar)
       m_pRestoreButtonPixmap = new QPixmap( kde_restorebutton);
       m_pCloseButtonPixmap = new QPixmap( kde_closebutton);
 #if QT_VERSION > 209
-      m_pUndock->setAutoRaise(TRUE);
-      m_pMinimize->setAutoRaise(TRUE);
-      m_pRestore->setAutoRaise(TRUE);
-      m_pClose->setAutoRaise(TRUE);
+      m_pUndock->setAutoRaise(true);
+      m_pMinimize->setAutoRaise(true);
+      m_pRestore->setAutoRaise(true);
+      m_pClose->setAutoRaise(true);
 #endif
    }
    else if (frameDecorOfAttachedViews() == QextMdi::KDE2Look) {
@@ -1410,10 +1354,10 @@ void QextMdiMainFrm::setMenuForSDIModeSysButtons( QMenuBar* pMenuBar)
    m_pRestore->hide();
    m_pClose->hide();
    
-   m_pUndock->setPixmap( *m_pUndockButtonPixmap);
-   m_pMinimize->setPixmap( *m_pMinButtonPixmap);
-   m_pRestore->setPixmap( *m_pRestoreButtonPixmap);
-   m_pClose->setPixmap( *m_pCloseButtonPixmap);
+   m_pUndock->setIcon( *m_pUndockButtonPixmap);
+   m_pMinimize->setIcon( *m_pMinButtonPixmap);
+   m_pRestore->setIcon( *m_pRestoreButtonPixmap);
+   m_pClose->setIcon( *m_pCloseButtonPixmap);
 }
 
 void QextMdiMainFrm::setSysButtonsAtMenuPosition()
@@ -1467,62 +1411,53 @@ void QextMdiMainFrm::activateNextWin()
 {
   QextMdiChildView* aWin = activeWindow();
 
-  QextMdiIterator<QextMdiChildView*>* it = createIterator();
-
-  for(it->first(); !it->isDone(); it->next()) {
-    if (it->currentItem() == aWin) {
-      it->next();
-      if (!it->currentItem()) {
-        it->first();
+  if (m_pWinList == 0L) return;
+  QList<QextMdiChildView*>::iterator it;
+  for(it=m_pWinList->begin(); it!=m_pWinList->end(); ++it) {
+      if (*it == aWin) {
+         ++it;
+         if (it==m_pWinList->end()) {
+            it=m_pWinList->begin();
+         }
+         activateView(*it);
+         break;
       }
-      if (it->currentItem()) {
-        activateView(it->currentItem());
-      }
-      break;
-    }
   }
-  delete it;
 }
 
 /** Activates the previous open view */
 void QextMdiMainFrm::activatePrevWin()
 {
-  QextMdiChildView* aWin = activeWindow();
+   QextMdiChildView* aWin = activeWindow();
 
-  QextMdiIterator<QextMdiChildView*>* it = createIterator();
+   if (m_pWinList == 0L) return;
+   QList<QextMdiChildView*>::reverse_iterator it;
+   for(it=m_pWinList->rbegin(); it!=m_pWinList->rend(); ++it) {
+      if (*it == aWin) {
+         ++it;
+         if (it==m_pWinList->rend()) {
+            it=m_pWinList->rbegin();
+         }
+         activateView(*it);
+         break;
+      }
+   }
 
-  for(it->first(); !it->isDone(); it->next()) {
-    if (it->currentItem() == aWin) {
-      it->prev();
-      if (!it->currentItem()) {
-        it->last();
-      }
-      if (it->currentItem()) {
-        activateView(it->currentItem());
-      }
-      break;
-    }
-  }
-  delete it;
+
 }
 
 /** Activates the view with a certain index (TabPage mode only) */
 void QextMdiMainFrm::activateView(int index)
 {
-   QextMdiChildView* pView = m_pWinList->first();
-   for (int i = 0; pView && (i < index); i++) {
-      pView = m_pWinList->next();
-   }
-   if (pView) {
-      pView->activate();
-   }
+   if (index>=m_pWinList->count()) return;
+   m_pWinList->at(index)->activate();
 }
 
 /** turns the system buttons for maximize mode (SDI mode) on, and connects them with the current child frame */
 void QextMdiMainFrm::setEnableMaximizedChildFrmMode(bool bEnable)
 {
    if (bEnable) {
-      m_bMaximizedChildFrmMode = TRUE;
+      m_bMaximizedChildFrmMode = true;
       //qDebug("MaximizeMode on");
 
       QextMdiChildFrm* pCurrentChild = m_pMdi->topChild();
@@ -1541,10 +1476,13 @@ void QextMdiMainFrm::setEnableMaximizedChildFrmMode(bool bEnable)
       m_pRestore->show();
 
       if (frameDecorOfAttachedViews() == QextMdi::KDE2LaptopLook) {
-         m_pMainMenuBar->insertItem( QPixmap(kde2laptop_closebutton_menu), m_pMdi->topChild(), SLOT(closePressed()), 0, -1, 0);
+         //m_pMainMenuBar->insertItem( QPixmap(kde2laptop_closebutton_menu), m_pMdi->topChild(), SLOT(closePressed()), 0, -1, 0);
+         QAction *ta = m_pMainMenuBar->addAction( QString(), m_pMdi->topChild(), SLOT(closePressed()));
+         ta->setIcon(QPixmap(kde2laptop_closebutton_menu));
       }
       else {
-         m_pMainMenuBar->insertItem( *pCurrentChild->icon(), pCurrentChild->systemMenu(), -1, 0);
+         pCurrentChild->systemMenu()->setIcon(*pCurrentChild->icon());
+         m_pMainMenuBar->addMenu(pCurrentChild->systemMenu());
          QObject::connect( m_pClose, SIGNAL(clicked()), pCurrentChild, SLOT(closePressed()) );
          m_pClose->show();
       }
@@ -1552,7 +1490,7 @@ void QextMdiMainFrm::setEnableMaximizedChildFrmMode(bool bEnable)
    else {
       if (!m_bMaximizedChildFrmMode) return;  // already set, nothing to do
 
-      m_bMaximizedChildFrmMode = FALSE;
+      m_bMaximizedChildFrmMode = false;
       //qDebug("MaximizeMode off");
 
       QextMdiChildFrm* pFrmChild = m_pMdi->topChild();
@@ -1574,7 +1512,8 @@ void QextMdiMainFrm::switchOffMaximizeModeForMenu(QextMdiChildFrm* oldChild)
    if( m_pMainMenuBar == 0L)
       return;
       
-   m_pMainMenuBar->removeItem( m_pMainMenuBar->idAt(0));
+   //m_pMainMenuBar->removeItem( m_pMainMenuBar->idAt(0));
+   m_pMainMenuBar->removeAction(m_pMainMenuBar->actions().at(0));
 
    if( oldChild) {
       QObject::disconnect( m_pUndock, SIGNAL(clicked()), oldChild, SLOT(undockPressed()) );
@@ -1598,14 +1537,19 @@ void QextMdiMainFrm::updateSysButtonConnections( QextMdiChildFrm* oldChild, Qext
       
    if (newChild) {
       if (frameDecorOfAttachedViews() == QextMdi::KDE2LaptopLook) {
-         m_pMainMenuBar->insertItem( QPixmap(kde2laptop_closebutton_menu), newChild, SLOT(closePressed()), 0, -1, 0);
+         //m_pMainMenuBar->insertItem( QPixmap(kde2laptop_closebutton_menu), newChild, SLOT(closePressed()), 0, -1, 0);
+         QAction *ta=m_pMainMenuBar->addAction(QString(),newChild, SLOT(closePressed()));
+         ta->setIcon(QPixmap(kde2laptop_closebutton_menu));
       }
       else {
-         m_pMainMenuBar->insertItem( *newChild->icon(), newChild->systemMenu(), -1, 0);
+         //m_pMainMenuBar->insertItem( *newChild->icon(), newChild->systemMenu(), -1, 0);
+         QAction *ta=m_pMainMenuBar->addMenu(newChild->systemMenu());
+         ta->setIcon(*newChild->icon());
       }
    }
    if (oldChild) {
-      m_pMainMenuBar->removeItem( m_pMainMenuBar->idAt(1));
+      //m_pMainMenuBar->removeItem( m_pMainMenuBar->idAt(1));
+      m_pMainMenuBar->removeAction(m_pMainMenuBar->actions().at(1));
    }
    if (oldChild) {
       QObject::disconnect( m_pUndock, SIGNAL(clicked()), oldChild, SLOT(undockPressed()) );
@@ -1634,26 +1578,26 @@ bool QextMdiMainFrm::isViewTaskBarOn()
 void QextMdiMainFrm::showViewTaskBar()
 {
    if (m_pTaskBar)
-      m_pTaskBar->switchOn(TRUE);
+      m_pTaskBar->switchOn(true);
 }
 
 /** Hides the view taskbar. This should be connected with your "View" menu. */
 void QextMdiMainFrm::hideViewTaskBar()
 {
    if (m_pTaskBar)
-      m_pTaskBar->switchOn(FALSE);
+      m_pTaskBar->switchOn(false);
 }
 
 //=============== fillWindowMenu ===============//
 void QextMdiMainFrm::fillWindowMenu()
 {
-   bool bTabPageMode = FALSE;
+   bool bTabPageMode = false;
    if (m_mdiMode == QextMdi::TabPageMode)
-      bTabPageMode = TRUE;
+      bTabPageMode = true;
 
-   bool bNoViewOpened = FALSE;
+   bool bNoViewOpened = false;
    if (m_pWinList->isEmpty()) {
-      bNoViewOpened = TRUE;
+      bNoViewOpened = true;
    }
    // construct the menu and its submenus
    if (!m_bClearingOfWindowMenuBlocked) {
@@ -1662,16 +1606,16 @@ void QextMdiMainFrm::fillWindowMenu()
    int closeId = m_pWindowMenu->insertItem(tr("&Close"), this, SLOT(closeActiveView()));
    int closeAllId = m_pWindowMenu->insertItem(tr("Close &All"), this, SLOT(closeAllViews()));
    if (bNoViewOpened) {
-      m_pWindowMenu->setItemEnabled(closeId, FALSE);
-      m_pWindowMenu->setItemEnabled(closeAllId, FALSE);
+      m_pWindowMenu->setItemEnabled(closeId, false);
+      m_pWindowMenu->setItemEnabled(closeAllId, false);
    }
    if (!bTabPageMode) {
       int iconifyId = m_pWindowMenu->insertItem(tr("&Minimize All"), this, SLOT(iconifyAllViews()));
       if (bNoViewOpened) {
-         m_pWindowMenu->setItemEnabled(iconifyId, FALSE);
+         m_pWindowMenu->setItemEnabled(iconifyId, false);
       }
    }
-   m_pWindowMenu->insertSeparator();
+   m_pWindowMenu->addSeparator();
    m_pWindowMenu->insertItem(tr("&MDI Mode..."), m_pMdiModeMenu);
    m_pMdiModeMenu->clear();
    m_pMdiModeMenu->insertItem(tr("&Toplevel mode"), this, SLOT(switchToToplevelMode()));
@@ -1679,18 +1623,18 @@ void QextMdiMainFrm::fillWindowMenu()
    m_pMdiModeMenu->insertItem(tr("Ta&b Page mode"), this, SLOT(switchToTabPageMode()));
    switch (m_mdiMode) {
    case QextMdi::ToplevelMode:
-      m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(0), TRUE);
+      m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(0), true);
       break;
    case QextMdi::ChildframeMode:
-      m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(1), TRUE);
+      m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(1), true);
       break;
    case QextMdi::TabPageMode:
-      m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(2), TRUE);
+      m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(2), true);
       break;
    default:
       break;
    }
-   m_pWindowMenu->insertSeparator();
+   m_pWindowMenu->addSeparator();
    if (!bTabPageMode) {
       int placMenuId = m_pWindowMenu->insertItem(tr("&Tile..."), m_pPlacingMenu);
       m_pPlacingMenu->clear();
@@ -1702,27 +1646,23 @@ void QextMdiMainFrm::fillWindowMenu()
       m_pPlacingMenu->insertItem(tr("Tile overla&pped"), m_pMdi,SLOT(tilePragma()));
       m_pPlacingMenu->insertItem(tr("Tile v&ertically"), m_pMdi,SLOT(tileVertically()));
       if (m_mdiMode == QextMdi::ToplevelMode) {
-         m_pWindowMenu->setItemEnabled(placMenuId, FALSE);
+         m_pWindowMenu->setItemEnabled(placMenuId, false);
       }
-      m_pWindowMenu->insertSeparator();
+      m_pWindowMenu->addSeparator();
       int dockUndockId = m_pWindowMenu->insertItem(tr("&Dock/Undock..."), m_pDockMenu);
          m_pDockMenu->clear();
-      m_pWindowMenu->insertSeparator();
+      m_pWindowMenu->addSeparator();
       if (bNoViewOpened) {
-         m_pWindowMenu->setItemEnabled(placMenuId, FALSE);
-         m_pWindowMenu->setItemEnabled(dockUndockId, FALSE);
+         m_pWindowMenu->setItemEnabled(placMenuId, false);
+         m_pWindowMenu->setItemEnabled(dockUndockId, false);
       }
    }
-   int entryCount = m_pWindowMenu->count();
+   int entryCount = m_pWindowMenu->actions().count();
 
    // for all child frame windows: give an ID to every window and connect them in the end with windowMenuItemActivated()
    int i=100;
    QextMdiChildView* pView = 0L;
-#if QT_VERSION < 300
-   QListIterator<QextMdiChildView> it(*m_pWinList);
-#else
    QPtrListIterator<QextMdiChildView> it(*m_pWinList);
-#endif
    for( ; it.current(); ++it) {
 
       pView = it.current();
@@ -1743,34 +1683,34 @@ void QextMdiMainFrm::fillWindowMenu()
 
       // insert the window entry sorted in alphabetical order
       unsigned int indx;
-      unsigned int windowItemCount = m_pWindowMenu->count() - entryCount;
-      bool inserted = FALSE;
+      unsigned int windowItemCount = m_pWindowMenu->actions().count() - entryCount;
+      bool inserted = false;
       QString tmpString;
       for (indx = 0; indx <= windowItemCount; indx++) {
          tmpString = m_pWindowMenu->text( m_pWindowMenu->idAt( indx+entryCount));
          if (tmpString.right( tmpString.length()-2) > item.right( item.length()-2)) {
             m_pWindowMenu->insertItem( item, pView, SLOT(slot_clickedInWindowMenu()), 0, -1, indx+entryCount);
             if (pView == m_pCurrentWindow)
-               m_pWindowMenu->setItemChecked( m_pWindowMenu->idAt( indx+entryCount), TRUE);
+               m_pWindowMenu->setItemChecked( m_pWindowMenu->idAt( indx+entryCount), true);
             pView->setWindowMenuID( i);
             if (!bTabPageMode) {
                m_pDockMenu->insertItem( item, pView, SLOT(slot_clickedInDockMenu()), 0, -1, indx);
                if (pView->isAttached())
-                  m_pDockMenu->setItemChecked( m_pDockMenu->idAt( indx), TRUE);
+                  m_pDockMenu->setItemChecked( m_pDockMenu->idAt( indx), true);
             }
-            inserted = TRUE;
+            inserted = true;
             indx = windowItemCount+1;  // break the loop
          }
       }
       if (!inserted) {  // append it
          m_pWindowMenu->insertItem( item, pView, SLOT(slot_clickedInWindowMenu()), 0, -1, windowItemCount+entryCount);
          if (pView == m_pCurrentWindow)
-            m_pWindowMenu->setItemChecked( m_pWindowMenu->idAt(windowItemCount+entryCount), TRUE);
+            m_pWindowMenu->setItemChecked( m_pWindowMenu->idAt(windowItemCount+entryCount), true);
          pView->setWindowMenuID( i);
          if (!bTabPageMode) {
             m_pDockMenu->insertItem( item, pView, SLOT(slot_clickedInDockMenu()), 0, -1, windowItemCount);
             if (pView->isAttached())
-               m_pDockMenu->setItemChecked( m_pDockMenu->idAt(windowItemCount), TRUE);
+               m_pDockMenu->setItemChecked( m_pDockMenu->idAt(windowItemCount), true);
          }
       }
       i++;
@@ -1807,10 +1747,10 @@ void QextMdiMainFrm::dockMenuItemActivated(int id)
    if( !pView) return;
    if( pView->isMinimized()) pView->minimize();
    if( pView->isAttached()) {
-      detachWindow( pView, TRUE);
+      detachWindow( pView, true);
    }
    else {   // is detached
-      attachWindow( pView, TRUE);
+      attachWindow( pView, true);
    }
 }
 
@@ -1828,7 +1768,8 @@ void QextMdiMainFrm::dragEndTimeOut()
 {
    // send drag end to all concerned views.
    QextMdiChildView* pView;
-   for (m_pWinList->first(); (pView = m_pWinList->current()) != 0L; m_pWinList->next()) {
+   //for (m_pWinList->first(); (pView = m_pWinList->current()) != 0L; m_pWinList->next()) {
+   foreach(QextMdiChildView* pView, *m_pWinList) {
       QextMdiChildFrmDragEndEvent   dragEndEvent(0L);
       QApplication::sendEvent(pView, &dragEndEvent);
    }
@@ -1856,11 +1797,7 @@ void QextMdiMainFrm::setFrameDecorOfAttachedViews( int frameDecor)
       break;
    }
    setMenuForSDIModeSysButtons( m_pMainMenuBar);
-#if QT_VERSION < 300
-   QListIterator<QextMdiChildView> it( *m_pWinList);
-#else
    QPtrListIterator<QextMdiChildView> it( *m_pWinList);
-#endif
    for( ; it.current(); ++it) {
       QextMdiChildView* pView = it.current();
       if( pView->isToolView())
@@ -1872,7 +1809,7 @@ void QextMdiMainFrm::setFrameDecorOfAttachedViews( int frameDecor)
 
 void QextMdiMainFrm::fakeSDIApplication()
 {
-   m_bSDIApplication = TRUE;
+   m_bSDIApplication = true;
    if (m_pTaskBar)
       m_pTaskBar->close();
    m_pTaskBar = 0L;
