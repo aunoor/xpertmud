@@ -76,7 +76,7 @@ class KDockWidgetPrivate;
 class KDockArea;
 
 //class QObjectList;
-class QPopupMenu;
+class QMenu;
 class QVBoxLayout;
 class QHBoxLayout;
 class QPixmap;
@@ -89,7 +89,7 @@ class QToolBar;
 #endif
 
 // KDE 3.0 TODO: this belongs in a namespace!! (Clash with X11/Intrinsic.h!)
-typedef QList<QWidget> WidgetList;
+typedef QList<QWidget*> WidgetList;
 
 /**
  * An abstract base clase for all dockwidget headers (and member of the dockwidget class set).
@@ -184,7 +184,7 @@ public:
    * @param name   the object instance name
    */
   KDockWidgetHeaderDrag( KDockWidgetAbstractHeader* parent, KDockWidget* dock,
-                         const QString name );
+                         const QString name=QString() );
 
   /**
    * Destructs this.
@@ -795,7 +795,7 @@ public:
   /**
    * @return the popupmenu for showing/hiding dockwidgets
    */
-  QPopupMenu* dockHideShowMenu(){ return menu; }
+  QMenu* dockHideShowMenu(){ return menu; }
 
   /**
    * @param dockName an internal QObject name
@@ -1016,12 +1016,12 @@ private:
    * A popup menu that contains one menuitem for each dockwidget that shows the current visibility state and
    * to show or hide the appropriate dockwidget.
    */
-  QPopupMenu* menu;
+  QMenu* menu;
 
   /**
    * An internal list containing data for the menuitems for the visibility popup menu.
    */
-  QList<MenuDockData> *menuData;
+  QList<MenuDockData*> *menuData;
 
   class KDockManagerPrivate;
   KDockManagerPrivate *d;
@@ -1089,7 +1089,7 @@ public:
    *
    * @param name object name
    */
-  KDockMainWindow( QWidget* parent = 0L, const QString name, Qt::WindowFlags f = Qt::Window,
+  KDockMainWindow( QWidget* parent = 0L, const QString name=QString(), Qt::WindowFlags f = Qt::Window,
                    QList<Qt::WidgetAttribute> a = (QList<Qt::WidgetAttribute>() << Qt::WA_DeleteOnClose));
 
   /**
@@ -1172,7 +1172,7 @@ public:
    *
    * @return the wanted popup menu
    */
-  QPopupMenu* dockHideShowMenu(){ return dockManager->dockHideShowMenu(); }
+  QMenu* dockHideShowMenu(){ return dockManager->dockHideShowMenu(); }
 
   /**
    * This method shows the given dockwidget.
@@ -1256,7 +1256,7 @@ friend class KDockManager;
 public:
 
 
-  KDockArea( QWidget* parent = 0L, const char *name = 0L);
+  KDockArea( QWidget* parent = 0L, const QString name = QString());
 
   virtual ~KDockArea();
 
@@ -1279,7 +1279,7 @@ public:
 
 
   void activateDock(){ dockManager->activate(); }
-  QPopupMenu* dockHideShowMenu(){ return dockManager->dockHideShowMenu(); }
+  QMenu* dockHideShowMenu(){ return dockManager->dockHideShowMenu(); }
   void makeDockVisible( KDockWidget* dock );
   void makeDockInvisible( KDockWidget* dock );
   void makeWidgetDockVisible( QWidget* widget );

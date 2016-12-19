@@ -38,7 +38,7 @@ class KDockSplitter : public QWidget
 {
   Q_OBJECT
 public:
-  KDockSplitter(QWidget *parent = 0, const char *name = 0, Qt::Orientation orient = Qt::Vertical, int pos = 50, bool highResolution = false);
+  KDockSplitter(QWidget *parent = 0, const QString name = QString(), Qt::Orientation orient = Qt::Vertical, int pos = 50, bool highResolution = false);
   virtual ~KDockSplitter(){};
 
   void activate(QWidget *c0, QWidget *c1 = 0L);
@@ -89,7 +89,7 @@ class KDockButton_Private : public QPushButton
 {
   Q_OBJECT
 public:
-  KDockButton_Private( QWidget *parent=0, const char *name=0 );
+  KDockButton_Private( QWidget *parent=0, const QString name=QString() );
   ~KDockButton_Private();
 
 protected:
