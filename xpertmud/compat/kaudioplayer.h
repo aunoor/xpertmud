@@ -1,12 +1,14 @@
 #ifndef KAUDIO_PLAYER_H
 #define KAUDIO_PLAYER_H
 
-#include <qstring.h>
-#include <qsound.h>
+#include <QString>
+#include <QSound>
+#include <QDebug>
+
 class KAudioPlayer {
 public:
 	static void play(const QString & filename) {
-		qDebug("PlayAudio: " + filename);
+		qDebug() << "PlayAudio: " + filename;
 		QSound::play(filename);
 	}
 };

@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 
   KApplication a;
   Xpertmud *xpertmud = new Xpertmud();
-  a.setMainWidget(xpertmud);
+  //a.setMainWidget(xpertmud);
   xpertmud->show();  
   xpertmud->initialize();
   if (a.isRestored() && KMainWindow::canBeRestored(1)) {

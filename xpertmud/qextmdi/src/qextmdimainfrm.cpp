@@ -181,7 +181,8 @@ QextMdiMainFrm::~QextMdiMainFrm()
 //============ applyOptions ============//
 void QextMdiMainFrm::applyOptions()
 {
-   for(QextMdiChildView *w = m_pWinList->first();w;w= m_pWinList->next()){
+   //for(QextMdiChildView *w = m_pWinList->first();w;w= m_pWinList->next()){
+   foreach(QextMdiChildView *w, *m_pWinList){
       QWidget *wdgt = w;
       if(w->mdiParent())wdgt =w->mdiParent();
       // Really ugly hack to FORCE the resize event
@@ -912,13 +913,9 @@ void QextMdiMainFrm::findRootDockWidgets(QList<KDockWidget*>* pRootDockWidgetLis
    const int frameBorderWidth  = 7;  // TODO: Can we / do we need to ask the window manager?
    const int windowTitleHeight = 10; // TODO:    -"-
 
-   QObjectList* pObjList = queryList( "KDockWidget");
-   QObjectListIt it( *pObjList);
-   QObject* pObj;
+   QList<KDockWidget*> pObjList = findChildren<KDockWidget*>();
    // for all dockwidgets (which are children of this mainwindow)
-   while ((pObj = it.current()) != 0L) {
-      ++it;
-      KDockWidget* pDockW = (KDockWidget*) pObj;
+   foreach(KDockWidget* pDockW, pObjList){
       KDockWidget* pRootDockW = 0L;
       KDockWidget* pUndockCandidate = 0L;
       QWidget* pW = pDockW;
@@ -934,12 +931,12 @@ void QextMdiMainFrm::findRootDockWidgets(QList<KDockWidget*>* pRootDockWidgetLis
       if (pRootDockW) {
          // if that oldest ancestor is not already in the list, append it
          bool found = false;
-         QPtrListIterator<KDockWidget> it2( *pRootDockWidgetList);
          if (!pRootDockWidgetList->isEmpty()) {
-            for ( ; it2.current() && !found; ++it2 ) {
-               KDockWidget* pDockW = it2.current();
-               if (pDockW == pRootDockW)
-                  found = true;
+            foreach(KDockWidget* pDockW, *pRootDockWidgetList){
+               if (pDockW == pRootDockW) {
+                   found = true;
+                   break;
+               }
             }
             if (!found) {
                pRootDockWidgetList->append( pDockW);
@@ -991,9 +988,7 @@ void QextMdiMainFrm::switchToToplevelMode()
    }
 
    // 3.) undock all these found oldest ancestors (being KDockWidgets)
-   QPtrListIterator<KDockWidget> it3( rootDockWidgetList);
-   for (; it3.current(); ++it3 ) {
-       KDockWidget* pDockW = it3.current();
+   foreach(KDockWidget* pDockW, rootDockWidgetList){
        pDockW->undock();
    }
 
@@ -1024,21 +1019,15 @@ void QextMdiMainFrm::switchToToplevelMode()
    }
 
    // 5. show the child views again
-   QPtrListIterator<QextMdiChildView> it( *m_pWinList);
-   for( it.toFirst(); it.current(); ++it) {
-      QextMdiChildView* pView = it.current();
-#ifndef NO_KDE2
-      XSetTransientForHint(qt_xdisplay(),pView->winId(),winId());
-#endif
+   foreach(QextMdiChildView* pView, *m_pWinList){
       if( !pView->isToolView())
          pView->show();
    }
 
    // 6.) reset all memorized positions of the undocked ones and show them again
-   QList<QRect>::Iterator it5;
-   for (it3.toFirst(), it5 = positionList.begin() ; it3.current(), it5 != positionList.end(); ++it3, ++it5 ) {
-       KDockWidget* pDockW = it3.current();
-       pDockW->setGeometry( (*it5));
+   for (int i=0; i<positionList.count(); i++){
+       KDockWidget* pDockW =  rootDockWidgetList.at(i);
+       pDockW->setGeometry( positionList.at(i));
        pDockW->show();
    }
 
@@ -1067,9 +1056,7 @@ void QextMdiMainFrm::switchToChildframeMode()
       findRootDockWidgets(&rootDockWidgetList, &positionList);
 
       // undock all these found oldest ancestors (being KDockWidgets)
-      QPtrListIterator<KDockWidget> it3( rootDockWidgetList);
-      for (; it3.current(); ++it3 ) {
-          KDockWidget* pDockW = it3.current();
+      foreach(KDockWidget* pDockW, rootDockWidgetList){
           pDockW->undock();
       }
 
@@ -1096,9 +1083,7 @@ void QextMdiMainFrm::switchToChildframeMode()
    }
    m_pDockbaseAreaOfDocumentViews->show();
    if (m_mdiMode == QextMdi::TabPageMode) {
-      QPtrListIterator<KDockWidget> it4( rootDockWidgetList);
-      for (; it4.current(); ++it4 ) {
-         KDockWidget* pDockW = it4.current();
+      foreach(KDockWidget* pDockW, rootDockWidgetList){
          pDockW->dockBack();
       }
    }
@@ -1112,15 +1097,12 @@ void QextMdiMainFrm::switchToChildframeMode()
    QextMdi::MdiMode oldMdiMode = m_mdiMode;
    m_mdiMode = QextMdi::ChildframeMode;
 
-   QPtrListIterator<QextMdiChildView> it( *m_pWinList);
-   for( ; it.current(); ++it) {
-      QextMdiChildView* pView = it.current();
+   foreach(QextMdiChildView* pView, *m_pWinList){
       if( !pView->isToolView())
          if( !pView->isAttached())
             attachWindow( pView, true);
    }
-   for( it.toFirst(); it.current(); ++it) {
-      QextMdiChildView* pView = it.current();
+   foreach(QextMdiChildView* pView, *m_pWinList){
       if( !pView->isToolView())
          pView->show();
    }
@@ -1144,9 +1126,7 @@ void QextMdiMainFrm::finishChildframeMode()
    writeDockConfig( curDockState);
 
    // detach all non-tool-views to toplevel
-   QPtrListIterator<QextMdiChildView> it( *m_pWinList);
-   for( ; it.current(); ++it) {
-      QextMdiChildView* pView = it.current();
+   foreach(QextMdiChildView* pView, *m_pWinList){
       if( pView->isToolView())
          continue;
       if( pView->isAttached()) {
@@ -1200,9 +1180,7 @@ void QextMdiMainFrm::switchToTabPageMode()
 
    // tabify all MDI views covered by a KDockWidget
    KDockWidget* pCover = 0L;
-   QPtrListIterator<QextMdiChildView> it4( *m_pWinList);
-   for( ; it4.current(); ++it4) {
-      QextMdiChildView* pView = it4.current();
+   foreach(QextMdiChildView* pView, *m_pWinList){
       if( pView->isToolView())
          continue;
       const QPixmap& wndIcon = !pView->windowIcon().isNull() ? pView->windowIcon().pixmap(22,22) : QPixmap();
@@ -1256,9 +1234,7 @@ void QextMdiMainFrm::finishTabPageMode()
 {
    // if tabified, release all views from their docking covers
    if (m_mdiMode == QextMdi::TabPageMode) {
-      QPtrListIterator<QextMdiChildView> it( *m_pWinList);
-      for( ; it.current(); ++it) {
-         QextMdiChildView* pView = it.current();
+      foreach(QextMdiChildView* pView, *m_pWinList){
          if( pView->isToolView())
             continue;
          QSize mins = pView->minimumSize();
@@ -1603,69 +1579,76 @@ void QextMdiMainFrm::fillWindowMenu()
    if (!m_bClearingOfWindowMenuBlocked) {
       m_pWindowMenu->clear();
    }
-   int closeId = m_pWindowMenu->insertItem(tr("&Close"), this, SLOT(closeActiveView()));
-   int closeAllId = m_pWindowMenu->insertItem(tr("Close &All"), this, SLOT(closeAllViews()));
+   QAction* closeId = m_pWindowMenu->addAction(tr("&Close"), this, SLOT(closeActiveView()));
+   QAction* closeAllId = m_pWindowMenu->addAction(tr("Close &All"), this, SLOT(closeAllViews()));
    if (bNoViewOpened) {
-      m_pWindowMenu->setItemEnabled(closeId, false);
-      m_pWindowMenu->setItemEnabled(closeAllId, false);
+      closeId->setEnabled(false);
+      closeAllId->setEnabled(false);
    }
    if (!bTabPageMode) {
-      int iconifyId = m_pWindowMenu->insertItem(tr("&Minimize All"), this, SLOT(iconifyAllViews()));
+      QAction* iconifyId = m_pWindowMenu->addAction(tr("&Minimize All"), this, SLOT(iconifyAllViews()));
       if (bNoViewOpened) {
-         m_pWindowMenu->setItemEnabled(iconifyId, false);
+         iconifyId->setEnabled(false);
       }
    }
    m_pWindowMenu->addSeparator();
-   m_pWindowMenu->insertItem(tr("&MDI Mode..."), m_pMdiModeMenu);
+   QAction *mdiMode = m_pWindowMenu->addMenu(m_pMdiModeMenu);
+   mdiMode->setText(tr("&MDI Mode..."));
    m_pMdiModeMenu->clear();
-   m_pMdiModeMenu->insertItem(tr("&Toplevel mode"), this, SLOT(switchToToplevelMode()));
-   m_pMdiModeMenu->insertItem(tr("C&hildframe mode"), this, SLOT(switchToChildframeMode()));
-   m_pMdiModeMenu->insertItem(tr("Ta&b Page mode"), this, SLOT(switchToTabPageMode()));
+   QAction *tplm=m_pMdiModeMenu->addAction(tr("&Toplevel mode"), this, SLOT(switchToToplevelMode())); //0
+   QAction *cfm=m_pMdiModeMenu->addAction(tr("C&hildframe mode"), this, SLOT(switchToChildframeMode())); //1
+   QAction *tpm=m_pMdiModeMenu->addAction(tr("Ta&b Page mode"), this, SLOT(switchToTabPageMode())); //2
    switch (m_mdiMode) {
    case QextMdi::ToplevelMode:
-      m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(0), true);
+      //m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(0), true);
+      tplm->setChecked(true);
       break;
    case QextMdi::ChildframeMode:
-      m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(1), true);
+      //m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(1), true);
+       cfm->setChecked(true);
       break;
    case QextMdi::TabPageMode:
-      m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(2), true);
+      //m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(2), true);
+       tpm->setChecked(true);
       break;
    default:
       break;
    }
    m_pWindowMenu->addSeparator();
    if (!bTabPageMode) {
-      int placMenuId = m_pWindowMenu->insertItem(tr("&Tile..."), m_pPlacingMenu);
+      QAction* placMenuId = m_pWindowMenu->addMenu(m_pPlacingMenu);
+      placMenuId->setText(tr("&Tile..."));
       m_pPlacingMenu->clear();
-      m_pPlacingMenu->insertItem(tr("Ca&scade windows"), m_pMdi,SLOT(cascadeWindows()));
-      m_pPlacingMenu->insertItem(tr("Cascade &maximized"), m_pMdi,SLOT(cascadeMaximized()));
-      m_pPlacingMenu->insertItem(tr("Expand &vertically"), m_pMdi,SLOT(expandVertical()));
-      m_pPlacingMenu->insertItem(tr("Expand &horizontally"), m_pMdi,SLOT(expandHorizontal()));
-      m_pPlacingMenu->insertItem(tr("Tile &non-overlapped"), m_pMdi,SLOT(tileAnodine()));
-      m_pPlacingMenu->insertItem(tr("Tile overla&pped"), m_pMdi,SLOT(tilePragma()));
-      m_pPlacingMenu->insertItem(tr("Tile v&ertically"), m_pMdi,SLOT(tileVertically()));
+      m_pPlacingMenu->addAction(tr("Ca&scade windows"), m_pMdi,SLOT(cascadeWindows()));
+      m_pPlacingMenu->addAction(tr("Cascade &maximized"), m_pMdi,SLOT(cascadeMaximized()));
+      m_pPlacingMenu->addAction(tr("Expand &vertically"), m_pMdi,SLOT(expandVertical()));
+      m_pPlacingMenu->addAction(tr("Expand &horizontally"), m_pMdi,SLOT(expandHorizontal()));
+      m_pPlacingMenu->addAction(tr("Tile &non-overlapped"), m_pMdi,SLOT(tileAnodine()));
+      m_pPlacingMenu->addAction(tr("Tile overla&pped"), m_pMdi,SLOT(tilePragma()));
+      m_pPlacingMenu->addAction(tr("Tile v&ertically"), m_pMdi,SLOT(tileVertically()));
       if (m_mdiMode == QextMdi::ToplevelMode) {
-         m_pWindowMenu->setItemEnabled(placMenuId, false);
+         placMenuId->setEnabled(false);
       }
       m_pWindowMenu->addSeparator();
-      int dockUndockId = m_pWindowMenu->insertItem(tr("&Dock/Undock..."), m_pDockMenu);
-         m_pDockMenu->clear();
+      QAction* dockUndockId = m_pWindowMenu->addMenu(m_pDockMenu);
+      dockUndockId->setText(tr("&Dock/Undock..."));
+      m_pDockMenu->clear();
       m_pWindowMenu->addSeparator();
       if (bNoViewOpened) {
-         m_pWindowMenu->setItemEnabled(placMenuId, false);
-         m_pWindowMenu->setItemEnabled(dockUndockId, false);
+         placMenuId->setEnabled(false);
+         dockUndockId->setEnabled(false);
       }
    }
    int entryCount = m_pWindowMenu->actions().count();
 
    // for all child frame windows: give an ID to every window and connect them in the end with windowMenuItemActivated()
    int i=100;
-   QextMdiChildView* pView = 0L;
-   QPtrListIterator<QextMdiChildView> it(*m_pWinList);
-   for( ; it.current(); ++it) {
+   //QextMdiChildView* pView = 0L;
+   //QPtrListIterator<QextMdiChildView> it(*m_pWinList);
+   foreach(QextMdiChildView* pView, *m_pWinList){
+   //for( ; it.current(); ++it) {
 
-      pView = it.current();
+//      pView = it.current();
       if( pView->isToolView())
          continue;
 
@@ -1687,30 +1670,35 @@ void QextMdiMainFrm::fillWindowMenu()
       bool inserted = false;
       QString tmpString;
       for (indx = 0; indx <= windowItemCount; indx++) {
-         tmpString = m_pWindowMenu->text( m_pWindowMenu->idAt( indx+entryCount));
+         //tmpString = m_pWindowMenu->text( m_pWindowMenu->idAt( indx+entryCount));
+         tmpString = m_pWindowMenu->actions().at(indx+entryCount)->text();
          if (tmpString.right( tmpString.length()-2) > item.right( item.length()-2)) {
-            m_pWindowMenu->insertItem( item, pView, SLOT(slot_clickedInWindowMenu()), 0, -1, indx+entryCount);
+            QAction *ta=m_pWindowMenu->addAction( item, pView, SLOT(slot_clickedInWindowMenu()));
             if (pView == m_pCurrentWindow)
-               m_pWindowMenu->setItemChecked( m_pWindowMenu->idAt( indx+entryCount), true);
+               ta->setChecked(true);
             pView->setWindowMenuID( i);
             if (!bTabPageMode) {
-               m_pDockMenu->insertItem( item, pView, SLOT(slot_clickedInDockMenu()), 0, -1, indx);
+                QAction *ta=m_pDockMenu->addAction( item, pView, SLOT(slot_clickedInDockMenu()));
                if (pView->isAttached())
-                  m_pDockMenu->setItemChecked( m_pDockMenu->idAt( indx), true);
+                  ta->setChecked(true);
             }
             inserted = true;
             indx = windowItemCount+1;  // break the loop
          }
       }
       if (!inserted) {  // append it
-         m_pWindowMenu->insertItem( item, pView, SLOT(slot_clickedInWindowMenu()), 0, -1, windowItemCount+entryCount);
+         //m_pWindowMenu->insertItem( item, pView, SLOT(slot_clickedInWindowMenu()), 0, -1, windowItemCount+entryCount);
+         QAction *ta = m_pWindowMenu->addAction( item, pView, SLOT(slot_clickedInWindowMenu()));
          if (pView == m_pCurrentWindow)
-            m_pWindowMenu->setItemChecked( m_pWindowMenu->idAt(windowItemCount+entryCount), true);
+            //m_pWindowMenu->setItemChecked( m_pWindowMenu->idAt(windowItemCount+entryCount), true);
+            ta->setChecked(true);
          pView->setWindowMenuID( i);
          if (!bTabPageMode) {
-            m_pDockMenu->insertItem( item, pView, SLOT(slot_clickedInDockMenu()), 0, -1, windowItemCount);
+            //m_pDockMenu->insertItem( item, pView, SLOT(slot_clickedInDockMenu()), 0, -1, windowItemCount);
+            QAction *ta = m_pDockMenu->addAction( item, pView, SLOT(slot_clickedInDockMenu()));
             if (pView->isAttached())
-               m_pDockMenu->setItemChecked( m_pDockMenu->idAt(windowItemCount), true);
+               //m_pDockMenu->setItemChecked( m_pDockMenu->idAt(windowItemCount), true);
+               ta->setChecked(true);
          }
       }
       i++;
@@ -1797,9 +1785,7 @@ void QextMdiMainFrm::setFrameDecorOfAttachedViews( int frameDecor)
       break;
    }
    setMenuForSDIModeSysButtons( m_pMainMenuBar);
-   QPtrListIterator<QextMdiChildView> it( *m_pWinList);
-   for( ; it.current(); ++it) {
-      QextMdiChildView* pView = it.current();
+   foreach(QextMdiChildView* pView, *m_pWinList){
       if( pView->isToolView())
          continue;
       if( pView->isAttached())

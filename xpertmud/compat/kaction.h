@@ -20,7 +20,7 @@ class KAction: public QAction {
 
   KAction( const QString& text, int accel,
   	   const QObject* receiver, const char* slot,
-	   QObject* parent, const char* name="",
+	   QObject* parent, const QString name=QString(),
 	   bool toggle=false):
     QAction(text, parent) {
     //QAction(text, text, accel, parent, name, toggle) {
@@ -31,13 +31,13 @@ class KAction: public QAction {
     }
 
   KAction( const QString& text, int accel, 
-	   QObject* parent = 0, const char* name = 0,
+	   QObject* parent = 0, const QString name = QString(),
 	   bool toggle=false):
     QAction(text, parent) {
     //QAction(text, text, accel, parent, name, toggle) {
       std::cout << (long)this << std::endl;
       std::cout << (long)parent << std::endl;
-      std::cout << name << std::endl;
+      std::cout << name.toLocal8Bit().data() << std::endl;
       this->toggled(toggle);
       this->setShortcut(accel);
       this->setObjectName(QString(name));
@@ -78,7 +78,7 @@ class KToggleAction: public KAction {
  public:
   KToggleAction( const QString& text, int accel,
 		 const QObject* receiver, const char* slot,
-		 QObject* parent, const char* name ):
+		 QObject* parent, const QString name ):
     KAction(text, accel, receiver, slot, parent, name, true) {}
 
   //KToggleAction() {}

@@ -47,15 +47,16 @@ int InputAction::plug( QWidget *w, int index ) {
   toolBar->setItemAutoSized( id, true );
 
   connect(inputline, SIGNAL(textEntered(const QString&)),
-  	  receiver, slotTextEntered);
-  connect(receiver, signalEchoMode,
+  	  receiver, slotTextEntered.toLatin1());
+  connect(receiver, signalEchoMode.toLatin1(),
 	  inputline, SLOT(slotEchoMode(bool)));
-  connect(receiver, signalCommandRetention,
+  connect(receiver, signalCommandRetention.toLatin1(),
 	  inputline, SLOT(slotCommandRetention(bool)));
 
   connect( toolBar, SIGNAL( destroyed() ), this, SLOT( slotDestroyed() ) );
 
-  QWhatsThis::add( inputline, whatsThis() );
+  //TODO: QWhatsThis::add( inputline, whatsThis() );
+
   
   return containerCount() - 1;
 }

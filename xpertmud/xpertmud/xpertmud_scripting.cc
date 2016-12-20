@@ -190,7 +190,7 @@ int Xpertmud::XM_TextWindow_initialize() {
   int id=childWidgets.size(); 
 
   QextMdiChildView * neuWrapper = new QextMdiChildView();
-  QBoxLayout* pLayout = new QHBoxLayout(neuWrapper, 0, -1);
+  QBoxLayout* pLayout = new QHBoxLayout(neuWrapper);
   TextBufferView * neu= new TextBufferView(id,neuWrapper,0,colorMap,defaultFont);
   pLayout->addWidget(neu);
 
@@ -199,7 +199,7 @@ int Xpertmud::XM_TextWindow_initialize() {
   pluginWrappers.push_back(NULL); 
 
   neuWrapper->setIcon(kapp->miniIcon());
-  neuWrapper->setFocusPolicy(QWidget::NoFocus);
+  neuWrapper->setFocusPolicy(Qt::NoFocus);
   neuWrapper->removeEventFilterForAllChildren();
 
   connect(this,SIGNAL(colorConfigChanged()),

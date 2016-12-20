@@ -174,7 +174,7 @@ void TextBuffer::clearBOL() {
   unsigned int line = getLine(cursorY);
 
   if(line < buffer.size()) {
-    unsigned int width = qMin(cursorX, buffer[line].size());
+    unsigned int width = qMin((int)cursorX, (int)buffer[line].size());
     for(unsigned int i=0; i<width; ++i)
       buffer[line][i] = defaultAttributes;
 
@@ -321,8 +321,7 @@ void TextBuffer::scrollColumns(int delta) {
   } else {
     for(int y=buffer.size()-ansiViewHeight; 0<=y && y<(int)buffer.size(); ++y) {
       if(buffer[y].size() < ansiViewWidth) {
-	buffer[y].resize(qMin(buffer[y].size()-delta,
-				  ansiViewWidth));
+	        buffer[y].resize(qMin((int)(buffer[y].size()-delta), (int)ansiViewWidth));
       }
       for(int x=buffer[y].size()-1; x>=0; --x) {
 	if(x >= -delta)

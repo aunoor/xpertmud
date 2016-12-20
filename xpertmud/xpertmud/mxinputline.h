@@ -19,12 +19,10 @@
 #ifndef MXINPUTLINE_H
 #define MXINPUTLINE_H
 
-#include <qobject.h>
-
-#include <qtextedit.h>
+#include <QPlainTextEdit>
 #include <vector>
 
-class MXInputLine : public QTextEdit  {
+class MXInputLine : public QPlainTextEdit  {
   Q_OBJECT
 public: 
 

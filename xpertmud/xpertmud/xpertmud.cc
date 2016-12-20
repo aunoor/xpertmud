@@ -16,16 +16,19 @@
  ***************************************************************************/
 
 // include files for QT
-#include <qaccel.h>
-#include <qdir.h>
-#include <qvbox.h>
-#include <qwhatsthis.h>
-#include <qtooltip.h>
-#include <qtoolbutton.h>
-#include <qstring.h>
-#include <qstringlist.h>
-#include <qsocket.h>
-#include <qtimer.h>
+//#include <qaccel.h>
+#include <QDir>
+//#include <qvbox.h>
+//#include <qwhatsthis.h>
+//#include <qtooltip.h>
+#include <QToolButton>
+#include <QString>
+#include <QStringList>
+//#include <qsocket.h>
+#include <QTimer>
+#include <QDebug>
+#include <QKeyEvent>
+#include <QShortcut>
 
 // include files for KDE
 #include <kiconloader.h>
@@ -207,9 +210,6 @@ KLibLoader2* KLibLoader2::ss_self;
 
 
 Xpertmud::Xpertmud(QWidget *parent, const char *name) : 
-#ifndef NO_KDE
-  DCOPObject("XpertmudIface"),
-#endif
   QextMdiMainFrm(parent, name),
   currentLib(NULL),
   scriptInterp(NULL),
@@ -244,7 +244,7 @@ Xpertmud::Xpertmud(QWidget *parent, const char *name) :
   connect(&bookmark,SIGNAL(titleChanged(const QString &)),
 	  this,SLOT(setCaption(const QString &)));
 
-  setCaption(bookmark.getTitle());
+  setWindowTitle(bookmark.getTitle());
 
 }
 
@@ -289,18 +289,9 @@ void Xpertmud::initialize() {
 
   QTimer *t = new QTimer( this );
   connect( t, SIGNAL(timeout()), SLOT(slotTimer()) );
-  t->start( 250, FALSE );
+  t->start( 250 );
 
-#ifdef USE_X11_KEYHANDLING
-  kapp->installX11EventFilter( this );
-#endif
-#ifdef USE_QT_KEYHANDLING
   kapp->installEventFilter(this);
-#endif
-#ifndef NO_KDE
-  // Works for now, no idea, if this is the way it is supposed to work
-  accel()->setEnabled(false);
-#endif
 }
 
 unsigned int Xpertmud::registerWidget(QWidget* widget) {
@@ -484,17 +475,18 @@ void Xpertmud::scriptingMenuAboutToShow() {
   
   scriptingMenu->insert(unloadLanguage);
 
-  scriptingMenu->popupMenu()->insertSeparator();
+  scriptingMenu->popupMenu()->addSeparator();
   for (int i = 0; i < (int)availableLanguages.count(); ++i) {
-    int id;
+    QAction* id;
     if (availableLanguages[i] == currentLanguage) { 
-      id = scriptingMenu->popupMenu()->insertItem(i18n("Restart &%1 interpreter").arg(availableLanguages[i]), this, 
+      id = scriptingMenu->popupMenu()->addAction(i18n("Restart &%1 interpreter").arg(availableLanguages[i]), this,
 						  SLOT( slotSwitchLanguage( int ) ));
     } else {
-      id = scriptingMenu->popupMenu()->insertItem(i18n("Start &%1 interpreter").arg(availableLanguages[i]), this, 
+      id = scriptingMenu->popupMenu()->addAction(i18n("Start &%1 interpreter").arg(availableLanguages[i]), this,
 						  SLOT( slotSwitchLanguage( int ) ));
     }
-    scriptingMenu->popupMenu()->setItemParameter(id, i);
+    //scriptingMenu->popupMenu()->setItemParameter(id, i);
+    id->setProperty("id",i);
   }
 }
 
@@ -578,7 +570,7 @@ void Xpertmud::slotFileSaveAs() {
 				     this, i18n("Save as..."));
   if(!url.isEmpty()) {
     QString fn = url.fileName();
-    if(fn.find('.') == -1) {
+    if(fn.indexOf('.') == -1) {
       url.setFileName(fn + ".xmud");
     }
     slotSaveBookmark(url);
@@ -588,11 +580,16 @@ void Xpertmud::slotFileSaveAs() {
 void Xpertmud::slotFindLanguages() {
   QStringList filenames=KGlobal::dirs()->findAllResources("module","libxm*interpreter.la",false,true);
   availableLanguages.clear();
-  for (QStringList::Iterator it=filenames.begin();
-       it != filenames.end(); ++it) {
 
-    QString lang=QString(*it).remove((*it).length()-14,14);
-    lang.remove(0,lang.findRev("/libxm")+6);
+//  for (QStringList::Iterator it=filenames.begin();
+//       it != filenames.end(); ++it) {
+
+
+  foreach(QString str, filenames){
+
+    QString lang=str;
+    lang.remove(str.length()-14, 14);
+    lang.remove(0,lang.lastIndexOf("/libxm")+6);
     availableLanguages.append(lang);
   }
 
@@ -600,6 +597,7 @@ void Xpertmud::slotFindLanguages() {
 }
 
 void Xpertmud::slotSwitchLanguage(int nr) {
+  //TODO: parse parametr from QAction!
   if (nr<(int)availableLanguages.count() && nr >= 0) {
     QString lang = availableLanguages[nr];
 
@@ -661,7 +659,7 @@ void Xpertmud::slotSwitchLanguage(const QString& langParam) {
       QObject * scripting = fac->create(this,"myXMScripting","XMScripting");
       if (scripting && scripting->inherits("XMScripting")) {
 	scriptInterp=static_cast<XMScripting*>(scripting);
-	qDebug(QString("create scriptInterp %1").arg((unsigned long)scriptInterp));
+	qDebug() << QString("create scriptInterp %1").arg((unsigned long)scriptInterp);
       } else {
 	if (scripting)
 	  delete scripting;
@@ -945,7 +943,7 @@ void Xpertmud::slotFileConnect() {
     }
   }
 
-  QValueVector<int> conns = bookmark.getAvailableConnections();
+  QVector<int> conns = bookmark.getAvailableConnections();
   while(conns.size() == 0) {
     BookmarkEditor editor(bookmark,this);
     if(!editor.exec())
@@ -960,7 +958,7 @@ void Xpertmud::slotFileConnect() {
 	 i18n("Error!"));
     }
   }    
-  for(QValueVector<int>::iterator it = conns.begin();
+  for(QVector<int>::iterator it = conns.begin();
       it != conns.end(); ++it) {
     QString host=bookmark.getConnectionHost(*it);
     QString encoding=bookmark.getConnectionEncoding(*it);
@@ -1120,7 +1118,7 @@ send, not to act like textEntered...
   if (!pending_commands.isEmpty()) {
     slotStatusMsg(i18n("Executing startup script..."));
     while (!pending_commands.isEmpty()) {
-      int enter=pending_commands.find('\n');
+      int enter=pending_commands.indexOf('\n');
       if (enter==-1) 
 	enter=pending_commands.length();
       QString cmd=pending_commands.left(enter);
@@ -1178,8 +1176,6 @@ void Xpertmud::resizeEvent(QResizeEvent *r) {
 using std::cout;
 using std::endl;
 
-#ifdef USE_QT_KEYHANDLING
-
 bool Xpertmud::eventFilter( QObject *o, QEvent *x )
 {
   if ( x->type() == QEvent::KeyPress ) {  // key press
@@ -1193,13 +1189,13 @@ bool Xpertmud::eventFilter( QObject *o, QEvent *x )
     kapp->installEventFilter(this);
 
     QKeyEvent *e = (QKeyEvent*)x;
-    uint mod=e->state();
+    Qt::KeyboardModifiers mod=e->modifiers();
     
     QString keyname;
 
-    keyname += (mod & Qt::ShiftButton)?'1':'0';
-    keyname += (mod & Qt::ControlButton)?'1':'0';
-    keyname += (mod & Qt::AltButton)?'1':'0';
+    keyname += (mod & Qt::ShiftModifier)?'1':'0';
+    keyname += (mod & Qt::ControlModifier)?'1':'0';
+    keyname += (mod & Qt::AltModifier)?'1':'0';
     //    keyname += (mod & Qt::MetaButton)?'1':'0'; 
     // not in Qt2.3 (!)
     keyname += '0';
@@ -1209,10 +1205,13 @@ bool Xpertmud::eventFilter( QObject *o, QEvent *x )
     keyname += '0'; // Scroll Lock
     keyname+=' ';
 
-    if(mod & Qt::Keypad) {
+    if(mod & Qt::KeypadModifier) {
       keyname+="KP_";
     }
-    QString qname = QAccel::keyToString(e->key());
+
+    //QString qname = QAccel::keyToString(e->key());
+    QKeySequence ks(e->key());
+    QString qname = ks.toString();
     if(qname == "<65535?>") {
       keyname += "KP_Begin";
     } else if(qname == "<4128?>") {
@@ -1226,128 +1225,12 @@ bool Xpertmud::eventFilter( QObject *o, QEvent *x )
     } else {
       keyname += qname;
     }
-# ifndef USE_X11_KEYHANDLING
     if (scriptInterp)
       return scriptInterp->keyPressed(keyname, e->text());
-# else
-    cout << "QEvent: " << keyname.latin1() << endl;
-# endif
   }
   return KMainWindow::eventFilter( o, x );    // standard event processing
 }
 
-#endif
 
-#ifdef USE_X11_KEYHANDLING
-
-// Include files for X11
-#include <X11/X.h>
-#include <X11/Xlib.h>
-#include <X11/keysym.h>
-#include <X11/Xutil.h>
-#include <cctype>
-
-/* Modifier Documentation:
-#define ShiftMask		(1<<0)
-#define LockMask		(1<<1)
-#define ControlMask		(1<<2)
-#define Mod1Mask		(1<<3)
-#define Mod2Mask		(1<<4)
-#define Mod3Mask		(1<<5)
-#define Mod4Mask		(1<<6)
-#define Mod5Mask		(1<<7)
-*/
-
-bool Xpertmud::x11Event( XEvent * e) {
-  if ( e->type != KeyPress ) return false;
-
-  //  std::cout << "(X11) ActiveWindow: " << (int)activeWindow() << " - ";
-  //  std::cout << activeWindow()->className() << std::endl;
-  //  std::cout << "(X11) FocusWidget: " << (int)qApp->focusWidget() << " - ";
-  //  std::cout << qApp->focusWidget()->className() << std::endl;
-  //  std::cout << qApp->focusWidget()->parent()->className() << std::endl;
-
-  uint mod=e->xkey.state;
-
-  KeySym ks;
-  char str[256+1];
-  const char *kname;
-
-  int len = XLookupString((XKeyEvent*)e, str, 256, &ks, NULL);
-  str[len] = 0;
-
-  if(ks == NoSymbol)
-    kname = "NoSymbol";
-  else if(!(kname = XKeysymToString(ks)))
-    kname = "(no name)";
-
-  QString keyname;
-  keyname += (mod & ShiftMask)?'1':'0';
-  keyname += (mod & ControlMask)?'1':'0';
-  keyname += (mod & Mod1Mask)?'1':'0'; // Metha
-  keyname += (mod & Mod4Mask)?'1':'0'; // Alt
-  keyname += (mod & Mod2Mask)?'1':'0'; // AltGr
-
-  keyname += (mod & Mod3Mask)?'1':'0'; // Num Lock
-  keyname += (mod & LockMask)?'1':'0'; // Caps Lock
-  keyname += (mod & Mod5Mask)?'1':'0'; // Scroll Lock
-  keyname+=' ';
-  //  if(len == 1 && str[0] > 32 && str[0] < 127) {
-  if(len != 1 || str[0]=='\t' || str[0]==' ' || iscntrl(str[0])) {
-    QString qname(kname);
-    if(qname == "Num_Lock") {
-      keyname += "NumLock";
-    } else if(qname == "Caps_Lock") {
-      keyname += "CapsLock";
-    } else if(qname == "Scroll_Lock") {
-      keyname += "ScrollLock";
-    } else if(qname == "Escape") {
-      keyname += "Esc";
-    } else if(qname == "space") {
-      keyname += "Space";
-    } else if(qname == "BackSpace") {
-      keyname += "Backspace";
-
-    } else if(qname == "KP_Delete") {
-      keyname += "KP_Del";
-    } else if(qname == "KP_Insert") {
-      keyname += "KP_Ins";
-    } else if(qname == "KP_Next") {
-      keyname += "KP_PgDown";
-    } else if(qname == "KP_Prior") {
-      keyname += "KP_PgUp";
-
-    } else if(qname == "Delete") {
-      keyname += "Del";
-    } else if(qname == "Insert") {
-      keyname += "Ins";
-    } else if(qname == "Next") {
-      keyname += "PgDown";
-    } else if(qname == "Prior") {
-      keyname += "PgUp";
-
-    } else if(qname.length() == 1) {
-      keyname+=qname.upper();
-    } else {
-      keyname+=kname;
-    }
-  } else {
-    if(kname[0] == 'K' && kname[1] == 'P' && kname[2] == '_') {
-      keyname+="KP_";
-    }
-    keyname+=QString(str).upper();
-  }
-
-# ifdef USE_QT_KEYHANDLING
-  cout << "XEvent: " << keyname << endl;
-# endif
-  
-  if (scriptInterp)
-    return scriptInterp->keyPressed(keyname, str);
-  else
-    return false;
-}
-
-#endif
 
 

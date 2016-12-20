@@ -2,10 +2,11 @@
 #include "TextBufferView.h"
 #include "TextBuffer.h"
 
-#include <qscrollbar.h>
-#include <qapplication.h>
-#include <qframe.h>
-#include <qcursor.h>
+#include <QScrollBar>
+#include <QApplication>
+#include <QFrame>
+#include <QMouseEvent>
+#include <QStyleOptionComplex>
 
 // This file requires the QT Compatibility mode for usage with QT3
 // QStyle::scrollBarExtend has been removed from QT3.
@@ -27,18 +28,16 @@ TextBufferHistoryView::
 TextBufferHistoryView(int id, QWidget* parent, const char* name, 
 		      const QColor* cmap,
 		      const QFont& font, unsigned int scrollBackLines):
-  QWidget(parent, name, WRepaintNoErase | WResizeNoErase |
-#if QT_VERSION<300
-	  WNorthWestGravity |
-#else
-	  WStaticContents |
-#endif
-	  WStyle_Customize | WStyle_NormalBorder | WStyle_Title |
-	  WStyle_SysMenu | WStyle_MinMax ),
+  QWidget(parent, /*WRepaintNoErase | WResizeNoErase |
+	  WStyle_Customize | WStyle_NormalBorder |*/ Qt::WindowTitleHint |
+    Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint ),
   inUpdate(false),
   winID(id), scrollSplitEnabled(true), scrollBackLines(scrollBackLines),
   movingSplit(false)
 {
+  setAttribute(Qt::WA_StaticContents, true);
+  setObjectName(name);
+
   textBuffer = new TextBuffer(0, 0, -1, true);
   ownsBuffer = true;
 
@@ -66,11 +65,12 @@ TextBufferHistoryView(int id, QWidget* parent, const char* name,
 	  this,SLOT(slotScriptingMouseReleaseEvent(int, int, int)));
 
 
-  splitSeperator = new QFrame( this, "seperator" );
+  splitSeperator = new QFrame( this );
+  splitSeperator->setObjectName("seperator");
   splitSeperator->hide();
   splitSeperator->setFrameShape( QFrame::HLine );
   splitSeperator->setFrameShadow( QFrame::Sunken );
-  splitSeperator->setCursor(QCursor(SplitVCursor));
+  splitSeperator->setCursor(QCursor(Qt::SplitVCursor));
 
   vscrollBar = new QScrollBar(Qt::Vertical, this);
   vscrollBar->show();
@@ -82,7 +82,9 @@ TextBufferHistoryView(int id, QWidget* parent, const char* name,
   connect(vscrollBar, SIGNAL(valueChanged(int)), 
 	  this, SLOT(slotVScroll(int)));
 
-  setPaletteBackgroundColor(QColor(0, 0, 0));
+  QPalette pal = palette();
+  pal.setColor(QPalette::Background, QColor(0, 0, 0));
+  setPalette(pal);
   //  setEraseColor(QColor(qRgba(0,0,0,0)));
 }
 
@@ -347,8 +349,12 @@ void TextBufferHistoryView::updateLayout() {
   vscrollBar->move(QPoint(width()-vscrollBar->width(),0));
 
   // TODO: migrate to Qt3
+  /*
   vscrollBar->resize(QApplication::style().scrollBarExtent().width(),
 		     height() - QApplication::style().scrollBarExtent().height());
+  */
+  QRect rect=QApplication::style()->subControlRect(QStyle::CC_ScrollBar, new QStyleOptionComplex(), QStyle::SC_ScrollBarGroove);
+  vscrollBar->resize(rect.width(), height()-rect.height());
   updateVScrollBar();
 
   //  splitView->move(0, splitViewY);

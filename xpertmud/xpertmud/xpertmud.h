@@ -23,20 +23,7 @@
 #include <config.h>
 #endif
 
-// define only one normally,
-// define both for debuggin purposes,
-// then only the X11 one will process
-// the interpreter, but both will give
-// debugging information
-#ifdef NO_KDE
-# undef  USE_X11_KEYHANDLING
 # define USE_QT_KEYHANDLING
-#else
-# define USE_X11_KEYHANDLING
-# undef  USE_QT_KEYHANDLING
-#endif
-//#define USE_QT_KEYHANDLING
-//#define USE_X11_KEYHANDLING
 
 #include <kapplication.h>
 #include <kmainwindow.h>
@@ -44,10 +31,6 @@
 #include <kurl.h>
 #include <qextmdimainfrm.h>
 #include <vector>
-
-#ifndef NO_KDE
-#include "DCOPxpertmud.h"
-#endif
 #include "scripting/GuiScriptingBindings.h"
 #include "ColorChar.h"
 #include "RegisterIface.h"
@@ -68,11 +51,6 @@ class TextBufferHistoryView;
 /** Xpertmud is the base class of the project */
 class Xpertmud : public QextMdiMainFrm, public GuiScriptingBindings, 
   public RegisterIface
-// MOC_SKIP_BEGIN
-#ifndef NO_KDE
-, public XpertmudIface
-#endif
-// MOC_SKIP_END
 {
   Q_OBJECT 
 
@@ -207,12 +185,7 @@ protected:
 protected:
   virtual void resizeEvent(QResizeEvent *r);
 
-#ifdef USE_X11_KEYHANDLING
-  bool x11Event( XEvent * e );
-#endif
-#ifdef USE_QT_KEYHANDLING
   bool eventFilter( QObject *, QEvent * );
-#endif
 
   /** saves the window properties for each open window during session end to the session config file, including saving the currently
    * opened file by a temporary filename provided by KApplication.

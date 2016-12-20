@@ -2,11 +2,10 @@
 #include "TextBuffer.h"
 
 #include <kfontdialog.h>
-#include <qpixmap.h>
-#include <qapplication.h>
-#include <qclipboard.h>
-#include <qpainter.h>
-#include <qpaintdevice.h>
+#include <QApplication>
+#include <QClipboard>
+#include <QPainter>
+#include <QPaintEvent>
 
 #include <iostream>
 
@@ -36,14 +35,9 @@ TextBufferView::TextBufferView(int id, QWidget* parent, const char* name,
 			       const QColor* cmap, const QFont& font,
 			       TextBuffer* cTextBuffer,
 			       bool fixBuffer):
-  QWidget(parent, name, WRepaintNoErase | WResizeNoErase |
-#if QT_VERSION<300
-	  WNorthWestGravity |
-#else
-	  WStaticContents |
-#endif
-	  WStyle_Customize | WStyle_NormalBorder | WStyle_Title |
-	  WStyle_SysMenu | WStyle_MinMax ),
+  QWidget(parent, /*WRepaintNoErase | WResizeNoErase |
+	  WStyle_Customize | WStyle_NormalBorder |*/ Qt::WindowTitleHint |
+    Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint ),
   leftBorderWidth(2),
   offsetX(0), offsetY(0), columns(0), lines(0), 
   fixTextBuffer(true), 
@@ -54,12 +48,15 @@ TextBufferView::TextBufferView(int id, QWidget* parent, const char* name,
   nextCachePoint(0), maxCache(1000),
   followMode(EFM_DontFollow)
 {
+
+  setAttribute(Qt::WA_StaticContents, true);
+  setObjectName(name);
+
   fontW = fontH = fontA = 1;
   columns = lines = 1;
 
-  drawBuffer = new QPixmap();
-  drawBuffer->resize(width(), height());
-  
+  drawBuffer = new QPixmap(width(), height());
+
   fixTextBuffer = fixBuffer;
   if(cTextBuffer == NULL) {
     textBuffer = new TextBuffer(columns, lines, false);
@@ -70,15 +67,17 @@ TextBufferView::TextBufferView(int id, QWidget* parent, const char* name,
   }
 
   setFont(font);
-  setFocusPolicy(QWidget::NoFocus);
+  setFocusPolicy(Qt::NoFocus);
 
-  setBackgroundColor(colorTable[16]);
+  QPalette pal(palette());
+  pal.setColor(QPalette::Background, colorTable[16]);
+  setAutoFillBackground(true);
+  setPalette(pal);
 
   clipboard = QApplication::clipboard();
 
   connectTextBuffer();
-  connect(clipboard, SIGNAL(dataChanged()),
-	  this, SLOT(slotClearSelection()));
+  connect(clipboard, SIGNAL(dataChanged()), this, SLOT(slotClearSelection()));
 
   updateChars(0, 0, columns+1, lines+1);
 }
@@ -190,7 +189,10 @@ void TextBufferView::recalcOffsetY(int delta, bool cut) {
 }
 
 void TextBufferView::slotColorConfigChanged() {
-  setBackgroundColor(colorTable[16]);
+  QPalette pal(palette());
+  pal.setColor(QPalette::Background, colorTable[16]);
+  setAutoFillBackground(true);
+  setPalette(pal);
   update();
 }
 
@@ -290,7 +292,8 @@ void TextBufferView::paintEvent(QPaintEvent* pe) {
 void TextBufferView::resizeEvent(QResizeEvent* re) {
   //qDebug("Resizing View!");
   calcGeometry();
-  drawBuffer->resize(re->size());
+  QPixmap tmpP = drawBuffer->scaled(re->size());
+  *drawBuffer=tmpP;
   update();
 }
 
@@ -465,10 +468,11 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
     charCache.clear();
     if(maxCache > 0) {
       // allways use the max. size if set
-      charCachePixmap.resize(fontW * maxCache, fontH);
+      charCachePixmap = charCachePixmap.scaled(fontW * maxCache, fontH);
+
     } else {
       // start with 30 and expand
-      charCachePixmap.resize(fontW * 30, fontH);
+      charCachePixmap = charCachePixmap.scaled(fontW * 30, fontH);
     }
   }
 
@@ -487,7 +491,7 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
 	if((nextCachePoint+1) * fontW < (unsigned int)maxCache * fontW) {
 	  //qDebug("resizing");
 	  // but it's not full yet (perhaps a width change)
-	  charCachePixmap.resize(maxCache * fontW, charCachePixmap.height());
+    charCachePixmap = charCachePixmap.scaled(maxCache * fontW, charCachePixmap.height());
 	  ++nextCachePoint;
 	} else {
 	  // and it's full
@@ -505,9 +509,9 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
       } else {
 	//qDebug("no limit");
 	// no cache limit, just go on
-	charCachePixmap.resize(charCachePixmap.width() * 2, 
+        charCachePixmap = charCachePixmap.scaled(charCachePixmap.width() * 2,
 			       charCachePixmap.height());
-	++nextCachePoint;
+	      ++nextCachePoint;
       }
     } else {
       //qDebug("enough space");
@@ -566,9 +570,11 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
     QPainter charPaint;
     charPaint.begin(&charCachePixmap);
 
-    charPaint.setBackgroundMode(TransparentMode);
+    charPaint.setBackgroundMode(Qt::TransparentMode);
     charPaint.setFont(drawFont);
-    charPaint.setBackgroundColor(bg);
+    QBrush bb = charPaint.background();
+    bb.setColor(bg);
+    charPaint.setBackground(bb);
     charPaint.setPen(pen);
     
     charPaint.eraseRect(offset * fontW, 0, fontW, fontH);
@@ -576,9 +582,13 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
   }
 
   //qDebug(QString("bitblitting %1").arg(it->second));
+  QPainter painter(pd);
+  painter.drawPixmap(rect.x()+leftBorderWidth, rect.y(), charCachePixmap, it->second * fontW, 0, fontW, fontH);
+/*
   bitBlt(pd, rect.x()+leftBorderWidth, rect.y(),
   	 &charCachePixmap, it->second * fontW, 0, fontW, fontH,
   	 Qt::CopyROP, true);
+*/
 #else
   std::cout << textBuffer->getBufferChar(offsetX+x, offsetY+y).getChar()
 	    << flush;
@@ -590,7 +600,7 @@ void TextBufferView::mousePressEvent(QMouseEvent* ev) {
 
 
   if (!selectingEnabled) {
-    if ( ev->button() == LeftButton) {
+    if ( ev->button() == Qt::LeftButton) {
       // only the LMB is used for scripting
 
       // TODO: Check cast and math
@@ -615,7 +625,7 @@ void TextBufferView::mousePressEvent(QMouseEvent* ev) {
   //    return;
   //  }
 
-  if (selecting && ev->button() != LeftButton) {
+  if (selecting && ev->button() != Qt::LeftButton) {
     // every other button removes the selection
     selecting=false; // just in case
 
@@ -642,7 +652,7 @@ void TextBufferView::mousePressEvent(QMouseEvent* ev) {
   selBeginY=selEndY=selStartY=std::max(0,((int)(ev->y()))/fontH)+offsetY;
   selecting=true;
   updateChars(selStartX-offsetX,selStartY-offsetY,1,1);
-  if (ev->state() & ShiftButton) 
+  if (ev->modifiers() & Qt::ShiftModifier)
     colorSelectingMux=true;
   else
     colorSelectingMux=false;
@@ -691,12 +701,12 @@ void TextBufferView::mouseMoveEvent(QMouseEvent* ev) {
       selEndY=selBeginY;
     }
 
-    int l=QABS(osy-y);
+    int l=qAbs(osy-y);
     if (l)
       updateChars(0,std::min(osy,y)-offsetY,columns+1,l+1);
     else 
       updateChars(std::min(osx,x)-offsetX,std::min(osy,y)-offsetY,
-		  QABS(osx-x)+1,1);
+		  qAbs(osx-x)+1,1);
   } else {
 
     // selecting downwards
@@ -714,13 +724,13 @@ void TextBufferView::mouseMoveEvent(QMouseEvent* ev) {
       selStartX=selBeginX;
       selStartY=selBeginY;
     }
-    int l=QABS(oey-y);
+    int l=qAbs(oey-y);
 
     if (l)
       updateChars(0,std::min(oey,y)-offsetY,columns+1,l+1);
     else 
       updateChars(std::min(oex,x)-offsetX,std::min(oey,y)-offsetY,
-		  QABS(oex-x)+1,1);
+		  qAbs(oex-x)+1,1);
   }
 
 }
@@ -757,11 +767,11 @@ void TextBufferView::mouseReleaseEvent(QMouseEvent* ev) {
   if (clipboard->supportsSelection()) {
     // SET DATA, but only on systems with mouse-Selection(X11) 
     // all others have to use the context menu
-    bool oldMode=clipboard->selectionModeEnabled();
-    clipboard->setSelectionMode(true);
+///    bool oldMode=clipboard->selectionModeEnabled();
+///    clipboard->setSelectionMode(true);
 
     slotCopySelectedContents();
-    clipboard->setSelectionMode(oldMode);
+///    clipboard->setSelectionMode(oldMode);
   }
 
   connect(clipboard, SIGNAL(dataChanged()),
@@ -777,7 +787,7 @@ void TextBufferView::mouseDoubleClickEvent(QMouseEvent * ev) {
 
   if ( !rect().contains(ev->pos()) ) return;
   if (!selectingEnabled) return;
-  if (ev->button() != LeftButton) return;
+  if (ev->button() != Qt::LeftButton) return;
   //qDebug("DoubleClick");
   if (!selecting) return; // we get a mousePressEvent earlier, so this should be set!
 

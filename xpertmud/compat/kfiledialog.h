@@ -10,7 +10,7 @@ class KFileDialog: public QFileDialog {
  public:
   static KURL getOpenURL(KURL initially = QString(),
 		     const QString & filter = QString::null, 
-		     QWidget * parent = 0, const char * name = 0) {
+		     QWidget * parent = 0, const QString name = QString()) {
     if (initially.isEmpty()) {
        initially=qApp->applicationDirPath();
     }
@@ -18,7 +18,7 @@ class KFileDialog: public QFileDialog {
   }
   static KURL getSaveURL(KURL  initially = QString(),
 		     const QString & filter = QString::null, 
-		     QWidget * parent = 0, const char * name = 0) {
+		     QWidget * parent = 0, const QString name = QString()) {
     if (initially.isEmpty()) {
        initially=qApp->applicationDirPath();
     }
