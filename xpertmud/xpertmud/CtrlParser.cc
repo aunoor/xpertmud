@@ -133,11 +133,11 @@ void CtrlParser::parse(const QString& s) {
       switch(state) {
       case SNORMAL:
 	if(param.size()) { param.clear(); }
-	if(*to == (char)155) { // CSI
+	if(to->toLatin1() == (char)155) { // CSI
 	  print(from, to);
 	  from = to+1;
 	  state = SATTR1;
-	} else if(*to == (char)27) { // ESC ... could become CSI
+	} else if(to->toLatin1() == (char)27) { // ESC ... could become CSI
 	  print(from, to); 
 	  from = to;
 	  //	  recovery = to+1;
@@ -164,50 +164,50 @@ void CtrlParser::parse(const QString& s) {
 	     *to == 26 || // SUB
 	     (*to >= 28 && *to <= 31) // IS4 .. IS1
 	     ) { for fine grained explanation purposes */
-	  if(*to < (char)32 && 
-	     (*to <= (char)6 || *to >= (char)14)) {
+	  if(to->toLatin1() < (char)32 &&
+	     (to->toLatin1() <= (char)6 || to->toLatin1() >= (char)14)) {
 	    // std::cout << "<cut>" << std::flush;
 	    print(from, to); from = to+1;
-	  } else if(*to == (char)7) { // BEL
+	  } else if(to->toLatin1() == (char)7) { // BEL
 	    print(from, to); from = to+1;
 	    callback->beep();
-	  } else if(*to == (char)8) { // BS
+	  } else if(to->toLatin1() == (char)8) { // BS
 	    print(from, to); from = to+1;
 	    callback->backspace();
-	  } else if(*to == (char)9) { // HT
+	  } else if(to->toLatin1() == (char)9) { // HT
 	    print(from, to); from = to+1;
 	    callback->tab();
-	  } else if(*to == (char)10 || 
-		    *to == (char)11 || 
-		    *to == (char)12) { // LF, VT, FF
+	  } else if(to->toLatin1() == (char)10 ||
+				to->toLatin1() == (char)11 ||
+				to->toLatin1() == (char)12) { // LF, VT, FF
 	    print(from, to); from = to+1;
 	    callback->newline();
-	  } else if(*to == (char)13) { // CR
+	  } else if(to->toLatin1() == (char)13) { // CR
 	    print(from, to); from = to+1;
 	    callback->carriageReturn();
 	  }
 	}
 	break;
       case SESC:
-	if(*to == '[') { // CSI
+	if(to->toLatin1() == '[') { // CSI
 	  from = to+1;
 	  state = SATTR1; 
-	} else if(*to == '(') { // character set stuff
+	} else if(to->toLatin1() == '(') { // character set stuff
 	  from = to+1;
 	  state = SCHAR;
-	} else if(*to == '#') { // line size commands
+	} else if(to->toLatin1() == '#') { // line size commands
 	  from = to+1;
 	  state = SSHARP;
 	} else if(in(*to, ONCECHARS)) { 
-	  execute(*to, state);
+	  execute(to->toLatin1(), state);
 	  from = to+1;
 	  state = SNORMAL;
-	} else if(in(*to, THRICECHARS)) { 
+	} else if(in(to->toLatin1(), THRICECHARS)) {
 	  from = to+1;
 	  state = STHRICE;
 	} else {
 	  DEBUG("Unknown ANSI Escape sequence: ESC ("
-	       << (int)*to << ") \"" << *to << "\"" << endl);
+	       << (int)to->toLatin1() << ") \"" << to->toLatin1() << "\"" << endl);
 	  //	  from = to = recovery;
 	  state = SNORMAL;
 	}
@@ -219,7 +219,7 @@ void CtrlParser::parse(const QString& s) {
 	  state = STHRICE_PARAM;
 	} else {
 	  DEBUG("Unknown ANSI Escape sequence: ESC ("
-	       << (int)*to << ") \"" << *to << "\"" << endl);
+	       << (int)to->toLatin1() << ") \"" << to->toLatin1() << "\"" << endl);
 	  //	  from = to = recovery;
 	  state = SNORMAL;
 	}
@@ -237,46 +237,46 @@ void CtrlParser::parse(const QString& s) {
 	break;
 #define SPECIAL(CASE_SWITCH_, CHARSET_) \
       case CASE_SWITCH_: \
-	if(in(*to, CHARSET_)) { \
-	  execute(*to, state); \
+	if(in(to->toLatin1(), CHARSET_)) { \
+	  execute(to->toLatin1(), state); \
 	  from = to+1; \
 	  state = SNORMAL; \
 	} else { \
 	  DEBUG("Unknown ANSI Escape sequence: ESC (" \
-	       << (int)*to << ") \"" << *to << "\"" << endl); \
+	       << (int)to->toLatin1() << ") \"" << to->toLatin1() << "\"" << endl); \
 	  state = SNORMAL; \
 	} \
         break;
 #define PATTR(ATTR_, SPACE_, ATTR_N, ACHARS, SCHARS, ERRSTR) \
     case ATTR_: \
-      if(*to == ';') { \
+      if(to->toLatin1() == ';') { \
         putparam(from, to); \
 	from = to+1; \
 	state = ATTR_N; \
-      } else if(*to == ' ') { \
+      } else if(to->toLatin1() == ' ') { \
 	putparam(from, to); \
 	state = SPACE_; \
-      } else if(*to >= '0' && *to <= '9') { \
+      } else if(to->toLatin1() >= '0' && to->toLatin1() <= '9') { \
 	/* NOP, no error, performance reasons of in() */ \
       } else if(in(*to, ACHARS)) { \
 	putparam(from, to); \
-	execute(*to, state); \
+	execute(to->toLatin1(), state); \
 	from = to+1; \
 	state = SNORMAL; \
       } else { \
 	DEBUG(ERRSTR << " (" \
-	     << (int)*to << ") \"" << *to << "\"" << endl); \
+	     << (int)to->toLatin1() << ") \"" << to->toLatin1() << "\"" << endl); \
 	state = SNORMAL; \
       } \
       break; \
     case SPACE_: \
-      if(in(*to, SCHARS)) { \
-	execute(*to, state); \
+      if(in(to->toLatin1(), SCHARS)) { \
+	execute(to->toLatin1(), state); \
 	from = to+1; \
 	state = SNORMAL; \
       } else { \
 	DEBUG(ERRSTR << "Space (" \
-	     << (int)*to << ") \"" << *to << "\"" << endl); \
+	     << (int)to->toLatin1() << ") \"" << to->toLatin1() << "\"" << endl); \
 	state = SNORMAL; \
       } \
       break;

@@ -317,7 +317,7 @@ private:
   // GUI Objects
 
   //  QextMdiMainFrm *pWorkspace;
-  std::vector<QWidget *> childWidgets;
+  QVector<QWidget *> childWidgets;
   std::vector<QextMdiChildView *> wrapperWidgets;
 
   std::vector<PluginWrapper *> pluginWrappers;

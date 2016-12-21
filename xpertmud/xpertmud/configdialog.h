@@ -17,7 +17,7 @@ class KFontChooser;
 class ConfigDialog:public KDialogBase {
   Q_OBJECT
 public:
-  ConfigDialog( QWidget * parent=0,const char *name=0);
+  ConfigDialog( QWidget * parent=0, const QString name=QString());
   ~ConfigDialog(); 
 
 

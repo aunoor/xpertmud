@@ -158,7 +158,11 @@ QextMdiMainFrm::~QextMdiMainFrm()
 {
    // safely close the windows so properties are saved...
    QextMdiChildView *pWnd = 0L;
-   while((pWnd = m_pWinList->first()))closeWindow(pWnd, false); // without re-layout taskbar!
+   QMutableListIterator<QextMdiChildView*> it(*m_pWinList);
+   while (it.hasNext()) {
+      pWnd = it.next();
+      closeWindow(pWnd, false);
+   }
    emit lastChildViewClosed();
    qDeleteAll(*m_pWinList);
    delete m_pWinList;

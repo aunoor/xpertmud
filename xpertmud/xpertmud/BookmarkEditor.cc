@@ -17,25 +17,24 @@
 
 #include "BookmarkEditor.h"
 
-#include <qlabel.h>
-#include <qlineedit.h>
-#include <qspinbox.h>
-#include <qtextedit.h>
-#include <qvbox.h>
-#include <qhbox.h>
-#include <qgrid.h>
-#include <qcheckbox.h>
-#include <qcombobox.h>
-#include <qhgroupbox.h>
-#include <qvgroupbox.h>
-#include <qlistview.h>
-#include <qpushbutton.h>
+#include <QLabel>
+#include <QLineEdit>
+#include <QSpinBox>
+#include <QPlainTextEdit>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QGridLayout>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QGroupBox>
+#include <QTreeWidget>
+#include <QPushButton>
 
 #include <kiconloader.h>
 #include <klocale.h>
 
 BookmarkEditor::BookmarkEditor(const Bookmark & original, QWidget * parent,
-			       const char *name):
+			       const QString name):
   KDialogBase(KDialogBase::IconList,i18n("Edit Bookmark"),
 	      KDialogBase::Ok | KDialogBase::Help | KDialogBase::Cancel,
 	      KDialogBase::Ok, parent,name), 
@@ -71,11 +70,10 @@ void BookmarkEditor::addGeneralPage() {
   label=new QLabel(i18n("Comments:"),page);
 
 
-  commentsEdit=new QTextEdit(bookmark.getComments(),QString::null,page);
-  commentsEdit->setTextFormat(PlainText);
+  commentsEdit=new QPlainTextEdit(bookmark.getComments(), page);
   label->setBuddy(commentsEdit);
 
-  page->setStretchFactor(commentsEdit,1);
+  ////page->setStretchFactor(commentsEdit,1);
 
   connect(commentsEdit,SIGNAL(textChanged()),
 	  this,SLOT(slotCommentsChanged()));
@@ -95,19 +93,16 @@ void BookmarkEditor::addScriptingPage() {
   connect(startInterp,SIGNAL(toggled(bool)),
 	  &bookmark,SLOT(setStartInterpreter(bool)));
 
-  line->setStretchFactor(startInterp,1);
+  ///line->setStretchFactor(startInterp,1);
 
-  QComboBox * scriptingSelector=new QComboBox(true,line);
+  QComboBox * scriptingSelector=new QComboBox(line);
+  scriptingSelector->setEditable(true);
   
   // TODO: read from avail Interpreters!!!
-  scriptingSelector->insertItem("perl");
-  scriptingSelector->insertItem("python");
-  scriptingSelector->insertItem("ruby");
-#if QT_VERSION < 300
-  // TODO: add workaround
-#else
+  scriptingSelector->addItem("perl");
+  scriptingSelector->addItem("python");
+  scriptingSelector->addItem("ruby");
   scriptingSelector->setCurrentText(bookmark.getInterpreter());
-#endif
   scriptingSelector->setEnabled(startInterp->isChecked());
 
   connect(startInterp,SIGNAL(toggled(bool)),
@@ -129,11 +124,10 @@ void BookmarkEditor::addScriptingPage() {
 
   QLabel * label=new QLabel(i18n("Script:"),page);
 
-  globalScriptEdit=new QTextEdit(bookmark.getGlobalScript(),QString::null,page);
-  globalScriptEdit->setTextFormat(PlainText);
+  globalScriptEdit=new QPlainTextEdit(bookmark.getGlobalScript(), page);
   globalScriptEdit->setEnabled(startInterp->isChecked());
   label->setBuddy(globalScriptEdit);
-  page->setStretchFactor(globalScriptEdit,1);
+  //page->setStretchFactor(globalScriptEdit,1);
 
   connect(globalScriptEdit,SIGNAL(textChanged()),
 	  this,SLOT(slotGlobalScriptChanged()));
@@ -149,17 +143,25 @@ void BookmarkEditor::addConnectionPage() {
   QVBox * page = addVBoxPage(i18n("Connections"),i18n("Connections:"),
 			     BarIcon("connect_no",KIcon::SizeMedium) );
   
-  QHGroupBox * conBox=new QHGroupBox(i18n("Connections:"),page);
+  //QHGroupBox * conBox=new QHGroupBox(i18n("Connections:"),page);
+  QGroupBox *conBox = new QGroupBox(i18n("Connections:"),page);
 
-  connectionList=new QListView(conBox);
-  connectionList->addColumn(i18n("Id"));
-  connectionList->addColumn(i18n("Host"),200);
-  connectionList->addColumn(i18n("Port"));
-  connectionList->addColumn(i18n("Encoding"));
+  connectionList=new QTreeWidget(conBox);
+  connectionList->setSelectionMode(QAbstractItemView::SingleSelection);
+  connectionList->setSelectionBehavior(QAbstractItemView::SelectRows);
+  connectionList->setHeaderLabels(QStringList() << i18n("Id")
+                                                << i18n("Host")
+                                                << i18n("Port")
+                                                << i18n("Encoding"));
+  connectionList->setColumnWidth(2, 200);
+  //connectionList->addColumn(i18n("Id"));
+  //connectionList->addColumn(i18n("Host"),200);
+  //connectionList->addColumn(i18n("Port"));
+  //connectionList->addColumn(i18n("Encoding"));
   connectionList->setAllColumnsShowFocus(true);
 
-  connect(connectionList,SIGNAL(selectionChanged(QListViewItem *)),
-	  this,SLOT(slotSelectedConnectionChanged(QListViewItem *)));
+  connect(connectionList,SIGNAL(itemSelectionChanged()),
+          this,SLOT(slotSelectedConnectionChanged()));
 
 
   // conBox->setStretchFactor(connectionList,1);
@@ -176,34 +178,55 @@ void BookmarkEditor::addConnectionPage() {
 	  this,SLOT(slotDeleteConnection()));
   
 
-  QVGroupBox * setBox=new QVGroupBox(i18n("Connection Settings:"),page);
-  QGrid * line = new QGrid(2,QGrid::Vertical,setBox);
+  QGroupBox * setBox=new QGroupBox(i18n("Connection Settings:"),page);
+  setBox->setAlignment(Qt::Vertical);
+  //QGrid * line = new QGrid(2,QGrid::Vertical,setBox);
+  QWidget * line = new QWidget(setBox);
+  QGridLayout *lineLayout = new QGridLayout();
   QLabel * label;
-
+// row 0
   label=new QLabel(i18n("Id:"),line);
-  idEdit=new QSpinBox(0,256,1,line);
+  lineLayout->addWidget(label, 0, 0);
+
+  idEdit=new QSpinBox(line);
+  idEdit->setMinimum(0);
+  idEdit->setMaximum(256);
+  idEdit->setSingleStep(1);
+  lineLayout->addWidget(idEdit, 0, 1);
+
   idEdit->setEnabled(false);
   connect(idEdit,SIGNAL(valueChanged(int)),
 	  this, SLOT(slotIdChanged()));
   label->setBuddy(idEdit);
 
+//row 1
   label=new QLabel(i18n("Host:"),line);
+  lineLayout->addWidget(label, 1, 0);
   hostEdit=new QLineEdit(line);
+  lineLayout->addWidget(hostEdit, 1, 1);
   hostEdit->setEnabled(false);
   connect(hostEdit,SIGNAL(textChanged(const QString &)),
 	  this, SLOT(slotHostChanged()));
   label->setBuddy(hostEdit);
 
+//row 2
   label=new QLabel(i18n("Port:"),line);
-  portEdit=new QSpinBox(0,0xFFFF,1,line);
+  lineLayout->addWidget(label, 2, 0);
+  portEdit=new QSpinBox(line);
+  portEdit->setMinimum(0);
+  portEdit->setMaximum(0xffff);
+  portEdit->setSingleStep(1);
+  lineLayout->addWidget(portEdit, 2, 1);
   portEdit->setEnabled(false);
   connect(portEdit,SIGNAL(valueChanged(int)),
 	  this, SLOT(slotPortChanged()));
   label->setBuddy(portEdit);
 
+//row 3
   label=new QLabel(i18n("Login Sequence:"),setBox);
-  loginEdit=new QTextEdit(setBox);
-  loginEdit->setTextFormat(PlainText);
+///  lineLayout->addWidget(label, 3, 0);
+  loginEdit=new QPlainTextEdit(setBox);
+////  lineLayout->addWidget(loginEdit, 3, 1);
   loginEdit->setEnabled(false);
   connect(loginEdit, SIGNAL(textChanged()),
 	  this, SLOT(slotScriptChanged()));
@@ -211,13 +234,14 @@ void BookmarkEditor::addConnectionPage() {
 
   QHBox * eBox=new QHBox(setBox);
   label=new QLabel(i18n("Encoding:"),eBox);
-  encodingEdit=new QComboBox(true,eBox);
-  encodingEdit->insertItem("<default>");
-  encodingEdit->insertItem("ISO8859-1");
-  encodingEdit->insertItem("UTF8");
-  encodingEdit->insertItem("ISO8859-15");
-  encodingEdit->insertItem("IBM850");
-  encodingEdit->insertItem("CP1252");
+  encodingEdit=new QComboBox(eBox);
+  encodingEdit->setEditable(true);
+  encodingEdit->addItem("<default>");
+  encodingEdit->addItem("ISO8859-1");
+  encodingEdit->addItem("UTF8");
+  encodingEdit->addItem("ISO8859-15");
+  encodingEdit->addItem("IBM850");
+  encodingEdit->addItem("CP1252");
   encodingEdit->setEnabled(false);
   encodingEdit->setDuplicatesEnabled(false);
   connect(encodingEdit, SIGNAL(textChanged(const QString &)),
@@ -228,28 +252,27 @@ void BookmarkEditor::addConnectionPage() {
 
 void BookmarkEditor::slotCommentsChanged() {
   // TODO: Check that comments doesn't contain ']]>'
-  bookmark.setComments(commentsEdit->text());
+  bookmark.setComments(commentsEdit->toPlainText());
 }
 
 void BookmarkEditor::slotGlobalScriptChanged() {
   // TODO: Check that script doesn't contain ']]>'
-  bookmark.setGlobalScript(globalScriptEdit->text());
+  bookmark.setGlobalScript(globalScriptEdit->toPlainText());
 }
 
 void BookmarkEditor::loadConnectionData() {
   connectionList->clear();
-  QValueVector<int> connIDs = bookmark.getAvailableConnections();
-  for (QValueVector<int>::iterator it=connIDs.begin();
+  QVector<int> connIDs = bookmark.getAvailableConnections();
+  for (QVector<int>::iterator it=connIDs.begin();
        it!=connIDs.end();++it) {
     QString host=bookmark.getConnectionHost(*it);
     short unsigned int port=bookmark.getConnectionPort(*it);
     QString enc=bookmark.getConnectionEncoding(*it);
-    (void)new QListViewItem(connectionList,
-			    QString::number(*it),
-			    host,
-			    QString::number(port),
-			    enc);
-    
+    QTreeWidgetItem *lw = new QTreeWidgetItem(connectionList, QStringList()
+			                            << QString::number(*it)
+			                            << host
+			                            << QString::number(port)
+			                            << enc);
   }
 }
 
@@ -261,7 +284,7 @@ void BookmarkEditor::slotAddConnection() {
   QString defaultHost;
   short unsigned int defaultPort=0;
   QString defaultEnc;
-  QValueVector<int> connIDs = bookmark.getAvailableConnections();
+  QVector<int> connIDs = bookmark.getAvailableConnections();
   if (connIDs.size()) {
     defaultHost=bookmark.getConnectionHost(connIDs.front());
     defaultPort=bookmark.getConnectionPort(connIDs.front());
@@ -273,43 +296,41 @@ void BookmarkEditor::slotAddConnection() {
   bookmark.setConnectionPort(id,defaultPort);
   bookmark.setConnectionEncoding(id,defaultEnc);
 
-  QListViewItem *i=new QListViewItem(connectionList,
-				     QString::number(id),
-				     defaultHost,
-				     QString::number(defaultPort),
-				     defaultEnc);
-  connectionList->setSelected(i,true);
+  QTreeWidgetItem *i=new QTreeWidgetItem(connectionList, QStringList()
+				     << QString::number(id)
+				     << defaultHost
+				     << QString::number(defaultPort)
+				     << defaultEnc);
+  connectionList->setItemSelected(i, true);
 }
 
 void BookmarkEditor::slotDeleteConnection() {
-  QListViewItem *i=connectionList->selectedItem();
-  if (i==NULL) {
+  QList<QTreeWidgetItem*> is=connectionList->selectedItems();
+  if (is.isEmpty()) {
     // internal error, the delete button should've been disabled!!!
     return;
   }
   bool ok=false;
-  int id=i->text(0).toInt(&ok);
+  int id=is.at(0)->text(0).toInt(&ok);
 
-  //remove in any case
-  delete i;
-  
   if (ok) {
     bookmark.removeConnection(id);
   }
-  if (connectionList->selectedItem()==NULL) {
+  if (connectionList->selectedItems().isEmpty()) {
     currentConnection=-1;
     slotDisableConnectionEditors();
   }
 }
 
 
-void BookmarkEditor::slotSelectedConnectionChanged(QListViewItem * i) {
-  if (i==NULL) {
+void BookmarkEditor::slotSelectedConnectionChanged() {
+  if (connectionList->selectedItems().isEmpty()) {
     currentConnection=-1;
     slotDisableConnectionEditors();
   } else {
+    QTreeWidgetItem *twi = connectionList->selectedItems().at(0);
     bool ok=false;
-    int id=i->text(0).toInt(&ok);
+    int id=twi->data(0, Qt::DisplayRole).toString().toInt(&ok);
     if (ok) {
       currentConnection=id;
       slotFillConnectionEditors();
@@ -334,7 +355,7 @@ void BookmarkEditor::slotFillConnectionEditors() {
   idEdit->setValue(currentConnection);
 
   loginEdit->setEnabled(true);
-  loginEdit->setText(bookmark.getConnectionScript(currentConnection));
+  loginEdit->setPlainText(bookmark.getConnectionScript(currentConnection));
 
   encodingEdit->setEnabled(true);
   QString e=bookmark.getConnectionEncoding(currentConnection);
@@ -362,9 +383,9 @@ void BookmarkEditor::slotIdChanged() {
     } else {
       bookmark.renameConnection(currentConnection,newID);
       currentConnection=newID;
-      QListViewItem * i = connectionList->selectedItem();
-      if (i!=NULL) {
-	i->setText(0,QString::number(currentConnection));
+      QList<QTreeWidgetItem*> is = connectionList->selectedItems();
+      if (!is.isEmpty()) {
+	        is.at(0)->setText(0,QString::number(currentConnection));
       } // else very strange
     }
   } // else very strange
@@ -373,9 +394,9 @@ void BookmarkEditor::slotHostChanged() {
   if (currentConnection>=0) {
     bookmark.setConnectionHost(currentConnection,hostEdit->text());
 
-    QListViewItem * i = connectionList->selectedItem();
-    if (i!=NULL) {
-      i->setText(1,hostEdit->text());
+    QList<QTreeWidgetItem*> is = connectionList->selectedItems();
+    if (!is.isEmpty()) {
+      is.at(0)->setText(1,hostEdit->text());
     } // else very strange
   }  // else very strange
 }
@@ -386,9 +407,9 @@ void BookmarkEditor::slotEncodingChanged(const QString & enc) {
   if (currentConnection>=0) {
     bookmark.setConnectionEncoding(currentConnection,e);
 
-    QListViewItem * i = connectionList->selectedItem();
-    if (i!=NULL) {
-      i->setText(3,e);
+    QList<QTreeWidgetItem*> is = connectionList->selectedItems();
+    if (!is.isEmpty()) {
+      is.at(0)->setText(3,e);
     } // else very strange
   }  // else very strange
 }
@@ -396,14 +417,14 @@ void BookmarkEditor::slotPortChanged() {
   if (currentConnection>=0) {
     bookmark.setConnectionPort(currentConnection,portEdit->value());
 
-    QListViewItem * i = connectionList->selectedItem();
-    if (i!=NULL) {
-      i->setText(2,QString::number(portEdit->value()));
+    QList<QTreeWidgetItem*> is = connectionList->selectedItems();
+    if (!is.isEmpty()) {
+      is.at(0)->setText(2,QString::number(portEdit->value()));
     } // else very strange
   }  // else very strange
 }
 void BookmarkEditor::slotScriptChanged() {
   if (currentConnection>=0) {
-    bookmark.setConnectionScript(currentConnection,loginEdit->text());
+    bookmark.setConnectionScript(currentConnection,loginEdit->toPlainText());
   }  // else very strange
 }

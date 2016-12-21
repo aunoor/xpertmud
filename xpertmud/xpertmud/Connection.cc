@@ -23,10 +23,10 @@ Connection::Connection(QWidget *parent, int id, const QString& onConnect):
   onConnect(onConnect)
 {
   inputEncoding = defaultInputEncoding;
-  textDecoder = QTextCodec::codecForName(defaultInputEncoding)->makeDecoder();
+  textDecoder = QTextCodec::codecForName(defaultInputEncoding.toLatin1())->makeDecoder();
 
   outputEncoding = defaultOutputEncoding;
-  textEncoder = QTextCodec::codecForName(defaultOutputEncoding)->makeEncoder();
+  textEncoder = QTextCodec::codecForName(defaultOutputEncoding.toLatin1())->makeEncoder();
 
   connect(&socket, SIGNAL(readyRead()), 
 	  this, SLOT(slotSocketReady()));
@@ -161,7 +161,7 @@ void Connection::close() {
 }
 
 void Connection::setInputEncoding(const QString& enc) {
-  QTextCodec* codec = QTextCodec::codecForName(enc);
+  QTextCodec* codec = QTextCodec::codecForName(enc.toLatin1());
   if(codec != NULL) {
     inputEncoding = enc;
     delete textDecoder;
@@ -172,7 +172,7 @@ void Connection::setInputEncoding(const QString& enc) {
 }
 
 void Connection::setOutputEncoding(const QString& enc) {
-  QTextCodec* codec = QTextCodec::codecForName(enc);
+  QTextCodec* codec = QTextCodec::codecForName(enc.toLatin1());
   if(codec != NULL) {
     outputEncoding = enc;
     delete textEncoder;
@@ -210,8 +210,11 @@ void Connection::send(const char *text, int length) {
 
 
 void Connection::send(const QString& text) {
-  int length = text.length();
-  QCString s = textEncoder->fromUnicode(text, length);
+  //int length = text.length();
+  //QCString s = textEncoder->fromUnicode(text, length);
+  //send(s, length);
+  QByteArray s = text.toLocal8Bit();
+  int length = s.length();
   send(s.data(), length);
 }
 
@@ -254,7 +257,7 @@ void Connection::slotSocketReady() {
 }
 
 void Connection::slotConnected() {
-  send(onConnect.latin1(), onConnect.length());
+  send(onConnect.toLatin1(), onConnect.length());
 
   emit connected(id);
 }

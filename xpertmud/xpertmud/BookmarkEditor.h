@@ -21,9 +21,9 @@
 
 #include "Bookmark.h"
 
-class QTextEdit;
-class QListView;
-class QListViewItem;
+class QPlainTextEdit;
+class QTreeWidget;
+class QTreeWidgetItem;
 class QLineEdit;
 class QSpinBox;
 class QComboBox;
@@ -33,7 +33,7 @@ class QComboBox;
 class BookmarkEditor: public KDialogBase {
   Q_OBJECT
 public:
-  BookmarkEditor(const Bookmark & original, QWidget * parent=0,const char *name=0);
+  BookmarkEditor(const Bookmark & original, QWidget * parent=0,const QString name=QString());
   
   const Bookmark & getBookmark() const { return bookmark; }
 
@@ -49,7 +49,7 @@ protected slots:
   void slotGlobalScriptChanged();
   void slotAddConnection();
   void slotDeleteConnection();
-  void slotSelectedConnectionChanged(QListViewItem *);
+  void slotSelectedConnectionChanged();
 
   void slotFillConnectionEditors();
   void slotDisableConnectionEditors();
@@ -61,14 +61,14 @@ protected slots:
   void slotEncodingChanged(const QString &);
 protected:
   Bookmark bookmark;
-  QTextEdit * commentsEdit;
-  QTextEdit * globalScriptEdit;
-  QListView * connectionList;
+  QPlainTextEdit * commentsEdit;
+  QPlainTextEdit * globalScriptEdit;
+  QTreeWidget * connectionList;
   QLineEdit * hostEdit;
   QSpinBox  * idEdit;
   QSpinBox  * portEdit;
   QComboBox * encodingEdit;
-  QTextEdit * loginEdit;
+  QPlainTextEdit * loginEdit;
   QPushButton * addButton;
   QPushButton * deleteButton;
   int currentConnection;

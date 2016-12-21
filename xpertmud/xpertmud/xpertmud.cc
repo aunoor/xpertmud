@@ -242,10 +242,9 @@ Xpertmud::Xpertmud(QWidget *parent, const char *name) :
     ("bookmarks", "share/apps/xpertmud/bookmarks");
 
   connect(&bookmark,SIGNAL(titleChanged(const QString &)),
-	  this,SLOT(setCaption(const QString &)));
+	  this,SLOT(setWindowTitle(const QString &)));
 
   setWindowTitle(bookmark.getTitle());
-
 }
 
 Xpertmud::~Xpertmud()
@@ -416,6 +415,7 @@ void Xpertmud::initActions() {
 				   NULL, NULL, 
 				   actionCollection(), "toggle_inputmode");
 
+  ///echoModeAction->setCheckable(true);
   echoModeAction->setChecked(true);
 
   connect(this,SIGNAL(echoMode(bool)),

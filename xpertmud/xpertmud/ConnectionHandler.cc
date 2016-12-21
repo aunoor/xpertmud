@@ -3,10 +3,12 @@
 #include "IacHandlerCollection.h"
 
 #ifndef Q_WS_WIN
+#ifdef ENABLE_MCCP
 #include "MCCP.h"
 #endif
+#endif
 
-#include <qwidget.h>
+//#include <qwidget.h>
 
 // TODO: use KDEBUG
 #include <iostream>
@@ -88,9 +90,11 @@ void ConnectionHandler::open(int id, const QString& host, int port,
   collection->plug(*telnetFilter);
 
 #ifndef Q_WS_WIN
+#ifdef ENABLE_MCCP
   MCCP* mccp = new MCCP(c, c);
   mccp->plug(*telnetFilter);
   c->addInputStreamFilter(mccp);
+#endif
 #endif
 
   c->addInputStreamFilter(telnetFilter);
@@ -147,7 +151,7 @@ void ConnectionHandler::send(const QString& text, int id) {
   if(it != connections.end()) {
     (*it).second->send(text);
   } else {
-    cout << "SEND (" << id << "): " << text << endl;
+    cout << "SEND (" << id << "): " << text.toLocal8Bit().data() << endl;
   }
 }
 

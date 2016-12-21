@@ -83,8 +83,8 @@ class KToggleAction: public KAction {
 
   //KToggleAction() {}
 
-  bool isChecked() { return isChecked(); }
-  void setChecked(bool enable) { setChecked(enable); }
+  ///bool isChecked() { return QAction::isChecked(); }
+  ///void setChecked(bool enable) { QAction::setChecked(enable); }
 };
 
 class KActionMenu: public KAction {

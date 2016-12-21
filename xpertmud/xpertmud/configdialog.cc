@@ -1,12 +1,13 @@
 #include "configdialog.h"
 
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qvbox.h>
-#include <qspinbox.h>
-#include <qcheckbox.h>
-#include <qgroupbox.h>
-#include <qcombobox.h>
+#include <QLabel>
+#include <QLayout>
+#include <QVBoxLayout>
+#include <QSpinBox>
+#include <QCheckBox>
+#include <QGroupBox>
+#include <QComboBox>
+#include <QGridLayout>
 
 #include <klocale.h>
 #include <kdialogbase.h>
@@ -15,11 +16,11 @@
 #include <kfontdialog.h>
 
 
-ConfigDialog::ConfigDialog(QWidget * parent,const char *name):
-  KDialogBase(KDialogBase::IconList,i18n("Configure Xpertmud"),
+ConfigDialog::ConfigDialog(QWidget * parent,const QString name):
+  KDialogBase(KDialogBase::IconList, i18n("Configure Xpertmud"),
 	      KDialogBase::Ok | KDialogBase::Help | 
 	      KDialogBase::Cancel | KDialogBase::Default,
-	      KDialogBase::Ok, parent,name) {
+	      KDialogBase::Ok, parent, name) {
 
   addColorPage();
   addHistoryPage();
@@ -36,11 +37,12 @@ void ConfigDialog::addColorPage() {
 			     BarIcon("colorize", KIcon::SizeMedium) );
 
   QWidget * colorBox=new QWidget(page);
-  QGridLayout* glay = new QGridLayout( colorBox, 9, 4, 0, KDialog::spacingHint());
-
-  {   
+  QGridLayout* glay = new QGridLayout( colorBox );
+  glay->setMargin(0);
+  glay->setSpacing(KDialog::spacingHint());
+  {
     QLabel * label = new QLabel(i18n("Default BG"),colorBox);
-    label->setAlignment(AlignVCenter | AlignRight);
+    label->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
     glay->addWidget(label,0,0);
     colorButton[16]=new KColorButton(colorBox);
     glay->addWidget(colorButton[16],0,1);
@@ -49,12 +51,12 @@ void ConfigDialog::addColorPage() {
     colorButton[17]=new KColorButton(colorBox);
     glay->addWidget(colorButton[17],0,2);
     QLabel * label = new QLabel(i18n("Default FG"),colorBox);
-    label->setAlignment(AlignVCenter | AlignLeft);
+    label->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
     glay->addWidget(label,0,3);
   }
   for (int i=0; i<8; ++i) {
     QLabel * label = new QLabel(QString::number(i),colorBox);
-    label->setAlignment(AlignVCenter | AlignRight);
+    label->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
     glay->addWidget(label,i+1,0);
     colorButton[i]=new KColorButton(colorBox);
     glay->addWidget(colorButton[i],i+1,1);
@@ -64,7 +66,7 @@ void ConfigDialog::addColorPage() {
     colorButton[i]=new KColorButton(colorBox);
     glay->addWidget(colorButton[i],i-7,2);
     QLabel * label = new QLabel(QString::number(i),colorBox);
-    label->setAlignment(AlignVCenter | AlignLeft);
+    label->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
     glay->addWidget(label,i-7,3);
   }}  
  
@@ -75,18 +77,26 @@ void ConfigDialog::addHistoryPage() {
   QVBox * page = addVBoxPage(i18n("History"),QString::null,
 		     BarIcon("history", KIcon::SizeMedium) );
   QWidget * histBox=new QWidget(page);
-  QGridLayout* glay = new QGridLayout( histBox, 4, 2, 0, KDialog::spacingHint());
+  QGridLayout* glay = new QGridLayout( histBox);
+  glay->setMargin(0);
+  glay->setSpacing(KDialog::spacingHint());
   QLabel * label;
   label=new QLabel(i18n("Default History Size:"),histBox);
-  label->setAlignment(AlignVCenter);
-  glay->addMultiCellWidget(label,0,0,0,1);
+  label->setAlignment(Qt::AlignVCenter);
+  //glay->addMultiCellWidget(label,0,0,0,1);
+  glay->addWidget(label,0,0,0,1);
 
 
   historyCheckBox=new QCheckBox(i18n("limit buffer size"),histBox);
   historyCheckBox->setChecked(true);
-  glay->addMultiCellWidget(historyCheckBox,1,1,0,1);
+  //glay->addMultiCellWidget(historyCheckBox,1,1,0,1);
+  glay->addWidget(historyCheckBox,1, 0, 0, 1);
 
-  historySpinBox=new QSpinBox(1,1<<30,100,histBox);
+  //QSpinBox ( int minValue, int maxValue, int step = 1, QWidget * parent = 0, const char * name = 0 )
+  historySpinBox=new QSpinBox(histBox);
+  historySpinBox->setMinimum(1);
+  historySpinBox->setMaximum(1<<30);
+  historySpinBox->setSingleStep(100);
   historySpinBox->setValue(2000);
   glay->addWidget(historySpinBox,2,0);
 
@@ -99,8 +109,8 @@ void ConfigDialog::addHistoryPage() {
   glay->setRowStretch(1,0);
   glay->setRowStretch(2,0);
   glay->setRowStretch(3,1);
-  glay->setColStretch(0,0);
-  glay->setColStretch(1,1);
+  glay->setColumnStretch(0,0);
+  glay->setColumnStretch(1,1);
 
   connect(historyCheckBox,SIGNAL(toggled(bool)),
 	  historySpinBox, SLOT(setEnabled(bool)));
@@ -112,13 +122,16 @@ void ConfigDialog::addScriptingPage() {
   QVBox * page = addVBoxPage(i18n("Scripting"),QString::null,
 		     BarIcon("pencil", KIcon::SizeMedium) );
   QWidget * scriptBox=new QWidget(page);
-  QVBoxLayout* lay = new QVBoxLayout( scriptBox, 0, KDialog::spacingHint());
+  QVBoxLayout* lay = new QVBoxLayout( scriptBox );
+  lay->setSpacing(KDialog::spacingHint());
+  lay->setMargin(0);
   QLabel * label;
   label=new QLabel(i18n("Default Scripting engine:"),scriptBox);
-  label->setAlignment(AlignVCenter);
+  label->setAlignment(Qt::AlignVCenter);
   lay->addWidget(label);
 
-  defaultScriptingBox=new QComboBox(true,scriptBox);
+  defaultScriptingBox=new QComboBox(scriptBox);
+  defaultScriptingBox->setEditable(true);
   defaultScriptingBox->setAutoCompletion(true);
   defaultScriptingBox->setDuplicatesEnabled(false);
   defaultScriptingBox->setEditable(true);
@@ -195,7 +208,7 @@ int ConfigDialog::getHistSize() const {
 }
 
 void ConfigDialog::setScriptingLangs(const QStringList & sl) {
-  defaultScriptingBox->insertStringList(sl);
+  defaultScriptingBox->insertItems(0, sl);
 }
 
 void ConfigDialog::setDefaultLanguage(const QString & lang) {

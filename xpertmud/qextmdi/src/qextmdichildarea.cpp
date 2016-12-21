@@ -202,7 +202,8 @@ void QextMdiChildArea::setTopChild(QextMdiChildFrm *lpC,bool bSetFocus)
 void QextMdiChildArea::resizeEvent(QResizeEvent* e)
 {
    //If we have a maximized children at the top , adjust its size
-   QextMdiChildFrm *lpC=m_pZ->last();
+   QextMdiChildFrm *lpC = NULL;
+   if (!m_pZ->isEmpty()) lpC=m_pZ->last();
    if(lpC){
       if(lpC->m_state == QextMdiChildFrm::Maximized) {
          int clientw = 0, clienth = 0;
@@ -286,7 +287,10 @@ void QextMdiChildArea::childMinimized(QextMdiChildFrm *lpC,bool bWasMaximized)
 
 void QextMdiChildArea::focusTopChild()
 {
-   QextMdiChildFrm *lpC=m_pZ->last();
+   QextMdiChildFrm *lpC = NULL;
+
+   if (!m_pZ->isEmpty()) lpC=m_pZ->last();
+
    if(!lpC) {
       emit lastChildFrmClosed();
       return;

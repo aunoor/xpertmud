@@ -247,7 +247,7 @@ bool TelnetFilter::executeIacCallback(EState state, unsigned char command) {
         retCommand = DONT;
       }
     }
-    char cmd[] = { retCommand, command };
+    char cmd[] = { (char)retCommand, (char)command };
     sender->sendByte((char)IAC);
     sender->send(cmd, 2);
   }

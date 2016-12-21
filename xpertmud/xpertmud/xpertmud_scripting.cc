@@ -23,6 +23,7 @@
 #include "scripting/Scripting.h"
 #include "CtrlParser.h"
 #include "mxinputline.h"
+#include <QTextBlock>
 
 // TEMPORARY DEBUG
 #include <iostream>
@@ -194,11 +195,11 @@ int Xpertmud::XM_TextWindow_initialize() {
   TextBufferView * neu= new TextBufferView(id,neuWrapper,0,colorMap,defaultFont);
   pLayout->addWidget(neu);
 
-  childWidgets.push_back(neu);  
+  childWidgets.append(neu);
   wrapperWidgets.push_back(neuWrapper);
   pluginWrappers.push_back(NULL); 
 
-  neuWrapper->setIcon(kapp->miniIcon());
+  neuWrapper->setWindowIcon(kapp->miniIcon());
   neuWrapper->setFocusPolicy(Qt::NoFocus);
   neuWrapper->removeEventFilterForAllChildren();
 
@@ -369,8 +370,13 @@ int Xpertmud::XM_TextWindow_getLines(int id) {
 }
 char Xpertmud::XM_TextWindow_getCharAt(int id, unsigned int x, unsigned int y) {
   TextBufferViewIface * tw=getChildTextWidget(id);
-  if (tw)
-    return tw->buffer()->getCharAt(x,y);
+  if (tw) {
+    char res;
+    QChar tmpc = tw->buffer()->getCharAt(x, y);
+    if (tmpc.isNull()) return 0;
+    res = QString(tmpc).toLocal8Bit().at(0);
+    return res;
+  }
   else
     return 0;
 }
@@ -435,16 +441,16 @@ int Xpertmud::XM_TextBufferWindow_initialize() {
   QextMdiChildView * neuWrapper = new QextMdiChildView();
   TextBufferHistoryView * neu= new TextBufferHistoryView(id, neuWrapper,0,colorMap,
 					       defaultFont);
-  QBoxLayout* pLayout = new QHBoxLayout(neuWrapper, 0, -1);
+  QBoxLayout* pLayout = new QHBoxLayout(neuWrapper);
   pLayout->addWidget(neu);
   neuWrapper->hide();
 
-  childWidgets.push_back(neu);  
+  childWidgets.append(neu);
   wrapperWidgets.push_back(neuWrapper);
   pluginWrappers.push_back(NULL);
 
-  neuWrapper->setIcon(kapp->miniIcon());
-  neuWrapper->setFocusPolicy(QWidget::NoFocus);
+  neuWrapper->setWindowIcon(kapp->miniIcon());
+  neuWrapper->setFocusPolicy(Qt::NoFocus);
   neuWrapper->removeEventFilterForAllChildren();
   neu->buffer()->setMaxBufferSize(scrollbacksize);
 
@@ -500,11 +506,11 @@ int Xpertmud::XM_Plugin_initialize(const QString& libname,
 	delete neuWrapper;
     }
     if (plugin) {
-      QBoxLayout* pLayout = new QHBoxLayout(neuWrapper, 0, -1);
+      QBoxLayout* pLayout = new QHBoxLayout(neuWrapper);
       pLayout->addWidget(plugin);
 
       int id=childWidgets.size(); 
-      plugin->setFocusPolicy( QWidget::NoFocus );
+      plugin->setFocusPolicy( Qt::NoFocus );
 
       neuWrapper->removeEventFilterForAllChildren();
 
@@ -723,7 +729,8 @@ int Xpertmud::XM_InputLine_getCursorX(int id) {
   MXInputLine* inputLine = getInputLine(id);
   if(inputLine != NULL) {
     int para, index;
-    inputLine->getCursorPosition(&para, &index);
+    //inputLine->getCursorPosition(&para, &index);
+    index = inputLine->textCursor().positionInBlock();
     return index;
   }
   return 0;
@@ -732,7 +739,8 @@ int Xpertmud::XM_InputLine_getCursorY(int id) {
   MXInputLine* inputLine = getInputLine(id);
   if(inputLine != NULL) {
     int para, index;
-    inputLine->getCursorPosition(&para, &index);
+    //inputLine->getCursorPosition(&para, &index);
+    index = inputLine->textCursor().positionInBlock();
     return para;
   }
   return 0;
@@ -742,8 +750,12 @@ void Xpertmud::XM_InputLine_setCursorX(int id, int x) {
   MXInputLine* inputLine = getInputLine(id);
   if(inputLine != NULL) {
     int para, index;
-    inputLine->getCursorPosition(&para, &index);
-    inputLine->setCursorPosition(para, x);
+    //inputLine->getCursorPosition(&para, &index);
+    para = inputLine->textCursor().blockNumber();
+    //index = inputLine->textCursor().positionInBlock();
+    //inputLine->setCursorPosition(para, x);
+    //inputLine->setB
+    inputLine->textCursor().setPosition(inputLine->textCursor().block().position()+x);
   }
 }
 
@@ -751,22 +763,25 @@ void Xpertmud::XM_InputLine_setCursorY(int id, int y) {
   MXInputLine* inputLine = getInputLine(id);
   if(inputLine != NULL) {
     int para, index;
-    inputLine->getCursorPosition(&para, &index);
-    inputLine->setCursorPosition(y, index);
+    //inputLine->getCursorPosition(&para, &index);
+    //inputLine->setCursorPosition(y, index);
+    //inputLine->textCursor().setPosition(inputLine->document()->findBlockByNumber(y).position());
+    index = inputLine->textCursor().positionInBlock();
+    inputLine->textCursor().setPosition(inputLine->document()->findBlockByNumber(y).position()+index);
   }
 }
 
 QString Xpertmud::XM_InputLine_getText(int id) {
   MXInputLine* inputLine = getInputLine(id);
   if(inputLine != NULL)
-    return inputLine->text();
+    return inputLine->toPlainText();
   return "";
 }
 
 void Xpertmud::XM_InputLine_setText(int id, const QString& text) {
   MXInputLine* inputLine = getInputLine(id);
   if(inputLine != NULL)
-    inputLine->setText(text);
+    inputLine->setPlainText(text);
 }
 
 MXInputLine* Xpertmud::getInputLine(unsigned int id) {

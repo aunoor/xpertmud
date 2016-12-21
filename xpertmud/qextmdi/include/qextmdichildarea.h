@@ -127,7 +127,7 @@ public:
    * Returns the topmost child (the active one) or 0 if there are no children.
    * Note that the topmost child may be also hidded , if ALL the windows are minimized.
    */
-   inline QextMdiChildFrm * topChild(){ return m_pZ->last(); };
+   inline QextMdiChildFrm * topChild(){ return m_pZ->isEmpty() ? 0 : m_pZ->last(); };
    /**
    * Returns the number of visible children
    */

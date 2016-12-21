@@ -78,23 +78,24 @@ class KDialogBase: public QDialog {
     Default = 1<<4
   };
 // QDialog ( QWidget * parent = 0, const char * name = 0, bool modal = FALSE, WFlags f = 0 )
-  KDialogBase(int dummy, const char* name,
+  KDialogBase(int dummy, const QString title,
 	      int buttons, int buttons2, QWidget* parent=NULL,
-	      const char* name2=""):
+	      const QString name=QString()):
     QDialog(parent), mainWidget(0), buttonMap(buttons)
     {
       setModal(true);
+      setWindowTitle(title);
       setObjectName(QString(name));
       mainWidget = makeMainWidget();
     }
 
-  KDialogBase(QWidget* parent, const char* name,
+  KDialogBase(QWidget* parent, const QString title,
 	      bool sw, const QString& heading,
 	      int buttons):
     QDialog(parent), mainWidget(0), buttonMap(buttons)
     {
       setModal(true);
-      setObjectName(QString(name));
+      setWindowTitle(title);
       mainWidget = makeMainWidget();
     }
 
