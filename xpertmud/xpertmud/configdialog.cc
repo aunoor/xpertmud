@@ -78,19 +78,21 @@ void ConfigDialog::addHistoryPage() {
 		     BarIcon("history", KIcon::SizeMedium) );
   QWidget * histBox=new QWidget(page);
   QGridLayout* glay = new QGridLayout( histBox);
+  histBox->setLayout(glay);
   glay->setMargin(0);
   glay->setSpacing(KDialog::spacingHint());
   QLabel * label;
+
   label=new QLabel(i18n("Default History Size:"),histBox);
   label->setAlignment(Qt::AlignVCenter);
   //glay->addMultiCellWidget(label,0,0,0,1);
-  glay->addWidget(label,0,0,0,1);
+  glay->addWidget(label, 0, 0);
 
 
-  historyCheckBox=new QCheckBox(i18n("limit buffer size"),histBox);
+  historyCheckBox=new QCheckBox(i18n("limit buffer size"), histBox);
   historyCheckBox->setChecked(true);
   //glay->addMultiCellWidget(historyCheckBox,1,1,0,1);
-  glay->addWidget(historyCheckBox,1, 0, 0, 1);
+  glay->addWidget(historyCheckBox, 1, 0);
 
   //QSpinBox ( int minValue, int maxValue, int step = 1, QWidget * parent = 0, const char * name = 0 )
   historySpinBox=new QSpinBox(histBox);
@@ -102,22 +104,21 @@ void ConfigDialog::addHistoryPage() {
 
   label=new QLabel(i18n("lines"),histBox);
   glay->addWidget(label,2,1);
-  
+
   
   //  glay->addWidget(new QWidget(histBox),3,0);
-  glay->setRowStretch(0,0);
-  glay->setRowStretch(1,0);
-  glay->setRowStretch(2,0);
+
+//  glay->setRowStretch(0,0);
+//  glay->setRowStretch(1,0);
+//  glay->setRowStretch(2,0);
   glay->setRowStretch(3,1);
-  glay->setColumnStretch(0,0);
+//  glay->setColumnStretch(0,0);
   glay->setColumnStretch(1,1);
 
   connect(historyCheckBox,SIGNAL(toggled(bool)),
 	  historySpinBox, SLOT(setEnabled(bool)));
-
-
-  
 }
+
 void ConfigDialog::addScriptingPage() {
   QVBox * page = addVBoxPage(i18n("Scripting"),QString::null,
 		     BarIcon("pencil", KIcon::SizeMedium) );

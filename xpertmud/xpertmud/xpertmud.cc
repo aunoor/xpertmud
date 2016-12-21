@@ -214,6 +214,8 @@ Xpertmud::Xpertmud(QWidget *parent, const char *name) :
   command_retention(false)
 {
 
+  setMinimumSize(800,600);
+
   config=kapp->config();
 
   initStatusBar();

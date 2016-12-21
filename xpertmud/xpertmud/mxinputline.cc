@@ -71,10 +71,10 @@ void MXInputLine::keyPressEvent(QKeyEvent *event) {
   } else if(event->key() == Qt::Key_Up && bufferPtr > 0 &&
 	    para == 0) {
 
-
+/*
     qDebug() << "KEY_UP! Text: [" << toPlainText().toLocal8Bit() << "] last: [" << last.toLocal8Bit()
 	 << "] bufferPtr: " << bufferPtr << " buffer.size(): " << buffer.size();
-
+*/
     if(toPlainText() != "" && toPlainText() != last &&
        bufferPtr >= buffer.size()-1) {
 

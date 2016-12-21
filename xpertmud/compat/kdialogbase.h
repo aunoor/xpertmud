@@ -31,6 +31,14 @@ public:
       QVBoxLayout *layout = new QVBoxLayout();
       this->setLayout(layout);
     }
+    virtual void childEvent(QChildEvent *event) {
+      if (event->type()==QEvent::ChildAdded) {
+        if (event->child()->isWidgetType()) {
+          layout()->addWidget((QWidget*)event->child());
+        }
+      }
+      QWidget::childEvent(event);
+    }
 };
 
 class QHBox : public QWidget {
@@ -41,6 +49,14 @@ public:
     }
     void setSpacing(int value) {
       layout()->setSpacing(value);
+    }
+    virtual void childEvent(QChildEvent *event) {
+      if (event->type()==QEvent::ChildAdded) {
+        if (event->child()->isWidgetType()) {
+          layout()->addWidget((QWidget*)event->child());
+        }
+      }
+      QWidget::childEvent(event);
     }
 };
 
@@ -111,25 +127,31 @@ class KDialogBase: public QDialog {
   }
 
  private:
-  QFrame *makeMainWidget() {
-    cout << "makeMainWidget" << endl;
+    QFrame *makeMainWidget() {
+//    cout << "makeMainWidget" << endl;
     QVBoxLayout *l = new QVBoxLayout(this);
     //l->setAutoAdd(TRUE);
     l->setSpacing(5);
     l->setMargin(5);
 
     QFrame *mainWidget = new QFrame(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(mainWidget);
+    l->addWidget(mainWidget);
+
     upperPart = new QHBox(this);
+    mainLayout->addWidget(upperPart);
+
     sideBar = new QVBox(upperPart);
     list = new QListWidget(sideBar);
-    connect(list, SIGNAL(selectionChanged(QListBoxItem *)),
-	    this, SLOT(slotSelectionChanged(QListBoxItem *)));
+    connect(list, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
+	    this, SLOT(slotSelectionChanged(QListWidgetItem *)));
 
     page = new QVBox(upperPart);
     stack = new QStackedWidget(page);
 
     buttons = new QHBox(this);
     buttons->setSpacing(5);
+    mainLayout->addWidget(buttons);
 
     if(buttonMap & Ok) {
       QPushButton *ok = new QPushButton("&OK", buttons);
