@@ -27,7 +27,7 @@ class KAction: public QAction {
       this->toggled(toggle);
       this->setShortcut(accel);
       this->setObjectName(QString(name));
-      connect(this, SIGNAL(activated()), receiver, slot);
+      connect(this, SIGNAL(triggered(bool)), receiver, slot);
     }
 
   KAction( const QString& text, int accel, 

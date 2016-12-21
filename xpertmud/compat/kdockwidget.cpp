@@ -990,7 +990,7 @@ KDockManager::KDockManager( QWidget* mainWindow , const QString name )
   menu = new QMenu();
 
   connect( menu, SIGNAL(aboutToShow()), SLOT(slotMenuPopup()) );
-  connect( menu, SIGNAL(activated(int)), SLOT(slotMenuActivated(int)) );
+  connect( menu, SIGNAL(triggered(QAction*)), SLOT(slotMenuActivated(QAction*)) );
 
   childDock = new QObjectList();
 }
@@ -1724,10 +1724,13 @@ void KDockManager::slotMenuPopup()
   }
 }
 
-void KDockManager::slotMenuActivated( int id )
+void KDockManager::slotMenuActivated( QAction * action )
 {
+#warning TODO: need implementation!
+#if 0
   MenuDockData* data = menuData->at( id );
   data->dock->changeHideShowState();
+#endif
 }
 
 KDockWidget* KDockManager::findWidgetParentDock( QWidget* w )

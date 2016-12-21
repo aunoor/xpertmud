@@ -53,7 +53,7 @@ int InputAction::plug( QWidget *w, int index ) {
   connect(receiver, signalCommandRetention.toLatin1(),
 	  inputline, SLOT(slotCommandRetention(bool)));
 
-  connect( toolBar, SIGNAL( destroyed() ), this, SLOT( slotDestroyed() ) );
+  connect( toolBar, SIGNAL( destroyed(QObject *) ), this, SLOT( slotDestroyed() ) );
 
   //TODO: QWhatsThis::add( inputline, whatsThis() );
 

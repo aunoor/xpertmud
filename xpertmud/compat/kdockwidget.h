@@ -866,9 +866,9 @@ private slots:
   /**
    * This method assumes a menuitem of the popupmenu for showing/hiding dockwidgets is selected and toggles that state.
    *
-   * @param id the popupmenu id of the selected menuitem
+   * @param action the popupmenu QAction of the selected menuitem
    */
-  void slotMenuActivated( int id);
+  void slotMenuActivated( QAction * action);
 
   /* clears the old drawn drag rectangle (oldDragRect) from screen and
    * draws the new current drag rectangle (dragRect) depending on the current mouse position.

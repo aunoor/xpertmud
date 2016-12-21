@@ -58,6 +58,7 @@
 
 #include <QResizeEvent>
 #include <QFocusEvent>
+#include <QDebug>
 
 //using namespace KParts;
 
@@ -158,9 +159,8 @@ QextMdiMainFrm::~QextMdiMainFrm()
 {
    // safely close the windows so properties are saved...
    QextMdiChildView *pWnd = 0L;
-   QMutableListIterator<QextMdiChildView*> it(*m_pWinList);
-   while (it.hasNext()) {
-      pWnd = it.next();
+   while (!m_pWinList->isEmpty()) {
+      pWnd = m_pWinList->first();
       closeWindow(pWnd, false);
    }
    emit lastChildViewClosed();
