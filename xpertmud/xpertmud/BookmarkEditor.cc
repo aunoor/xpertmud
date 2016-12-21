@@ -104,11 +104,12 @@ void BookmarkEditor::addScriptingPage() {
   scriptingSelector->addItem("ruby");
   scriptingSelector->setCurrentText(bookmark.getInterpreter());
   scriptingSelector->setEnabled(startInterp->isChecked());
+  scriptingSelector->setEditable(false);
 
   connect(startInterp,SIGNAL(toggled(bool)),
 	  scriptingSelector, SLOT(setEnabled(bool)));
 
-  connect(scriptingSelector,SIGNAL(textChanged(const QString &)),
+  connect(scriptingSelector,SIGNAL(currentTextChanged(const QString &)),
 	  &bookmark,SLOT(setInterpreter(const QString &)));
 
   QCheckBox * resetInterp = new QCheckBox(i18n("Reset Interpreter if already running?"),
@@ -247,7 +248,7 @@ void BookmarkEditor::addConnectionPage() {
   lineLayout->addWidget(eBox, 4, 0);
   label=new QLabel(i18n("Encoding:"),eBox);
   encodingEdit=new QComboBox(eBox);
-  encodingEdit->setEditable(true);
+  //encodingEdit->setEditable(true);
   encodingEdit->addItem("<default>");
   encodingEdit->addItem("ISO8859-1");
   encodingEdit->addItem("UTF8");
@@ -256,7 +257,7 @@ void BookmarkEditor::addConnectionPage() {
   encodingEdit->addItem("CP1252");
   encodingEdit->setEnabled(false);
   encodingEdit->setDuplicatesEnabled(false);
-  connect(encodingEdit, SIGNAL(textChanged(const QString &)),
+  connect(encodingEdit, SIGNAL(currentTextChanged(const QString &)),
 	  this, SLOT(slotEncodingChanged(const QString &)));
 
   label->setBuddy(encodingEdit);
