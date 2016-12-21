@@ -144,9 +144,12 @@ void BookmarkEditor::addConnectionPage() {
 			     BarIcon("connect_no",KIcon::SizeMedium) );
   
   //QHGroupBox * conBox=new QHGroupBox(i18n("Connections:"),page);
-  QGroupBox *conBox = new QGroupBox(i18n("Connections:"),page);
+  QGroupBox *conBox = new QGroupBox(i18n("Connections:"), page);
+  QHBoxLayout *conLayout = new QHBoxLayout;
+  conBox->setLayout(conLayout);
 
   connectionList=new QTreeWidget(conBox);
+  conLayout->addWidget(connectionList);
   connectionList->setSelectionMode(QAbstractItemView::SingleSelection);
   connectionList->setSelectionBehavior(QAbstractItemView::SelectRows);
   connectionList->setHeaderLabels(QStringList() << i18n("Id")
@@ -166,6 +169,7 @@ void BookmarkEditor::addConnectionPage() {
 
   // conBox->setStretchFactor(connectionList,1);
   QVBox * buttonBox=new QVBox(conBox);
+  conLayout->addWidget(buttonBox);
   addButton=new QPushButton(i18n("Add"),buttonBox);
   connect(addButton,SIGNAL(clicked()),
 	  this,SLOT(slotAddConnection()));
@@ -180,9 +184,15 @@ void BookmarkEditor::addConnectionPage() {
 
   QGroupBox * setBox=new QGroupBox(i18n("Connection Settings:"),page);
   setBox->setAlignment(Qt::Vertical);
-  //QGrid * line = new QGrid(2,QGrid::Vertical,setBox);
+  QVBoxLayout *setLayout = new QVBoxLayout;
+  setBox->setLayout(setLayout);
+    //QGrid * line = new QGrid(2,QGrid::Vertical,setBox);
   QWidget * line = new QWidget(setBox);
+  setLayout->addWidget(line);
+
   QGridLayout *lineLayout = new QGridLayout();
+  line->setLayout(lineLayout);
+
   QLabel * label;
 // row 0
   label=new QLabel(i18n("Id:"),line);
@@ -224,15 +234,17 @@ void BookmarkEditor::addConnectionPage() {
 
 //row 3
   label=new QLabel(i18n("Login Sequence:"),setBox);
-///  lineLayout->addWidget(label, 3, 0);
+  lineLayout->addWidget(label, 3, 0);
   loginEdit=new QPlainTextEdit(setBox);
-////  lineLayout->addWidget(loginEdit, 3, 1);
+  lineLayout->addWidget(loginEdit, 3, 1);
   loginEdit->setEnabled(false);
   connect(loginEdit, SIGNAL(textChanged()),
 	  this, SLOT(slotScriptChanged()));
   label->setBuddy(loginEdit);
 
+//row4
   QHBox * eBox=new QHBox(setBox);
+  lineLayout->addWidget(eBox, 4, 0);
   label=new QLabel(i18n("Encoding:"),eBox);
   encodingEdit=new QComboBox(eBox);
   encodingEdit->setEditable(true);
