@@ -21,10 +21,10 @@ class KAction: public QAction {
   KAction( const QString& text, int accel,
   	   const QObject* receiver, const char* slot,
 	   QObject* parent, const QString name=QString(),
-	   bool toggle=false):
+	   bool checkable=false):
     QAction(text, parent) {
     //QAction(text, text, accel, parent, name, toggle) {
-      this->toggled(toggle);
+      this->setCheckable(checkable);
       this->setShortcut(accel);
       this->setObjectName(QString(name));
       connect(this, SIGNAL(triggered(bool)), receiver, slot);
@@ -32,13 +32,13 @@ class KAction: public QAction {
 
   KAction( const QString& text, int accel, 
 	   QObject* parent = 0, const QString name = QString(),
-	   bool toggle=false):
+	   bool checkable=false):
     QAction(text, parent) {
     //QAction(text, text, accel, parent, name, toggle) {
       std::cout << (long)this << std::endl;
       std::cout << (long)parent << std::endl;
       std::cout << name.toLocal8Bit().data() << std::endl;
-      this->toggled(toggle);
+      this->setCheckable(checkable);
       this->setShortcut(accel);
       this->setObjectName(QString(name));
     }
@@ -83,8 +83,8 @@ class KToggleAction: public KAction {
 
   //KToggleAction() {}
 
-  ///bool isChecked() { return QAction::isChecked(); }
-  ///void setChecked(bool enable) { QAction::setChecked(enable); }
+  //bool isChecked() { return QAction::isChecked(); }
+  //void setChecked(bool enable) { QAction::setChecked(enable); }
 };
 
 class KActionMenu: public KAction {

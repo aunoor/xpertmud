@@ -38,6 +38,7 @@ class KToolBar: public QToolBar {
     cout << "hmmm" << (long)w << endl;
     id2widget.insert(id, w);
     cout << "done" << endl;
+    this->addWidget(w);
   }
 
   void setItemAutoSized(int id, bool enable) {

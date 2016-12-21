@@ -18,6 +18,7 @@
 #include "mxinputline.h"
 #include <QScrollBar>
 #include <QKeyEvent>
+#include <QDebug>
 
 MXInputLine::MXInputLine(const QString &/* unused: string*/, QWidget *parent, const char *name):
   QPlainTextEdit(parent),bufferPtr(0),
@@ -29,6 +30,7 @@ MXInputLine::MXInputLine(const QString &/* unused: string*/, QWidget *parent, co
   //setWrapPolicy(AtWordOrDocumentBoundary);
   setMinimumWidth(150);
   adjustHeight();
+  setSizePolicy(sizePolicy().horizontalPolicy(), /*QSizePolicy::MinimumExpanding*/ QSizePolicy::Fixed);
 
   connect(this, SIGNAL(textChanged()),
 	  this, SLOT(adjustHeight()));
@@ -44,6 +46,8 @@ void MXInputLine::keyPressEvent(QKeyEvent *event) {
 
   //  QFontMetrics fm(font());
   // setFixedHeight(fm.height() * lines() + 10);
+
+  adjustHeight();
 
   if(event->modifiers() & Qt::ControlModifier) { // ctrl-return
     QPlainTextEdit::keyPressEvent(event);
@@ -67,10 +71,10 @@ void MXInputLine::keyPressEvent(QKeyEvent *event) {
   } else if(event->key() == Qt::Key_Up && bufferPtr > 0 &&
 	    para == 0) {
 
-    /*
-    cout << "KEY_UP! Text: [" << text().latin1() << "] last: [" << last.latin1() 
-	 << "] bufferPtr: " << bufferPtr << " buffer.size(): " << buffer.size() << endl;
-    */
+
+    qDebug() << "KEY_UP! Text: [" << toPlainText().toLocal8Bit() << "] last: [" << last.toLocal8Bit()
+	 << "] bufferPtr: " << bufferPtr << " buffer.size(): " << buffer.size();
+
     if(toPlainText() != "" && toPlainText() != last &&
        bufferPtr >= buffer.size()-1) {
 
@@ -82,8 +86,9 @@ void MXInputLine::keyPressEvent(QKeyEvent *event) {
       bufferPtr= buffer.size()-1;
     }
     --bufferPtr;
+    moveCursor(QTextCursor::Start);
     setPlainText(buffer[bufferPtr]);
-    moveCursor(QTextCursor::End);
+    moveCursor(QTextCursor::End, QTextCursor::KeepAnchor);
 
     //x?setModified(true);
 
@@ -105,7 +110,14 @@ void MXInputLine::adjustHeight() {
   if(horizontalScrollBar()->isVisible()) {
     offset += horizontalScrollBar()->height();
   }
-  setFixedHeight(qMin(200,heightForWidth(width())+offset));
+
+  int height = offset;
+
+  QFontMetrics fm(font());
+  height =  fm.height() * document()->lineCount()+5;
+
+  height = qMin(200,height+offset);
+  setFixedHeight(height);
 }
 
 void MXInputLine::slotEchoMode(bool mode) {

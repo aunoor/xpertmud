@@ -16,15 +16,10 @@
  ***************************************************************************/
 
 // include files for QT
-//#include <qaccel.h>
 #include <QDir>
-//#include <qvbox.h>
-//#include <qwhatsthis.h>
-//#include <qtooltip.h>
 #include <QToolButton>
 #include <QString>
 #include <QStringList>
-//#include <qsocket.h>
 #include <QTimer>
 #include <QDebug>
 #include <QKeyEvent>
@@ -265,7 +260,8 @@ Xpertmud::~Xpertmud()
 }
 
 void Xpertmud::initialize() {
-
+#warning TODO: enable initialization!
+return;
   int stid=XM_TextBufferWindow_initialize();
   assert(stid==0);
     
@@ -404,7 +400,7 @@ void Xpertmud::initActions() {
   unloadLanguage->setToolTip(i18n("Unloads any currently loaded Interpreter"));
   
 
-  inputAction=new InputAction(i18n("Input Line"), 0,this,
+  inputAction=new InputAction(i18n("Input Line"), 0, this,
 			      SLOT(slotTextEntered(const QString&)),
 			      SIGNAL(echoMode(bool)),
 			      SIGNAL(commandRetention(bool)),

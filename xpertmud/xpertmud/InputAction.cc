@@ -55,8 +55,7 @@ int InputAction::plug( QWidget *w, int index ) {
 
   connect( toolBar, SIGNAL( destroyed(QObject *) ), this, SLOT( slotDestroyed() ) );
 
-  //TODO: QWhatsThis::add( inputline, whatsThis() );
-
+  inputline->setWhatsThis(whatsThis());
   
   return containerCount() - 1;
 }

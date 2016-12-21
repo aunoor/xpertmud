@@ -75,7 +75,7 @@ void KMainWindow::restoreToolBar(KConfig *config, QToolBar *tb) {
       int extraOffset;
       QTextStream str(&s, QIODevice::ReadOnly);
       str >> dock >> index >> nl >> extraOffset;
-        //TODO: reimplement moveToolBar!
+#warning TODO: reimplement moveToolBar!
       //moveToolBar(tb, (ToolBarDock)dock, (bool)nl, index, extraOffset);
     }
     if(config->readNumEntry(name + " Hidden", 0))
@@ -149,12 +149,14 @@ void KMainWindow::createGUI(QWidget *) {
   menu->addMenu(file);
   //menu->insertItem("&Connection", connection);
   menu->addMenu(connection);
-//  if(scriptingMenu) { menu->insertItem("&Scripting", 
-//				       scriptingMenu->popupMenu()); }
+  //if(scriptingMenu) { menu->insertItem("&Scripting",
+	//			       scriptingMenu->popupMenu()); }
   //menu->insertItem("&Settings", options);
   menu->addMenu(options);
   //menu->insertItem("&Help", help);
   menu->addMenu(help);
+
+  this->setMenuBar(menu);
 
   KToolBar *tb = new KToolBar("InputBar", this,
 			      Qt::BottomToolBarArea, true,
