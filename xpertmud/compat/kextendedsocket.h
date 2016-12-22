@@ -38,10 +38,10 @@ public:
 	    this, SLOT(slotReadyRead()));
     connect(&socket, SIGNAL(connected()),
 	    this, SLOT(slotConnected()));
-    connect(&socket, SIGNAL(connectionClosed()),
+    connect(&socket, SIGNAL(disconnected()),
 	    this, SLOT(slotConnectionClosed()));
-    connect(&socket, SIGNAL(error(int)),
-	    this, SLOT(slotError(int)));
+    connect(&socket, SIGNAL(error(QAbstractSocket::SocketError)),
+	    this, SLOT(slotError(QAbstractSocket::SocketError)));
   }
 
   QString host() {
@@ -112,10 +112,10 @@ private slots:
   void slotConnected() {
     emit connectionSuccess();
   }
-  void slotConnectionCLosed() {
+  void slotConnectionClosed() {
     emit closed(0);
   }
-  void slotError(int e) {
+  void slotError(QAbstractSocket::SocketError e) {
     err = e;
     emit connectionFailed(e);
   }
