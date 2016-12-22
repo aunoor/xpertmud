@@ -280,7 +280,7 @@ void Xpertmud::initialize() {
       slotSwitchLanguage(defaultLanguage);
     } else {
       defaultLanguage="";
-      KMessageBox::error(this,i18n("There are no scripting plugins available!\nPlease check your installation"), i18n("Error!"));
+      ///KMessageBox::error(this,i18n("There are no scripting plugins available!\nPlease check your installation"), i18n("Error!"));
     }
   }
 

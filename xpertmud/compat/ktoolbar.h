@@ -19,36 +19,15 @@ class KToolBar: public QToolBar {
   KToolBar() {}
   KToolBar(const QString& text, QMainWindow* parent,
        Qt::ToolBarArea dock = Qt::TopToolBarArea,
-	   bool newline=false, const char *name=0):
-    QToolBar(text, parent) {
-      this->setObjectName(QString(name));
-      parent->addToolBar(dock, this);
-  }
+	   bool newline=false, const char *name=0);
 
-  KToolBar(QMainWindow* parent, const char *name, bool, bool):
-    QToolBar(parent) {
-      this->setObjectName(QString(name));
-      parent->addToolBar(this);
-  }
+  KToolBar(QMainWindow* parent, const char *name, bool, bool);
 
   virtual ~KToolBar() {}
 
-  void insertWidget(int id, int, QWidget*w, int) {
-    cout << "inserted... " << id << endl;
-    cout << "hmmm" << (long)w << endl;
-    id2widget.insert(id, w);
-    cout << "done" << endl;
-    this->addWidget(w);
-  }
+  void insertWidget(int id, int, QWidget*w, int);
 
-  void setItemAutoSized(int id, bool enable) {
-    Id2WidgetMap::Iterator it = id2widget.find( id );
-    QWidget *w = (( it == id2widget.end() ) ? 0 : (*it));
-    if(w && enable) {
-      cout << "yep!" << endl;
-      //setStretchableWidget(w);
-    }
-  }
+  void setItemAutoSized(int id, bool enable);
 
   void removeItem(int id) {
   }

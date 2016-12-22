@@ -26,7 +26,8 @@ class KMainWindow: public QMainWindow {
 
   virtual KStatusBar* statusBar() { return _bar; }
   virtual QObject* actionCollection() { return &_actionCollection; }
-  KToolBar * toolBar(const QString& name) { 
+
+  KToolBar * toolBar(const QString& name) {
     QObject *c = this->findChild<QObject *>(name);
     if(c != NULL) 
       if(c->inherits("KToolBar"))

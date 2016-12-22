@@ -211,7 +211,7 @@ void QextMdiMainFrm::createMdiManager()
 //============ createTaskBar ==============//
 void QextMdiMainFrm::createTaskBar()
 {
-   m_pTaskBar = new QextMdiTaskBar(this,Qt::BottomToolBarArea);
+   m_pTaskBar = new QextMdiTaskBar(this, Qt::BottomToolBarArea);
    m_pTaskBar->installEventFilter( this);
 }
 

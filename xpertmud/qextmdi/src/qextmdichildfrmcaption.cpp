@@ -74,7 +74,7 @@ void QextMdiChildFrmCaption::mousePressEvent(QMouseEvent *e)
       if (QextMdiMainFrm::frameDecorOfAttachedViews() != QextMdi::Win95Look) {
          QApplication::setOverrideCursor(Qt::SizeAllCursor);
       }
-      m_pParent->m_bDragging = false;
+      m_pParent->m_bDragging = true;
       m_offset = mapToParent( e->pos());
    }
    else if ( e->button() == Qt::RightButton) {

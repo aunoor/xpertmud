@@ -82,6 +82,7 @@ compat/kdocktabctl.cpp
 compat/kmainwindow.cc
 compat/kdockwidget.cpp
 compat/kdockwidget_private.cpp
+compat/ktoolbar.cpp
 qextmdi/src/qextmdichildarea.cpp
 qextmdi/src/qextmdichildfrmcaption.cpp
 qextmdi/src/qextmdichildfrm.cpp

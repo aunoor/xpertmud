@@ -136,7 +136,7 @@ QString QextMdiTaskBarButton::actualText() const
 //####################################################################
 
 QextMdiTaskBar::QextMdiTaskBar(QextMdiMainFrm *parent, Qt::ToolBarArea dock)
-:  KToolBar( parent, "QextMdiTaskBar", /*honor_style*/ false, /*readConfig*/ true)
+:  KToolBar( QString(), parent, dock, false, "QextMdiTaskBar")
    ,m_pCurrentFocusedWindow(0)
    ,m_pStretchSpace(0)
    ,m_layoutIsPending(false)
@@ -146,6 +146,7 @@ QextMdiTaskBar::QextMdiTaskBar(QextMdiMainFrm *parent, Qt::ToolBarArea dock)
    m_pButtonList = new QList<QextMdiTaskBarButton*>;
 //QT30   setFontPropagation(QWidget::SameFont);
    setMinimumWidth(1);
+   setMinimumHeight(20);
    setFocusPolicy(Qt::NoFocus);
    //parent->moveToolBar( this, dock); //XXX obsolete!
 }

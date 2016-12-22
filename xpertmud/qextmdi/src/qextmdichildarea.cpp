@@ -148,8 +148,10 @@ void QextMdiChildArea::destroyChildButNotItsView(QextMdiChildFrm *lpC,bool bFocu
 
 void QextMdiChildArea::setTopChild(QextMdiChildFrm *lpC, bool bSetFocus)
 {
-   //TODO: fix crash on last()!
-   if(m_pZ->last() != lpC){
+   QextMdiChildFrm * tmc = NULL;
+   if (!m_pZ->isEmpty()) tmc = m_pZ->last();
+
+   if(tmc != lpC){
       if (lpC) {
          m_pZ->removeAll(lpC);
       }
@@ -172,8 +174,8 @@ void QextMdiChildArea::setTopChild(QextMdiChildFrm *lpC, bool bSetFocus)
          nChildAreaMinW = lpC->m_pClient->minimumWidth();
          nChildAreaMinH = lpC->m_pClient->minimumHeight();
          // XXX TODO: setting the maximum size doesn't work properly - fix this later
-         // nChildAreaMaxW = lpC->m_pClient->maximumWidth();
-         // nChildAreaMaxH = lpC->m_pClient->maximumHeight();
+         //nChildAreaMaxW = lpC->m_pClient->maximumWidth();
+         //nChildAreaMaxH = lpC->m_pClient->maximumHeight();
       }
       setMinimumSize(nChildAreaMinW, nChildAreaMinH);
       setMaximumSize(nChildAreaMaxW, nChildAreaMaxH);
