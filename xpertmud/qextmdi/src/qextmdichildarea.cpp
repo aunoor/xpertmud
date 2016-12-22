@@ -90,7 +90,7 @@ void QextMdiChildArea::manageChild(QextMdiChildFrm *lpC,bool bShow,bool bCascade
 
 //============ destroyChild ============//
 
-void QextMdiChildArea::destroyChild(QextMdiChildFrm *lpC,bool bFocusTopChild)
+void QextMdiChildArea::destroyChild(QextMdiChildFrm *lpC, bool bFocusTopChild)
 {
    bool bWasMaximized = lpC->state() == QextMdiChildFrm::Maximized;
 

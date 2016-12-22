@@ -12,8 +12,8 @@ KToolBar::KToolBar(const QString& text, QMainWindow* parent,
 
 KToolBar::KToolBar(QMainWindow* parent, const char *name, bool, bool):
 QToolBar(parent) {
-        this->setObjectName(QString(name));
-        parent->addToolBar(this);
+    this->setObjectName(QString(name));
+    parent->addToolBar(this);
 }
 
 void KToolBar::insertWidget(int id, int, QWidget*w, int) {

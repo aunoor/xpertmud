@@ -45,6 +45,8 @@ class KMainWindow: public QMainWindow {
   virtual bool queryExit() { return true; }
   virtual bool queryClose() { return true; }
 
+  virtual QMenu *createPopupMenu() {return NULL; } //return no PopupMenu for Toolbars
+
  protected:
   void saveToolBar(KConfig *config, QToolBar *tb);
   void restoreToolBar(KConfig *config, QToolBar *tb);

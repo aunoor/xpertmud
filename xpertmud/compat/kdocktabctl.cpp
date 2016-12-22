@@ -984,7 +984,8 @@ void KDockTabBar::paintEvent(QPaintEvent *)
       break;
   }
   paint.end();
-  barPainter->repaint();
+  //TODO: fix recursive repaint on: barPainter->repaint();
+  ///qApp->sendEvent(barPainter, new QPaintEvent(QRect()));
 }
 
 int KDockTabBar::insertTab( const QString &label, int id, int index )

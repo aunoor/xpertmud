@@ -619,6 +619,9 @@ void QextMdiMainFrm::closeWindow(QextMdiChildView *pWnd, bool layoutTaskBar)
    if (m_pWinList->count() == 0)
       m_pCurrentWindow = 0L;
 
+   if (m_pCurrentWindow == pWnd)
+       m_pCurrentWindow = 0L;
+
    if (m_pTaskBar) {
       m_pTaskBar->removeWinButton(pWnd, layoutTaskBar);
    }
@@ -661,8 +664,7 @@ void QextMdiMainFrm::closeWindow(QextMdiChildView *pWnd, bool layoutTaskBar)
    }
    else if (pWnd->isAttached()) {
       m_pMdi->destroyChild(pWnd->mdiParent());
-   }
-   else {
+   } else {
       delete pWnd;
       // is not attached
       if (m_pMdi->getVisibleChildCount() > 0) {
@@ -752,10 +754,10 @@ void QextMdiMainFrm::activateView(QextMdiChildView* pWnd)
 	 bool bActivateNecessary = true;
    if (m_pCurrentWindow != pWnd) {
      if(m_pCurrentWindow != NULL) {
-       if(!m_pCurrentWindow->parentWidget()) {
-	 m_pCurrentWindow->showNormal();
+       if(m_pCurrentWindow->parentWidget() == NULL) {
+	          m_pCurrentWindow->showNormal();
        } else {
-	 m_pCurrentWindow->mdiParent()->restorePressed();
+	          m_pCurrentWindow->mdiParent()->restorePressed();
        }
      }
       m_pCurrentWindow = pWnd;

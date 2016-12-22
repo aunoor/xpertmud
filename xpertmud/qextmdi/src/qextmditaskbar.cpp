@@ -144,11 +144,9 @@ QextMdiTaskBar::QextMdiTaskBar(QextMdiMainFrm *parent, Qt::ToolBarArea dock)
 {
    m_pFrm = parent;
    m_pButtonList = new QList<QextMdiTaskBarButton*>;
-//QT30   setFontPropagation(QWidget::SameFont);
    setMinimumWidth(1);
    setMinimumHeight(20);
    setFocusPolicy(Qt::NoFocus);
-   //parent->moveToolBar( this, dock); //XXX obsolete!
 }
 
 QextMdiTaskBar::~QextMdiTaskBar()
@@ -174,14 +172,16 @@ QextMdiTaskBarButton * QextMdiTaskBar::addWinButton(QextMdiChildView *win_ptr)
    m_pButtonList->append(b);
    b->setChecked(true);
    b->setText(win_ptr->tabCaption());
+   this->addWidget(b);
    
    layoutTaskBar();
-      
+/*
    m_pStretchSpace = new QLabel(this);
    m_pStretchSpace->setObjectName("empty");
    m_pStretchSpace->setText("");
    //setStretchableWidget( m_pStretchSpace);
    m_pStretchSpace->show();
+*/
 
    if (m_bSwitchedOn) {
       b->show();
@@ -290,7 +290,7 @@ void QextMdiTaskBar::layoutTaskBar( int taskBarWidth)
    if (m_layoutIsPending) return;
    m_layoutIsPending = true;
 
-   if( !taskBarWidth)
+   if( taskBarWidth==0)
       // no width is given
       taskBarWidth = width();
 
