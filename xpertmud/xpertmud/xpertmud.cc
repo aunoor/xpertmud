@@ -263,7 +263,7 @@ Xpertmud::~Xpertmud()
 
 void Xpertmud::initialize() {
 #warning TODO: enable initialization!
-return;
+//return;
   int stid=XM_TextBufferWindow_initialize();
   assert(stid==0);
     
@@ -413,7 +413,6 @@ void Xpertmud::initActions() {
 				   NULL, NULL, 
 				   actionCollection(), "toggle_inputmode");
 
-  ///echoModeAction->setCheckable(true);
   echoModeAction->setChecked(true);
 
   connect(this,SIGNAL(echoMode(bool)),

@@ -146,8 +146,9 @@ void QextMdiChildArea::destroyChildButNotItsView(QextMdiChildFrm *lpC,bool bFocu
 
 //============= setTopChlid ============//
 
-void QextMdiChildArea::setTopChild(QextMdiChildFrm *lpC,bool bSetFocus)
+void QextMdiChildArea::setTopChild(QextMdiChildFrm *lpC, bool bSetFocus)
 {
+   //TODO: fix crash on last()!
    if(m_pZ->last() != lpC){
       if (lpC) {
          m_pZ->removeAll(lpC);

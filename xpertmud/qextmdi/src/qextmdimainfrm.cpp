@@ -1672,6 +1672,8 @@ void QextMdiMainFrm::fillWindowMenu()
       unsigned int indx;
       unsigned int windowItemCount = m_pWindowMenu->actions().count() - entryCount;
       bool inserted = false;
+//TODO: fix inserting
+/*
       QString tmpString;
       for (indx = 0; indx <= windowItemCount; indx++) {
          //tmpString = m_pWindowMenu->text( m_pWindowMenu->idAt( indx+entryCount));
@@ -1690,6 +1692,7 @@ void QextMdiMainFrm::fillWindowMenu()
             indx = windowItemCount+1;  // break the loop
          }
       }
+      */
       if (!inserted) {  // append it
          //m_pWindowMenu->insertItem( item, pView, SLOT(slot_clickedInWindowMenu()), 0, -1, windowItemCount+entryCount);
          QAction *ta = m_pWindowMenu->addAction( item, pView, SLOT(slot_clickedInWindowMenu()));
