@@ -6,6 +6,7 @@
 #include <QClipboard>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QDebug>
 
 #include <iostream>
 
@@ -48,6 +49,8 @@ TextBufferView::TextBufferView(int id, QWidget* parent, const char* name,
   nextCachePoint(0), maxCache(1000),
   followMode(EFM_DontFollow)
 {
+
+  charCachePixmap = QPixmap(1,1);
 
   setAttribute(Qt::WA_StaticContents, true);
   setObjectName(name);
@@ -229,12 +232,11 @@ void TextBufferView::slotNewDefaultFont(const QFont& newFont) {
 
 void TextBufferView::calcGeometry() {
   bool inLastLine = (offsetY == (int)textBuffer->getSizeY() - (int)lines);
-  //qDebug(QString("CalcGeometry: inLastLine = %1").arg(inLastLine));
+  //qDebug() << QString("CalcGeometry: inLastLine = %1").arg(inLastLine);
 
   columns = width() / fontW;
   lines = height() / fontH;
-  //qDebug(QString("CalcGeometry: Height = %1, fontH = %2, lines = %3")
-  // .arg(height()).arg(fontH).arg(lines));
+  //qDebug() << QString("CalcGeometry: Height = %1, fontH = %2, lines = %3").arg(height()).arg(fontH).arg(lines);
 
   if(fixTextBuffer) {
     textBuffer->resize(columns, lines);
@@ -257,7 +259,7 @@ void TextBufferView::calcGeometry() {
   }
 }
 
-void TextBufferView::fontChange(const QFont&) {
+void TextBufferView::fontChange() {
   QFontMetrics fm(font());
   fontH = fm.height();
   fontW = fm.maxWidth();
@@ -282,8 +284,7 @@ void TextBufferView::paintEvent(QPaintEvent* pe) {
   //   .arg(rect.left()).arg(rect.top()).arg(rect.right())
   //   .arg(rect.bottom()));
   for(int y=rect.top()/fontH; y<rect.bottom()/fontH+1; ++y) {
-    for(int x=(rect.left()-leftBorderWidth)/fontW; 
-	x<(rect.right()-leftBorderWidth)/fontW+1; ++x) {
+    for(int x=(rect.left()-leftBorderWidth)/fontW; x<(rect.right()-leftBorderWidth)/fontW+1; ++x) {
       drawChar(this, x, y);
     }
   }
@@ -292,9 +293,17 @@ void TextBufferView::paintEvent(QPaintEvent* pe) {
 void TextBufferView::resizeEvent(QResizeEvent* re) {
   //qDebug("Resizing View!");
   calcGeometry();
-  QPixmap tmpP = drawBuffer->scaled(re->size());
+  QPixmap tmpP(re->size());
+  tmpP = drawBuffer->copy(0,0,drawBuffer->width(), drawBuffer->height());
   *drawBuffer=tmpP;
   update();
+}
+
+void TextBufferView::changeEvent(QEvent *event) {
+  if (event->type()==QEvent::FontChange) {
+    fontChange();
+  }
+  QWidget::changeEvent(event);
 }
 
 /*
@@ -448,8 +457,8 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
 
   if (selecting && 
       ((bufY>selStartY && bufY<selEndY) || // Line in between
-       
-       (bufY==selStartY && bufX>=selStartX && 
+
+       (bufY==selStartY && bufX>=selStartX &&
 	(bufY!=selEndY || bufX<selEndX)) || // starting line
        
        (bufY==selEndY && bufX<selEndX &&
@@ -468,49 +477,68 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
     charCache.clear();
     if(maxCache > 0) {
       // allways use the max. size if set
-      charCachePixmap = charCachePixmap.scaled(fontW * maxCache, fontH);
-
+      QPixmap tmpPix(fontW * maxCache, fontH);
+      QPainter pntr(&tmpPix);
+      pntr.drawPixmap(0,0, charCachePixmap);
+      pntr.end();
+      charCachePixmap = tmpPix;
     } else {
       // start with 30 and expand
-      charCachePixmap = charCachePixmap.scaled(fontW * 30, fontH);
+      QPixmap tmpPix(fontW * 30, fontH);
+      QPainter pntr(&tmpPix);
+      pntr.drawPixmap(0,0, charCachePixmap);
+      pntr.end();
+      charCachePixmap = tmpPix;
     }
   }
 
   charCacheT::iterator it = charCache.find(cc);
 
   if(it == charCache.end()) {
-    //qDebug(QString("Creating cache entry... %1").arg(nextCachePoint));
+    //qDebug() << QString("Creating cache entry... %1").arg(nextCachePoint);
     unsigned int offset = nextCachePoint;
 
     if((nextCachePoint+1) * fontW > (unsigned int)charCachePixmap.width()) {
-      //qDebug("not enough space");
+      //qDebug() << QString("not enough space %1 vs %2").arg((nextCachePoint+1) * fontW).arg(charCachePixmap.width());
+
       // => not enough space in the pixmap
+      maxCache=0;
       if(maxCache > 0) {
-	//qDebug("limit");
-	// there is a cache limit
-	if((nextCachePoint+1) * fontW < (unsigned int)maxCache * fontW) {
-	  //qDebug("resizing");
-	  // but it's not full yet (perhaps a width change)
-    charCachePixmap = charCachePixmap.scaled(maxCache * fontW, charCachePixmap.height());
-	  ++nextCachePoint;
-	} else {
-	  // and it's full
-	  // let's overwrite something
-	  charCacheT::reverse_iterator del = charCache.rbegin();
-	  if(del != charCache.rend()) {
-	    // there was at least one char in the cache
-	    offset = del->second;
-	    //qDebug(QString("overwrite %1").arg(offset));
-	    charCache.erase(del->first);
-	  } else {
-	    offset = 0;
-	  }
-	}
+    //qDebug("limit");
+    // there is a cache limit
+        if((nextCachePoint+1) * fontW < (unsigned int)maxCache * fontW) {
+          //qDebug() << QString("resizing to %1 (vs %2)").arg(maxCache * fontW).arg((nextCachePoint+1) * fontW);
+          // but it's not full yet (perhaps a width change)
+          QPixmap tmpPix(maxCache * fontW, charCachePixmap.height());
+          QPainter pntr(&tmpPix);
+          pntr.drawPixmap(0,0, charCachePixmap);
+          pntr.end();
+          charCachePixmap = tmpPix;
+          //qDebug() << "pixmap size: "<<charCachePixmap.width();
+          ++nextCachePoint;
+        } else {
+          // and it's full
+          // let's overwrite something
+          //qDebug() << "need overwrite";
+          charCacheT::reverse_iterator del = charCache.rbegin();
+          if(del != charCache.rend()) {
+            // there was at least one char in the cache
+            offset = del->second;
+            //qDebug() << QString("overwrite %1").arg(offset);
+            charCache.erase(del->first);
+          } else {
+            //qDebug() << QString("reset offset from %1").arg(offset);
+            offset = 0;
+          }
+        }
       } else {
-	//qDebug("no limit");
+	//qDebug() << "no limit";
 	// no cache limit, just go on
-        charCachePixmap = charCachePixmap.scaled(charCachePixmap.width() * 2,
-			       charCachePixmap.height());
+        QPixmap tmpPix(charCachePixmap.width() * 2, charCachePixmap.height());
+        QPainter pntr(&tmpPix);
+        pntr.drawPixmap(0,0, charCachePixmap);
+        pntr.end();
+        charCachePixmap = tmpPix;
 	      ++nextCachePoint;
       }
     } else {
@@ -518,10 +546,9 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
       // still enough space for this time
       ++nextCachePoint;
     }
-    //qDebug(QString("offset is %1").arg(offset));
+    //qDebug() << QString("offset is %1").arg(offset);
 
-    it = charCache.insert
-      (charCacheT::value_type(cc, offset)).first;
+    it = charCache.insert(charCacheT::value_type(cc, offset)).first;
 
     // background color
     QColor bg;
@@ -579,19 +606,22 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
     
     charPaint.eraseRect(offset * fontW, 0, fontW, fontH);
     charPaint.drawText(offset * fontW, fontA, cc.getChar());
+    charPaint.end();
+    //qDebug() << offset * fontW <<  fontA << cc.getChar();
   }
 
-  //qDebug(QString("bitblitting %1").arg(it->second));
+  //qDebug() << QString("bitblitting %1").arg(it->second);
   QPainter painter(pd);
   painter.drawPixmap(rect.x()+leftBorderWidth, rect.y(), charCachePixmap, it->second * fontW, 0, fontW, fontH);
+  painter.end();
 /*
   bitBlt(pd, rect.x()+leftBorderWidth, rect.y(),
   	 &charCachePixmap, it->second * fontW, 0, fontW, fontH,
   	 Qt::CopyROP, true);
 */
 #else
-  std::cout << textBuffer->getBufferChar(offsetX+x, offsetY+y).getChar()
-	    << flush;
+  std::cout << textBuffer->getBufferChar(offsetX+x, offsetY+y).getChar().toLatin1()
+	    << std::flush;
 #endif
 }
 

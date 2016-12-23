@@ -209,7 +209,7 @@ void TextBufferHistoryView::slotMainOffsetYChange(int) {
 }
 
 void TextBufferHistoryView::wheelEvent(QWheelEvent* ev) {
-  QApplication::sendEvent(vscrollBar, ev);
+  ////QApplication::sendEvent(vscrollBar, ev);
 }
 
 void TextBufferHistoryView::mousePressEvent(QMouseEvent* ev) {

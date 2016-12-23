@@ -76,11 +76,13 @@ protected:
   void connectTextBuffer();
 
   void calcGeometry();
-  void fontChange(const QFont& newFont);
+
+  void fontChange();
 
   void closeEvent(QCloseEvent* ce);
   void paintEvent(QPaintEvent* pe);
   void resizeEvent(QResizeEvent* re);
+  void changeEvent(QEvent *event);
 
   // update chars by finding longest strings with equal
   // attributes

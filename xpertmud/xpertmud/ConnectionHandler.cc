@@ -151,7 +151,7 @@ void ConnectionHandler::send(const QString& text, int id) {
   if(it != connections.end()) {
     (*it).second->send(text);
   } else {
-    cout << "SEND (" << id << "): " << text.toLocal8Bit().data() << endl;
+    cout << "No connection: try to send(" << id << "): " << text.toLocal8Bit().data() << endl;
   }
 }
 

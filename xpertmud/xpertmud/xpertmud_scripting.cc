@@ -439,12 +439,11 @@ void Xpertmud::XM_TextWindow_disableMouseEvents(int id) {
 int Xpertmud::XM_TextBufferWindow_initialize() {
   int id=childWidgets.size(); 
   QextMdiChildView * neuWrapper = new QextMdiChildView();
-  //TODO: remove comments block!
-  QFrame *neu = new QFrame(neuWrapper);
-/*
+  //QFrame *neu = new QFrame();
+
   TextBufferHistoryView * neu= new TextBufferHistoryView(id, neuWrapper,0,colorMap,
 					       defaultFont);
-*/
+
   QBoxLayout* pLayout = new QHBoxLayout(neuWrapper);
   pLayout->addWidget(neu);
 
@@ -457,21 +456,20 @@ int Xpertmud::XM_TextBufferWindow_initialize() {
   neuWrapper->setWindowIcon(kapp->miniIcon());
   neuWrapper->setFocusPolicy(Qt::NoFocus);
   neuWrapper->removeEventFilterForAllChildren();
-/////  neu->buffer()->setMaxBufferSize(scrollbacksize);
-/*
-  // TODO:
-#pragma warning TODO
+  neu->buffer()->setMaxBufferSize(scrollbacksize);
+
+//#pragma warning TODO
   connect(this,SIGNAL(colorConfigChanged()),
 	  neu,SLOT(slotColorConfigChanged()));
   
-#pragma warning TODO
+//#pragma warning TODO
   connect(this,SIGNAL(historyConfigChanged(int)),
 	  neu->buffer(),SLOT(setMaxBufferSize(int)));
 
-#pragma warning TODO
+//#pragma warning TODO
   connect(this,SIGNAL(defaultFontConfigChanged(const QFont &)),
 	  neu,SLOT(slotNewDefaultFont(const QFont &)));
-*/
+
   addWindow(neuWrapper, QextMdi::Hide);
 
   return id;

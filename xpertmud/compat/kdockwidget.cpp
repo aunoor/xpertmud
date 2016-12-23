@@ -204,6 +204,7 @@ KDockWidgetHeader::KDockWidgetHeader( KDockWidget* parent, const char* name )
 {
   layout = new QHBoxLayout( this );
   layout->setSizeConstraint( QLayout::SetMinimumSize );
+  layout->setContentsMargins(0,0,0,0);
 
   drag = new KDockWidgetHeaderDrag( this, parent );
 
