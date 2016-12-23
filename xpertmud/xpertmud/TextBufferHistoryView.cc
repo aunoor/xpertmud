@@ -8,21 +8,8 @@
 #include <QMouseEvent>
 #include <QStyleOptionComplex>
 
-// This file requires the QT Compatibility mode for usage with QT3
-// QStyle::scrollBarExtend has been removed from QT3.
-
-// TODO: Remove if fixed
-#ifdef QT_NO_COMPAT
-#  undef QT_NO_COMPAT
-#  define QT_NO_COMPAT_WAS_REMOVED
-#endif
-
-#include <QStyle>
-
-#ifdef QT_NO_COMPAT_WAS_REMOVED
-#  define QT_NO_COMPAT
-#  undef QT_NO_COMPAT_WAS_REMOVED
-#endif
+//#include <QStyle>
+#include <QDebug>
 
 TextBufferHistoryView::
 TextBufferHistoryView(int id, QWidget* parent, const char* name, 
@@ -55,6 +42,8 @@ TextBufferHistoryView(int id, QWidget* parent, const char* name,
 	  this,SLOT(slotScriptingMouseReleaseEvent(int, int, int)));
   connect(mainView,SIGNAL(offsetYChange(int)),
 	  this,SLOT(slotMainOffsetYChange(int)));
+  connect(mainView,SIGNAL(linesCountChange(int)),
+    this,SLOT(slotLinesCountChange(int)));
 
 
   splitView = new TextBufferView(0, this, "", cmap, font, textBuffer, false);
@@ -201,19 +190,22 @@ void TextBufferHistoryView::slotMainOffsetYChange(int) {
   // updateLayout is _slow_, so don't call it if we
   // already know that nothin' changed!
   if(scrollSplitEnabled) {
-    if(mainView->getOffsetY() < ((int)textBuffer->getSizeY() - 
-				 (int)mainView->getLines())) {
-      if(splitView->isHidden())
-	updateLayout();
+    if(mainView->getOffsetY() < ((int)textBuffer->getSizeY() - (int)mainView->getLines())) {
+      if(splitView->isHidden()) updateLayout();
     } else {
-      if(splitView->isVisible())
-	updateLayout();
+      if(splitView->isVisible()) updateLayout();
     }
   }
 }
 
+void TextBufferHistoryView::slotLinesCountChange(int) {
+    int value = ((int)textBuffer->getSizeY() - (int)mainView->getLines());
+    if (vscrollBar->maximum()<value)
+        vscrollBar->setMaximum(value);
+}
+
 void TextBufferHistoryView::wheelEvent(QWheelEvent* ev) {
-  ////QApplication::sendEvent(vscrollBar, ev);
+    vscrollBar->event(ev);
 }
 
 void TextBufferHistoryView::mousePressEvent(QMouseEvent* ev) {

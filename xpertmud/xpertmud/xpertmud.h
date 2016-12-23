@@ -303,7 +303,7 @@ private slots:
 
 signals:
   void colorConfigChanged(); 
-  void historyConfigChanged(int lines);
+  void historyConfigChanged(unsigned int lines);
   void echoMode(bool);
   void commandRetention(bool);
   void defaultFontConfigChanged(const QFont & font);

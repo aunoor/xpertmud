@@ -2,8 +2,8 @@
 #ifndef TEXTBUFFER_H
 #define TEXTBUFFER_H
 
-#include <qobject.h>
-#include <qstring.h>
+#include <QObject>
+#include <QString>
 #include <vector>
 #include <deque>
 #include <assert.h>
@@ -113,10 +113,6 @@ public:
   virtual unsigned int getLines() { return ansiViewHeight; }
   virtual unsigned int getColumns() { return ansiViewWidth; }
 
-  void setMaxBufferSize(unsigned int size) {
-    maxBufferSize = size;
-  }
-
   void setWordWrapColumn(int c) {
     if(autoFeedForward) wordWrapColumn = c;
   }
@@ -138,6 +134,11 @@ public:
   ColorChar getBufferChar(int column, int line);
   unsigned int getSizeY();
   bool isGrowBuffer();
+
+public slots:
+  void setMaxBufferSize(unsigned int size) {
+    maxBufferSize = size;
+  }
 
 signals:
   void textChanged(int column, int line,

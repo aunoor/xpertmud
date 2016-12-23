@@ -71,6 +71,7 @@ signals:
   void scriptingMouseDragEvent(int id, int x, int y);
   void scriptingMouseReleaseEvent(int id, int x, int y);
   void offsetYChange(int);
+  void linesCountChange(int lines);
 
 protected:
   void connectTextBuffer();

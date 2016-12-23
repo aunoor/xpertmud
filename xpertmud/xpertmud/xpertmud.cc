@@ -784,7 +784,7 @@ void Xpertmud::slotConfigure() {
     // redraw all text(buffer)widgets
     emit colorConfigChanged();
     scrollbacksize=cfg.getHistSize();
-    emit historyConfigChanged(scrollbacksize);
+    emit historyConfigChanged((unsigned int)scrollbacksize);
     defaultLanguage=cfg.getDefaultLanguage();
     QFont newFont=cfg.getDefaultFont();
     command_retention=cfg.getCommandRetention();

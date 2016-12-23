@@ -143,6 +143,8 @@ void TextBufferView::slotTextChanged(int column, int line,
   //  qDebug(QString("slotTextChanged called! %1 %2 %3 %4")
   //   .arg(column).arg(line).arg(width).arg(height));
   updateChars(column-offsetX, line-offsetY, width, height);
+
+  emit linesCountChange(buffer()->getLines());
 }
 
 void TextBufferView::slotTextChanged() {

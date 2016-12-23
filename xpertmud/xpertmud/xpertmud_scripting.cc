@@ -464,8 +464,8 @@ int Xpertmud::XM_TextBufferWindow_initialize() {
 	  neu,SLOT(slotColorConfigChanged()));
   
 //#pragma warning TODO
-  connect(this,SIGNAL(historyConfigChanged(int)),
-	  neu->buffer(),SLOT(setMaxBufferSize(int)));
+  connect(this,SIGNAL(historyConfigChanged(unsigned int)),
+	  neu->buffer(),SLOT(setMaxBufferSize(unsigned int)));
 
 //#pragma warning TODO
   connect(this,SIGNAL(defaultFontConfigChanged(const QFont &)),
