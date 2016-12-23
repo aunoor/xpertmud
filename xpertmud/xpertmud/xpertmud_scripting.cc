@@ -444,7 +444,8 @@ int Xpertmud::XM_TextBufferWindow_initialize() {
   TextBufferHistoryView * neu= new TextBufferHistoryView(id, neuWrapper,0,colorMap,
 					       defaultFont);
 
-  QBoxLayout* pLayout = new QHBoxLayout(neuWrapper);
+  QHBoxLayout* pLayout = new QHBoxLayout(neuWrapper);
+  pLayout->setContentsMargins(1,1,1,1);
   pLayout->addWidget(neu);
 
   neuWrapper->hide();

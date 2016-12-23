@@ -309,6 +309,8 @@ KDockWidget::KDockWidget( KDockManager* dockManager, const QString name, const Q
   layout = new QVBoxLayout( this );
   this->setLayout(layout);
   layout->setSizeConstraint(QLayout::SetMinimumSize);
+  layout->setContentsMargins(1,1,1,1);
+  //layout->setContentsMargins(2,2,2,2);
 
 #ifdef Q_OS_MACOS
   m_localMenuBar = new QMenuBar(this);

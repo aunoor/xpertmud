@@ -54,7 +54,6 @@ QextMdiChildArea::QextMdiChildArea(QWidget *parent)
    m_pZ = new QList<QextMdiChildFrm*>;
    setFocusPolicy(Qt::ClickFocus);
    m_defaultChildFrmSize = QSize(400,300);
-   setStyleSheet("background: yellow;");
 }
 
 //============ ~QextMdiChildArea ============//
