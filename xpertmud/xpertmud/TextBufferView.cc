@@ -796,7 +796,7 @@ void TextBufferView::mouseReleaseEvent(QMouseEvent* ev) {
   disconnect(clipboard, SIGNAL(dataChanged()),
 	     this, SLOT(slotClearSelection()));
 
-  if (clipboard->supportsSelection()) {
+  /*if (clipboard->supportsSelection()) */{
     // SET DATA, but only on systems with mouse-Selection(X11) 
     // all others have to use the context menu
 ///    bool oldMode=clipboard->selectionModeEnabled();
