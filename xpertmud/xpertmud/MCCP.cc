@@ -1,7 +1,8 @@
 #ifdef MCCP_SUPPORT
 #include "MCCP.h"
-
 #include <arpa/telnet.h>
+#include <QDebug>
+
 extern char* telopts[];
 
 #ifndef TELOPT_COMPRESS
@@ -50,7 +51,7 @@ bool MCCP::iacSubNegotiation(int iac, const string& command) {
     isCompressed = true;
   }
   if(wasCompressed != isCompressed) {
-    qDebug("compression state changed");
+    qDebug() << "compression state changed. now" << isCompressed;
     stream.next_in = Z_NULL;
     stream.avail_in = 0;
     stream.zalloc = Z_NULL;
