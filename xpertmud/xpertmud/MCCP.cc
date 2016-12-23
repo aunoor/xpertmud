@@ -1,3 +1,4 @@
+#ifdef MCCP_SUPPORT
 #include "MCCP.h"
 
 #include <arpa/telnet.h>
@@ -101,3 +102,4 @@ void MCCP::parse(const string& str) {
     next->parse(str);
   }
 }
+#endif

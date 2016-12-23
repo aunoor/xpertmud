@@ -2,10 +2,8 @@
 #include "TelnetFilter.h"
 #include "IacHandlerCollection.h"
 
-#ifndef Q_WS_WIN
-#ifdef ENABLE_MCCP
+#ifdef MCCP_SUPPORT
 #include "MCCP.h"
-#endif
 #endif
 
 //#include <qwidget.h>
@@ -89,12 +87,10 @@ void ConnectionHandler::open(int id, const QString& host, int port,
   collection->registerTType("ansi");
   collection->plug(*telnetFilter);
 
-#ifndef Q_WS_WIN
-#ifdef ENABLE_MCCP
+#ifdef MCCP_SUPPORT
   MCCP* mccp = new MCCP(c, c);
   mccp->plug(*telnetFilter);
   c->addInputStreamFilter(mccp);
-#endif
 #endif
 
   c->addInputStreamFilter(telnetFilter);

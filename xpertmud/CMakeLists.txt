@@ -40,6 +40,7 @@ xpertmud/InputStreamHandler.h
 xpertmud/Bookmark.h
 xpertmud/BookmarkEditor.h
 xpertmud/LogToFile.h
+xpertmud/MCCP.h
 compat/kaction.h
 compat/kfontdialog.h
 compat/kapplication.h
@@ -56,6 +57,7 @@ compat/dummykpartsdockmainwindow.h
 compat/kdocktabctl.h
 compat/kdockwidget.h
 compat/kdockwidget_private.h
+compat/arpa/telnet.h
 qextmdi/include/qextmditaskbar.h
 qextmdi/include/qextmdichildarea.h
 qextmdi/include/qextmdichildfrmcaption.h
@@ -109,9 +111,8 @@ xpertmud/configdialog.cc
 xpertmud/LogToFile.cc
 xpertmud/Bookmark.cc
 xpertmud/BookmarkEditor.cc
+xpertmud/MCCP.cc
 )
-
-#unix:SOURCES +=   xpertmud/MCCP.cc
 
 #file(GLOB UI_FORMS src/ui/*.ui)
 #file(GLOB MAIN_RES src/*.qrc)
@@ -122,8 +123,8 @@ source_group("Autogen files" FILES ${UI_GEN})
 set(CMAKE_AUTOMOC ON)
 
 set(MAIN_PROJ_NAME ${PROJECT_NAME})
-
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(GLOBAL PROPERTY MCCP_SUPPORT OFF)
 
 set(MACOSX_BUNDLE_GUI_IDENTIFIER "RTIS.\${PRODUCT_NAME:identifier}")
 
@@ -181,6 +182,10 @@ if (APPLE)
     add_definitions(-DMACOS_X)
 endif(APPLE)
 
+if (MCCP_SUPPORT)
+    add_definitions(-DMCCP_SUPPORT)
+endif(MCCP_SUPPORT)
+
 set(LIBRARY_OUTPUT_PATH ${FIELD_WORK_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${FIELD_WORK_BINARY_DIR})
 
@@ -229,17 +234,20 @@ if("${CMAKE_SYSTEM}" MATCHES "Linux")
 endif()
 
 add_executable(${PROJECT_NAME} ${GUI_TYPE} ${SRCS} ${HDR} ${RCC_FILE} ${INCLUDE_LIST_FORMS} ${MAIN_UI_RC})
-#target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Xml Qt5::Sql setupapi)
+
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Xml Qt5::Network Qt5::Multimedia)
-#target_link_libraries(${PROJECT_NAME} Qt5::Widgets ${Qt5Core_QTMAIN_LIBRARIES} ${EXSERIALPLIBS} setupapi)
-#qt5_use_modules(${PROJECT_NAME} Core Network Gui Widgets XML)
+if (MCCP_SUPPORT)
+    target_link_libraries(${PROJECT_NAME} z)
+endif(MCCP_SUPPORT)
 
 
-add_executable(${PROJECT_NAME}_dbg ${GUI_TYPE} ${SRCS} ${HDR} ${RCC_FILE} ${INCLUDE_LIST_FORMS} ${MAIN_UI_RC})
-#target_link_libraries(${PROJECT_NAME}_dbg Qt5::Widgets ${Qt5Core_QTMAIN_LIBRARIES} ${EXSERIALPLIBS} setupapi)
-#target_link_libraries(${PROJECT_NAME}_dbg Qt5::Widgets Qt5::Xml Qt5::Sql setupapi)
-target_link_libraries(${PROJECT_NAME}_dbg Qt5::Widgets Qt5::Xml Qt5::Network Qt5::Multimedia)
-#qt5_use_modules(${PROJECT_NAME}_dbg Core Network Gui Widgets Xml)
+#add_executable(${PROJECT_NAME}_dbg ${GUI_TYPE} ${SRCS} ${HDR} ${RCC_FILE} ${INCLUDE_LIST_FORMS} ${MAIN_UI_RC})
+#target_link_libraries(${PROJECT_NAME}_dbg Qt5::Widgets Qt5::Xml Qt5::Network Qt5::Multimedia)
+#if (MCCP_SUPPORT)
+#    target_link_libraries(${PROJECT_NAME}_dbg z)
+#endif(MCCP_SUPPORT)
+#target_link_libraries(${PROJECT_NAME}_dbg z)
+
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX})
 

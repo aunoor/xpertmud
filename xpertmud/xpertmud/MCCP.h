@@ -1,7 +1,8 @@
 #ifndef MCCP_H
 #define MCCP_H
+#ifdef MCCP_SUPPORT
 
-#include <qobject.h>
+#include <QObject>
 #include <zlib.h>
 #include <vector>
 #include "TelnetFilter.h"
@@ -32,4 +33,5 @@ private:
   z_stream stream;
 };
 
+#endif
 #endif
