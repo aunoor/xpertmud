@@ -28,9 +28,12 @@ TextBufferHistoryView::
 TextBufferHistoryView(int id, QWidget* parent, const char* name, 
 		      const QColor* cmap,
 		      const QFont& font, unsigned int scrollBackLines):
+        QWidget(parent),
+#if 0
   QWidget(parent, /*WRepaintNoErase | WResizeNoErase |
 	  WStyle_Customize | WStyle_NormalBorder |*/ Qt::WindowTitleHint |
     Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint ),
+#endif
   inUpdate(false),
   winID(id), scrollSplitEnabled(true), scrollBackLines(scrollBackLines),
   movingSplit(false)
@@ -76,6 +79,7 @@ TextBufferHistoryView(int id, QWidget* parent, const char* name,
   vscrollBar->show();
   vscrollBar->setMaximum(0);
   vscrollBar->setMaximum(0);
+  vscrollBar->setFixedWidth(style()->pixelMetric(QStyle::PM_ScrollBarExtent ));
 
   connect(textBuffer, SIGNAL(scrolledLines(int)),
 	  this, SLOT(slotScrolledLines(int)));
