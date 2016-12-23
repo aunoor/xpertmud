@@ -143,7 +143,8 @@ void KMainWindow::createGUI(QWidget *) {
   QMenu *help = new QMenu(this);
   help->setTitle("&Help");
 
-  QMenuBar *menu = new QMenuBar(this);
+  //QMenuBar *menu = new QMenuBar(this);
+  QMenuBar * menu = this->menuBar();
   menu->setObjectName("Menu");
   //menu->insertItem("&File", file);
   menu->addMenu(file);

@@ -29,10 +29,11 @@
 #ifndef _QEXTMDICHILDVIEW_H_
 #define _QEXTMDICHILDVIEW_H_
 
-#include <qwidget.h>
-#include <qpixmap.h>
-#include <qrect.h>
-#include <qapplication.h>
+#include <QWidget>
+#include <QPixmap>
+#include <QRect>
+#include <QApplication>
+#include <QDebug>
 
 #include "qextmdichildfrm.h"
 
@@ -497,9 +498,10 @@ signals:
 inline QextMdiChildFrm *QextMdiChildView::mdiParent() const
 {
    QWidget* pw = parentWidget();
-   if( pw != 0L)
-      if( pw->inherits("QextMdiChildFrm"))
-         return (QextMdiChildFrm *)pw;
+   if( pw != 0L) {
+      if (pw->inherits("QextMdiChildFrm"))
+         return (QextMdiChildFrm *) pw;
+   }
    return 0L;
 }
 

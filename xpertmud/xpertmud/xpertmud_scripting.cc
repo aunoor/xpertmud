@@ -439,17 +439,18 @@ void Xpertmud::XM_TextWindow_disableMouseEvents(int id) {
 int Xpertmud::XM_TextBufferWindow_initialize() {
   int id=childWidgets.size(); 
   QextMdiChildView * neuWrapper = new QextMdiChildView();
-  QextMdiChildView * tmpDbgChld = new QextMdiChildView("dbg");
   //TODO: remove comments block!
+  QFrame *neu = new QFrame(neuWrapper);
 /*
   TextBufferHistoryView * neu= new TextBufferHistoryView(id, neuWrapper,0,colorMap,
 					       defaultFont);
+*/
   QBoxLayout* pLayout = new QHBoxLayout(neuWrapper);
   pLayout->addWidget(neu);
-*/
+
   neuWrapper->hide();
 
-///  childWidgets.append(neu);
+  childWidgets.append(neu);
   wrapperWidgets.push_back(neuWrapper);
   pluginWrappers.push_back(NULL);
 
@@ -472,7 +473,6 @@ int Xpertmud::XM_TextBufferWindow_initialize() {
 	  neu,SLOT(slotNewDefaultFont(const QFont &)));
 */
   addWindow(neuWrapper, QextMdi::Hide);
-  addWindow(tmpDbgChld, QextMdi::Hide);
 
   return id;
 }

@@ -188,7 +188,7 @@ void QextMdiMainFrm::applyOptions()
    //for(QextMdiChildView *w = m_pWinList->first();w;w= m_pWinList->next()){
    foreach(QextMdiChildView *w, *m_pWinList){
       QWidget *wdgt = w;
-      if(w->mdiParent())wdgt =w->mdiParent();
+      if(w->mdiParent()) wdgt = w->mdiParent();
       // Really ugly hack to FORCE the resize event
       // a resize(width(),height()) won't work...
       wdgt->resize(wdgt->width()+1,wdgt->height()+1);
@@ -639,28 +639,23 @@ void QextMdiMainFrm::closeWindow(QextMdiChildView *pWnd, bool layoutTaskBar)
          m_pDockbaseAreaOfDocumentViews->setEnableDocking(KDockWidget::DockNone);
          m_pDockbaseOfTabPage = m_pDockbaseAreaOfDocumentViews;
       }
-      KDockWidget* pDockW = (KDockWidget*) pWnd->parentWidget();
-      pWnd->setParent(NULL);
-      pWnd->move(0, 0);
-      pDockW->setWidget(0L);
-      if (pDockW == m_pDockbaseOfTabPage) {
-#if !defined(NO_KDE2) && (QT_VERSION >= 300)
-         QTabWidget* pTab = (QTabWidget*) pDockW->parentWidget()->parentWidget();
-         int cnt = pTab->count();
-         m_pDockbaseOfTabPage = (KDockWidget*) pTab->page(cnt - 2);
-         if (pDockW == m_pDockbaseOfTabPage) {
-            m_pDockbaseOfTabPage = (KDockWidget*) pTab->page(cnt - 1); // different to the one deleted next
-         }
-#else
-         KDockTabCtl* pTab = (KDockTabCtl*) pDockW->parentWidget()->parentWidget();
-         KDockWidget* pLastPage = (KDockWidget*) pTab->getLastPage();
-         m_pDockbaseOfTabPage = (KDockWidget*) pTab->getPrevPage(pLastPage);
-         if (pDockW == m_pDockbaseOfTabPage) {
-            m_pDockbaseOfTabPage = pLastPage;
-         }
-#endif
+
+      //KDockWidget* pDockW = (KDockWidget*) pWnd->parentWidget();
+      KDockWidget* pDockW = dynamic_cast<KDockWidget*>(pWnd->parentWidget());
+      if (pDockW!=NULL) {
+          pWnd->setParent(NULL);
+          pWnd->move(0, 0);
+          pDockW->setWidget(0L);
+          if (pDockW == m_pDockbaseOfTabPage) {
+              KDockTabCtl *pTab = (KDockTabCtl *) pDockW->parentWidget()->parentWidget();
+              KDockWidget *pLastPage = (KDockWidget *) pTab->getLastPage();
+              m_pDockbaseOfTabPage = (KDockWidget *) pTab->getPrevPage(pLastPage);
+              if (pDockW == m_pDockbaseOfTabPage) {
+                  m_pDockbaseOfTabPage = pLastPage;
+              }
+          }
+          delete pDockW;
       }
-      delete pDockW;
    }
    else if (pWnd->isAttached()) {
       m_pMdi->destroyChild(pWnd->mdiParent());
@@ -757,7 +752,8 @@ void QextMdiMainFrm::activateView(QextMdiChildView* pWnd)
        if(m_pCurrentWindow->parentWidget() == NULL) {
 	          m_pCurrentWindow->showNormal();
        } else {
-	          m_pCurrentWindow->mdiParent()->restorePressed();
+          if (m_pCurrentWindow->mdiParent()!=NULL)
+	             m_pCurrentWindow->mdiParent()->restorePressed();
        }
      }
       m_pCurrentWindow = pWnd;
@@ -1276,6 +1272,10 @@ void QextMdiMainFrm::setMenuForSDIModeSysButtons( QMenuBar* pMenuBar)
    if (m_bSDIApplication)  // there are no buttons in the menubar in this mode (although the view is always maximized)
       return;
 
+#ifdef Q_OS_MACOS
+    pMenuBar = m_pDockbaseAreaOfDocumentViews->menuBar();
+#endif
+
    m_pMainMenuBar = pMenuBar;
    if( m_pMainMenuBar == 0L)
       return;  // use setMenuForSDIModeSysButtons( 0L) for unsetting the external main menu!
@@ -1375,10 +1375,12 @@ void QextMdiMainFrm::setSysButtonsAtMenuPosition()
      m_pClose->setFixedSize(h, h);
    }
    QHBoxLayout *layout = new QHBoxLayout(m_pMainMenuBar);
+   layout->setContentsMargins(0,0,0,0);
    QSpacerItem *spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding,
 					 QSizePolicy::Minimum);
    QSpacerItem *spacerRight = new QSpacerItem(10, 0, QSizePolicy::Minimum,
 					      QSizePolicy::Minimum);
+   m_pMainMenuBar->setLayout(layout);
    
    layout->addItem(spacer);
    layout->addWidget(m_pUndock);
@@ -1440,7 +1442,7 @@ void QextMdiMainFrm::setEnableMaximizedChildFrmMode(bool bEnable)
 {
    if (bEnable) {
       m_bMaximizedChildFrmMode = true;
-      //qDebug("MaximizeMode on");
+      qDebug() << "MaximizeMode on";
 
       QextMdiChildFrm* pCurrentChild = m_pMdi->topChild();
       if( !pCurrentChild)
@@ -1461,8 +1463,7 @@ void QextMdiMainFrm::setEnableMaximizedChildFrmMode(bool bEnable)
          //m_pMainMenuBar->insertItem( QPixmap(kde2laptop_closebutton_menu), m_pMdi->topChild(), SLOT(closePressed()), 0, -1, 0);
          QAction *ta = m_pMainMenuBar->addAction( QString(), m_pMdi->topChild(), SLOT(closePressed()));
          ta->setIcon(QPixmap(kde2laptop_closebutton_menu));
-      }
-      else {
+      } else {
          pCurrentChild->systemMenu()->setIcon(*pCurrentChild->icon());
          m_pMainMenuBar->addMenu(pCurrentChild->systemMenu());
          QObject::connect( m_pClose, SIGNAL(clicked()), pCurrentChild, SLOT(closePressed()) );
@@ -1495,7 +1496,8 @@ void QextMdiMainFrm::switchOffMaximizeModeForMenu(QextMdiChildFrm* oldChild)
       return;
       
    //m_pMainMenuBar->removeItem( m_pMainMenuBar->idAt(0));
-   m_pMainMenuBar->removeAction(m_pMainMenuBar->actions().at(0));
+   if (!m_pMainMenuBar->actions().isEmpty())
+        m_pMainMenuBar->removeAction(m_pMainMenuBar->actions().at(0));
 
    if( oldChild) {
       QObject::disconnect( m_pUndock, SIGNAL(clicked()), oldChild, SLOT(undockPressed()) );

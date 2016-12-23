@@ -262,8 +262,6 @@ Xpertmud::~Xpertmud()
 }
 
 void Xpertmud::initialize() {
-#warning TODO: enable initialization!
-//return;
   int stid=XM_TextBufferWindow_initialize();
   assert(stid==0);
     

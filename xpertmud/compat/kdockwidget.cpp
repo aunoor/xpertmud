@@ -28,6 +28,7 @@
 
 #include <QApplication>
 #include <QMenu>
+#include <QDebug>
 
 #define DOCK_CONFIG_VERSION "0.0.5"
 
@@ -91,7 +92,7 @@ void KDockMainWindow::setMainDockWidget( KDockWidget* mdw )
 
 void KDockMainWindow::setView( QWidget *view )
 {
-  if ( QString(view->staticMetaObject.className()) ==  QString("KDockWidget") ){
+  if (qobject_cast<KDockWidget*>(view)) {
     if ( view->parent() != this ) ((KDockWidget*)view)->applyToWidget( this );
   }
 
@@ -305,7 +306,15 @@ KDockWidget::KDockWidget( KDockManager* dockManager, const QString name, const Q
   d->_parent = parent;
 
   layout = new QVBoxLayout( this );
+  this->setLayout(layout);
   layout->setSizeConstraint(QLayout::SetMinimumSize);
+
+#ifdef Q_OS_MACOS
+  m_localMenuBar = new QMenuBar(this);
+  m_localMenuBar->setNativeMenuBar(false);
+  m_localMenuBar->show();
+  layout->setMenuBar(m_localMenuBar);
+#endif
 
   manager = dockManager;
   manager->childDock->append( this );
@@ -334,6 +343,7 @@ KDockWidget::KDockWidget( KDockManager* dockManager, const QString name, const Q
 
   QObject::connect(this, SIGNAL(hasUndocked()), manager->main, SLOT(slotDockWidgetUndocked()) );
   applyToWidget( parent, QPoint(0,0) );
+  setStyleSheet("KDockWidget {border: 2px solid blue;}");
 }
 
 KDockWidget::~KDockWidget()
@@ -355,9 +365,9 @@ void KDockWidget::setHeader( KDockWidgetAbstractHeader* h )
 
   if ( header ){
     delete header;
-    delete layout;
+///    delete layout;
     header = h;
-    layout = new QVBoxLayout( this );
+//    layout = new QVBoxLayout( this );
     layout->setSizeConstraint( QLayout::SetMinimumSize );
     layout->addWidget( header );
      setWidget( widget );    
@@ -393,9 +403,10 @@ void KDockWidget::applyToWidget( QWidget* s, const QPoint& p )
   if ( parent() != s ){
     hide();
     this->setParent(s);
+    show();
   }
 
-  if ( s && s->inherits("KDockMainWindow") ){
+  if ( s && qobject_cast<KDockMainWindow*>(s) ){
     ((KDockMainWindow*)s)->setView( this );
   }
 
@@ -807,13 +818,13 @@ void KDockWidget::setWidget( QWidget* mw )
   }
 
   widget = mw;
-  delete layout;
+  //delete layout;
 
-  layout = new QVBoxLayout( this );
-  layout->setSizeConstraint( QLayout::SetMinimumSize );
+  //layout = new QVBoxLayout( this );
+  //layout->setSizeConstraint( QLayout::SetMinimumSize );
 
   layout->addWidget( header );
-  layout->addWidget( widget,1 );
+  layout->addWidget( widget, 1 );
 }
 
 void KDockWidget::setDockTabName( KDockTabGroup* tab )

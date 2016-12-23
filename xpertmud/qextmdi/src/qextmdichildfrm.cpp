@@ -124,8 +124,6 @@ QextMdiChildFrm::QextMdiChildFrm(QextMdiChildArea *parent)
       h->setAutoAdd(true);*/
    m_pCaption  = new QextMdiChildFrmCaption(this);
 
-   //this->setStyleSheet("background: red;");
-
    m_pManager  = parent;
 
    m_pWinIcon  = new QextMdiWin32IconButton(m_pCaption, "qextmdi_iconbutton_icon");

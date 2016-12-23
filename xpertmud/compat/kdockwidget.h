@@ -638,6 +638,13 @@ signals:
    */
   void hasUndocked();
 
+#ifdef Q_OS_MACOS
+   /**
+    * return local menubar for MacOS native menubar workaround
+    */
+  QMenuBar *menuBar() {return m_localMenuBar;};
+#endif
+
 protected slots:
 
   /** Does several things here when it has noticed that the former brother widget (closest neighbor) gets lost.
@@ -689,6 +696,11 @@ private:
 
   /** an icon for the tab widget header */
   QPixmap* pix;
+
+#ifdef Q_OS_MACOS
+  /** menubar for MacOS native menubar workaround */
+  QMenuBar *m_localMenuBar;
+#endif
 
   /**
    * Information about the ability for docking to another dockwidget.
