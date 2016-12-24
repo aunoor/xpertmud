@@ -35,7 +35,7 @@
 
 BookmarkEditor::BookmarkEditor(const Bookmark & original, QWidget * parent,
 			       const QString name):
-  KDialogBase(KDialogBase::IconList,i18n("Edit Bookmark"),
+  KDialogBase(i18n("Edit Bookmark"),
 	      KDialogBase::Ok | KDialogBase::Help | KDialogBase::Cancel,
 	      KDialogBase::Ok, parent,name), 
   bookmark(original),currentConnection(-1) {

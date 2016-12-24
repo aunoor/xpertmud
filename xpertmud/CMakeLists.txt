@@ -57,6 +57,7 @@ compat/dummykpartsdockmainwindow.h
 compat/kdocktabctl.h
 compat/kdockwidget.h
 compat/kdockwidget_private.h
+compat/kstandarddirs.h
 compat/arpa/telnet.h
 qextmdi/include/qextmditaskbar.h
 qextmdi/include/qextmdichildarea.h
@@ -85,6 +86,7 @@ compat/kmainwindow.cc
 compat/kdockwidget.cpp
 compat/kdockwidget_private.cpp
 compat/ktoolbar.cpp
+compat/kstandarddirs.cpp
 qextmdi/src/qextmdichildarea.cpp
 qextmdi/src/qextmdichildfrmcaption.cpp
 qextmdi/src/qextmdichildfrm.cpp

@@ -17,7 +17,7 @@
 
 
 ConfigDialog::ConfigDialog(QWidget * parent,const QString name):
-  KDialogBase(KDialogBase::IconList, i18n("Configure Xpertmud"),
+  KDialogBase(i18n("Configure Xpertmud"),
 	      KDialogBase::Ok | KDialogBase::Help | 
 	      KDialogBase::Cancel | KDialogBase::Default,
 	      KDialogBase::Ok, parent, name) {

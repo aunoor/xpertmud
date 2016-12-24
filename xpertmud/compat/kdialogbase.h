@@ -93,8 +93,8 @@ class KDialogBase: public QDialog {
     Help = 1<<3,
     Default = 1<<4
   };
-// QDialog ( QWidget * parent = 0, const char * name = 0, bool modal = FALSE, WFlags f = 0 )
-  KDialogBase(int dummy, const QString title,
+
+  KDialogBase(const QString title,
 	      int buttons, int buttons2, QWidget* parent=NULL,
 	      const QString name=QString()):
     QDialog(parent), mainWidget(0), buttonMap(buttons)
