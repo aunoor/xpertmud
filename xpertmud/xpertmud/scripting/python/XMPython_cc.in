@@ -132,7 +132,7 @@ void XMPython::setCallback(GuiScriptingBindings *cB) {
        it!=incPath.end(); ++it) {
     
     PyObject *obj;
-    if((obj = PyRun_String(const_cast<char *>(("sys.path.append(\""+*it+"\")").latin1()),
+    if((obj = PyRun_String(const_cast<char *>(("sys.path.append(\""+*it+"\")").toLatin1().data()),
 			   Py_file_input, globals, globals))) {
       Py_DECREF(obj);
     } else {

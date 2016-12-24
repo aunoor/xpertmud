@@ -116,7 +116,7 @@ while line != "":
       q%s = QString((QChar*)NULL, %sLen);
       Py_UNICODE* p%s = PyUnicode_AS_UNICODE(%sUni);
       for(int i=0; i<%sLen; ++i) {
-        q%s.ref(i) = QChar(p%s[i]);
+        q%s[i] = QChar(p%s[i]);
       }
     }
 """ % (name, name, name, name, name, name, name, name, name, name, name, name, name, name, name, name)
