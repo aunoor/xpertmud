@@ -44,18 +44,6 @@ QStringList KStandardDirs::findAllResources(const QString& type,
     return ret;
 }
 
-QStringList KStandardDirs::findDirs(const QString& type, const QString& name) {
-    QStringList ret;
-    if(type == "appdata") {
-        if(name == "perl") {
-            ret.append("appdata/perl");
-        } else if(name == "python") {
-            ret.append("appdata/python");
-        }
-    }
-    return ret;
-}
-
 void KStandardDirs::findModules(const QString& dir, const QString &cfilter,
                  QStringList& ret) {
     QDir d(dir);

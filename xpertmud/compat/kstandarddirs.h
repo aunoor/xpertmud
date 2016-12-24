@@ -21,7 +21,18 @@ class KStandardDirs {
 
   QStringList findAllResources(const QString& type, const QString& cfilter, bool, bool);
 
-  QStringList findDirs(const QString& type, const QString& name);
+  /*Need keep implementation there for script plugins working */
+  QStringList findDirs(const QString& type, const QString& name) {
+    QStringList ret;
+    if(type == "appdata") {
+        if(name == "perl") {
+            ret.append("appdata/perl");
+        } else if(name == "python") {
+            ret.append("appdata/python");
+        }
+    }
+    return ret;
+  }
 
   void findModules(const QString& dir, const QString &cfilter, QStringList& ret);
 

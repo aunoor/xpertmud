@@ -14,11 +14,9 @@ endif()
 
 project(xpertmud-ng)
 
-# Files
+include(FindZLIB)
 
-#file(GLOB HDR xpertmud/*.h
-#		      compat/*.h
-#	)
+# Files
 
 file (GLOB HDR
 xpertmud/TextBuffer.h
@@ -125,8 +123,9 @@ source_group("Autogen files" FILES ${UI_GEN})
 set(CMAKE_AUTOMOC ON)
 
 set(MAIN_PROJ_NAME ${PROJECT_NAME})
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY MCCP_SUPPORT OFF)
+set_property(GLOBAL PROPERTY PYTHON_SUPPORT ON)
+set_property(GLOBAL PROPERTY PERL_SUPPORT ON)
 
 set(MACOSX_BUNDLE_GUI_IDENTIFIER "XPM.\${PRODUCT_NAME:identifier}")
 
@@ -199,6 +198,9 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/compat)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qextmdi/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qextmdi/res)
+if (MCCP_SUPPORT)
+    include_directories(${ZLIB_INCLUDE_DIRS})
+endif(MCCP_SUPPORT)
 
 # Build
 
@@ -232,7 +234,7 @@ endif()
 add_executable(${PROJECT_NAME} ${GUI_TYPE} ${SRCS} ${HDR} ${RCC_FILE} ${INCLUDE_LIST_FORMS} ${MAIN_UI_RC})
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Xml Qt5::Network Qt5::Multimedia)
 if (MCCP_SUPPORT)
-    target_link_libraries(${PROJECT_NAME} z)
+    target_link_libraries(${PROJECT_NAME} ${ZLIB_LIBRARIES})
 endif(MCCP_SUPPORT)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX})
