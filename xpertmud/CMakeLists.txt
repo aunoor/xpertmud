@@ -96,7 +96,6 @@ xpertmud/TextBufferView.cc
 xpertmud/TextBufferHistoryView.cc
 xpertmud/mxinputline.cc
 xpertmud/InputAction.cc
-xpertmud/scripting/Scripting.cc
 xpertmud/xpertmud.cc
 xpertmud/main.cc
 xpertmud/xpertmud_scripting.cc
@@ -112,6 +111,7 @@ xpertmud/LogToFile.cc
 xpertmud/Bookmark.cc
 xpertmud/BookmarkEditor.cc
 xpertmud/MCCP.cc
+xpertmud/scripting/Scripting.cc
 )
 
 #file(GLOB UI_FORMS src/ui/*.ui)
@@ -126,7 +126,7 @@ set(MAIN_PROJ_NAME ${PROJECT_NAME})
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY MCCP_SUPPORT OFF)
 
-set(MACOSX_BUNDLE_GUI_IDENTIFIER "RTIS.\${PRODUCT_NAME:identifier}")
+set(MACOSX_BUNDLE_GUI_IDENTIFIER "XPM.\${PRODUCT_NAME:identifier}")
 
 if (WIN32 OR APPLE)
     set(QTDIR "" CACHE PATH "Qt root dir")
@@ -194,16 +194,10 @@ qt5_add_resources(MAIN_UI_RC ${MAIN_RES})
 
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/compat)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qextmdi/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qextmdi/res)
 
-#include_directories(${MARBLE_INCLUDE_DIR})
-#include_directories(${GEOGRAPHIC_INCLUDE_DIR})
-#include_directories(${SHAPELIB_INCLUDE_DIR})
-#include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src)
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/plugins)
 # Build
 
 if(MSVC)
@@ -234,20 +228,10 @@ if("${CMAKE_SYSTEM}" MATCHES "Linux")
 endif()
 
 add_executable(${PROJECT_NAME} ${GUI_TYPE} ${SRCS} ${HDR} ${RCC_FILE} ${INCLUDE_LIST_FORMS} ${MAIN_UI_RC})
-
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets Qt5::Xml Qt5::Network Qt5::Multimedia)
 if (MCCP_SUPPORT)
     target_link_libraries(${PROJECT_NAME} z)
 endif(MCCP_SUPPORT)
-
-
-#add_executable(${PROJECT_NAME}_dbg ${GUI_TYPE} ${SRCS} ${HDR} ${RCC_FILE} ${INCLUDE_LIST_FORMS} ${MAIN_UI_RC})
-#target_link_libraries(${PROJECT_NAME}_dbg Qt5::Widgets Qt5::Xml Qt5::Network Qt5::Multimedia)
-#if (MCCP_SUPPORT)
-#    target_link_libraries(${PROJECT_NAME}_dbg z)
-#endif(MCCP_SUPPORT)
-#target_link_libraries(${PROJECT_NAME}_dbg z)
-
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX})
 
@@ -280,3 +264,4 @@ endif (APPLE)
 
 #SETUP_APPLICATION(${PROJECT_NAME})
 #add_subdirectory(plugins)
+add_subdirectory(xpertmud/scripting)

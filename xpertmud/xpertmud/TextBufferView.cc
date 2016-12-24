@@ -789,10 +789,6 @@ void TextBufferView::mouseReleaseEvent(QMouseEvent* ev) {
 
   if (!selecting) return;
 
-#if QT_VERSION<300
-  // To copy or not to copy, that's the question
-
-#else
   disconnect(clipboard, SIGNAL(dataChanged()),
 	     this, SLOT(slotClearSelection()));
 
@@ -809,7 +805,6 @@ void TextBufferView::mouseReleaseEvent(QMouseEvent* ev) {
   connect(clipboard, SIGNAL(dataChanged()),
 	  this, SLOT(slotClearSelection()));
 
-#endif
   //  std::cout << "ReleaseClick" << std::endl;
 }
 

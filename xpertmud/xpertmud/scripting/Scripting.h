@@ -6,13 +6,9 @@
 #  define ABSTRACT 0
 #endif
 
-#ifndef NO_KDE
-#include "DCOPScripting.h"
-#endif
-
-#include <qobject.h>
-#include <qstring.h>
-#include <qvariant.h>
+//#include <qobject.h>
+#include <QString>
+#include <QVariant>
 
 // #include <string>
 // #include <exception>

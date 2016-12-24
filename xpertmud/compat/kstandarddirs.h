@@ -6,10 +6,10 @@
 #endif
 
 #include "kurl.h"
-#include <qstringlist.h>
-#include <qdir.h>
-#include <qregexp.h>
-#include <qapplication.h>
+#include <QStringList>
+#include <QDir>
+#include <QRegExp>
+#include <QApplication>
 #include <iostream>
 using std::cout;
 using std::endl;
