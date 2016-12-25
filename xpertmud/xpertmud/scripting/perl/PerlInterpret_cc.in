@@ -2,6 +2,7 @@
 #include "PerlInterpret.h"
 
 #include <cstdio>
+#include <iostream>
 // using snprintf;
 
 // perl headers
@@ -106,8 +107,16 @@ PerlInterpret::PerlInterpret(GuiScriptingWrapper *callBack):
 {
   currentCallBack = callBack;
 
+//simulate environment for perl
+  int argc = 1;
+  char argv[1][9]={{"xperlmud"}};
+  char env[1][1]={{""}};
+
+  PERL_SYS_INIT3(&argc,(char***)&argv,(char***)&env);
+
   perlInt = perl_alloc();
-  
+
+  //TODO: Do not exist, but do something another...
   if (!perlInt)
     exit(42);
 
@@ -116,13 +125,21 @@ PerlInterpret::PerlInterpret(GuiScriptingWrapper *callBack):
   perl_construct(perlInt);
   const char *args[]={"xperlmud",
 		      "-w",
-		      "-e", ""
+		      "-e", "0"
   };
+
   int ret = perl_parse(perlInt,xs_init,4,(char **)args,0);
+
+  PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
+
   if(!ret)
     perl_run(perlInt);
-  else 
+  else {
+    std::cout << "perl_parse failed. exit with code 23" << std::endl;
     exit(23);
+  }
+
+
 
 #ifndef SCRIPTDEVEL
 # ifndef NO_MULTILINE_STRING
@@ -165,6 +182,7 @@ PerlInterpret::~PerlInterpret() {
 
   perl_destruct(perlInt);
   perl_free(perlInt);
+  PERL_SYS_TERM();
 }
 
 void PerlInterpret::setCallback(GuiScriptingWrapper *cB) {

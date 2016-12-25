@@ -1,10 +1,9 @@
 #ifndef KLIBLOADER_H
 #define KLIBLOADER_H
 
-#include <qobject.h>
-#include <qstring.h>
-#include <qstringlist.h>
-#include <qlibrary.h>
+#include <QString>
+#include <QStringList>
+#include <QLibrary>
 #include "kstandarddirs.h"
 #include "kglobal.h"
 
@@ -84,8 +83,8 @@ class KLibLoader {
     cout << list.first().toLocal8Bit().data() << endl;
     
     QString function = QString("init_") + libname;
-    cout << "QLibrary::resolve('" << list.first().toLocal8Bit().data() << "', '" << function.toLocal8Bit().data() << "');" << endl;
-    QFunctionPointer symAddr = QLibrary::resolve(list.first(), function.toLocal8Bit().data());
+    cout << "QLibrary::resolve('" << list.first().toLatin1().data() << "', '" << function.toLatin1().data() << "');" << endl;
+    QFunctionPointer symAddr = QLibrary::resolve(list.first(), function.toLatin1().data());
     //void *symAddr = QLibrary::resolve(list.first(), function.toLocal8Bit().data());
 
     if(symAddr == NULL) { cout << "buuuuh2" << endl; return 0; }

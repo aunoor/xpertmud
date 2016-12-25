@@ -23,7 +23,7 @@ XMPerl::XMPerl(QObject* parent,
 	       const char* name):
   XMScripting(parent,name),interp(NULL),recursionCounter(0) {
   
-  
+
 }
 
 XMPerl::~XMPerl() {
