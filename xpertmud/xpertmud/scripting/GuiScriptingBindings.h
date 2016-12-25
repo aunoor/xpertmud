@@ -6,7 +6,7 @@
 #  define ABSTRACT 0
 #endif
 
-#include <qstring.h>
+#include <QString>
 
 /**
  * Strings are represented QString now!

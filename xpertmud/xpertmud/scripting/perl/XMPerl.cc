@@ -43,14 +43,15 @@ void XMPerl::setCallback(GuiScriptingBindings *callBack) {
     for (QStringList::Iterator it=incPath.begin();
 	 it!=incPath.end(); ++it) {
       
-      interp->addIncludeDir((*it).latin1());
+      interp->addIncludeDir((*it).toLocal8Bit().data());
     }
   }
 }
 
 void XMPerl::textEntered(const QString & text) {
   RecursionGuard guard(recursionCounter);
-  QCString utf8=text.utf8();
+  //QCString utf8=text.utf8();
+  QByteArray utf8 = text.toUtf8();
   if (interp)
     interp->textEntered(utf8.data(),utf8.length());
 }
@@ -59,14 +60,15 @@ void XMPerl::textEntered(const QString & text) {
 bool XMPerl::keyPressed(const QString & key, const QString & ascii) {
   RecursionGuard guard(recursionCounter);
   if (interp)
-    return interp->keyPressed(key.latin1(), ascii.latin1());
+    return interp->keyPressed(key.toLocal8Bit().data(), ascii.toLocal8Bit().data());
   return false;
 }
 
 void XMPerl::textReceived(const QString & line, int id) {
   RecursionGuard guard(recursionCounter);
   if (interp) {
-    QCString utf8 = line.utf8();
+    //QCString utf8 = line.utf8();
+    QByteArray utf8(line.toUtf8());
     interp->textReceived(utf8.data(), utf8.length(), id);
   }
 }
@@ -123,7 +125,8 @@ void XMPerl::mouseUp(int id, int x, int y) {
 QVariant XMPerl::pluginCall(int id, int function, const QVariant & args) {
   RecursionGuard guard(recursionCounter);
   if (interp) {
-      QCString utf8=args.toString().utf8();
+      //QCString utf8=args.toString().utf8();
+      QByteArray utf8=args.toString().toUtf8();
 
 #ifdef WIN32
     char * ret=(char*)interp->pluginCall(id,function,utf8.data(),utf8.length());

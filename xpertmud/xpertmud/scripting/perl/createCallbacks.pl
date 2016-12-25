@@ -9,7 +9,7 @@ if(! defined $ARGV[0]) {
 my $functions = "";
 my $xsses = "";
 my $wrapperH = "#undef bool\n";
-my $wrapperCC = "\#include \"AutoGuiScriptingWrapper.h\"\n\#include \"../GuiScriptingBindings.h\"\n\#include <qcstring.h>\n\n";
+my $wrapperCC = "\#include \"AutoGuiScriptingWrapper.h\"\n\#include \"../GuiScriptingBindings.h\"\n\#include <QString>\n\n";
 
 while(my $line = <STDIN>) {
   if($line =~ s/\s+virtual\s+([^\s]+)\s+([^\(]+)\(//) {
@@ -120,7 +120,7 @@ while(my $line = <STDIN>) {
 
     if($functionType ne "void") {
       if($functionType eq "QString") {
-	$wrapperCC .= "  QCString locallyEncoded=ret.utf8();\n  LenChar retc; retc.pointer = qstrdup(locallyEncoded.data());\n  retc.length = locallyEncoded.length();\n  return retc;\n";
+	$wrapperCC .= "  QByteArray locallyEncoded=ret.toUtf8();\n  LenChar retc; retc.pointer = qstrdup(locallyEncoded.data());\n  retc.length = locallyEncoded.length();\n  return retc;\n";
       } else {
 	$wrapperCC .= "  return ret;\n";
       }
