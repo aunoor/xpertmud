@@ -70,11 +70,6 @@ qextmdi/include/qextmdimainfrm.h
 qextmdi/res/*.xpm
 )
 
-#file(GLOB SRCS xpertmud/*.cc
-#		       compat/*.cc
-#		       compat/*.cpp
-#	)
-
 file (GLOB SRCS
 compat/klibloader.cc
 compat/kapplication.cc
@@ -116,9 +111,8 @@ xpertmud/scripting/Scripting.cc
 
 #file(GLOB UI_FORMS src/ui/*.ui)
 #file(GLOB MAIN_RES src/*.qrc)
-file(GLOB UI_GEN ui_*.h moc_*)
+file(GLOB UI_GEN ui_*.h *_automoc.*)
 
-#source_group("Forms" FILES ${UI_FORMS})
 source_group("Autogen files" FILES ${UI_GEN})
 set(CMAKE_AUTOMOC ON)
 
@@ -150,17 +144,12 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Xml REQUIRED)
 find_package(Qt5XmlPatterns)
 find_package(Qt5Network REQUIRED)
-#find_package(Qt5Sql REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
-#find_package(Qt5PrintSupport REQUIRED)
 
-include_directories( ${Qt5Svg_INCLUDE_DIRS} )
-#include_directories( ${Qt5PrintSupport_INCLUDE_DIRS} )
 include_directories( ${Qt5Network_INCLUDE_DIRS} )
 include_directories( ${Qt5Concurrent_INCLUDE_DIRS} )
 include_directories( ${Qt5Multimedia_INCLUDE_DIRS} )
-#include_directories( ${Qt5Sql_INCLUDE_DIRS} )
 
 SET(CMAKE_AUTOMOC TRUE)
 #SET(CMAKE_AUTOMOC_RELAXED_MODE TRUE)
@@ -175,10 +164,13 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions (-Wall)
 endif(MSVC)
 
+add_definitions(-DQT_DLL)
+
 add_definitions(-DNO_KDE)
 add_definitions(-DNO_KDE2)
 add_definitions(-DNO_INCLUDE_MOCFILES)
 add_definitions(-DMAKEDLL_QEXTMDI)
+
 if (APPLE)
     add_definitions(-DMACOS_X)
 endif(APPLE)
@@ -187,8 +179,8 @@ if (MCCP_SUPPORT)
     add_definitions(-DMCCP_SUPPORT)
 endif(MCCP_SUPPORT)
 
-set(LIBRARY_OUTPUT_PATH ${FIELD_WORK_BINARY_DIR})
-set(EXECUTABLE_OUTPUT_PATH ${FIELD_WORK_BINARY_DIR})
+#set(LIBRARY_OUTPUT_PATH ${FIELD_WORK_BINARY_DIR})
+#set(EXECUTABLE_OUTPUT_PATH ${FIELD_WORK_BINARY_DIR})
 
 qt5_wrap_ui(INCLUDE_LIST_FORMS ${UI_FORMS})
 qt5_add_resources(MAIN_UI_RC ${MAIN_RES})
@@ -217,6 +209,10 @@ if(WIN32)
 	set(GUI_TYPE WIN32)
 elseif(APPLE)
 	set(GUI_TYPE MACOSX_BUNDLE)
+
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+    set(CMAKE_INSTALL_RPATH "@loader_path/../Framework")
+
 endif(WIN32)
 
 if("${CMAKE_SYSTEM}" MATCHES "Linux")
