@@ -108,6 +108,7 @@ protected:
   void mouseReleaseEvent(QMouseEvent* ev);
   void mouseDoubleClickEvent(QMouseEvent * ev);
 
+  QColor getBGColor(ColorChar &cc);
 
   /*
     Offset (in pixel) from the left to the  text.
@@ -183,7 +184,7 @@ protected:
   bool ownsBuffer;
 
   // for nice looking drawing...
-  QPixmap* drawBuffer;
+//  QPixmap* drawBuffer;
 
   // cache: Color char -> int #nr in charCachePixmap
   // the cache will be at position fontW * #nr

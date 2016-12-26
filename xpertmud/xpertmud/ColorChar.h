@@ -31,7 +31,7 @@ public:
     A_BOLD = (1<<16)
   };
 
-  ColorChar(QChar ch = QChar(' '), 
+  ColorChar(QChar ch = QChar(QChar::Space),
 	    unsigned char fg = 7,  
 	    unsigned char bg = 0,  
 	    unsigned short attr = A_DEFAULTFG | A_DEFAULTBG):

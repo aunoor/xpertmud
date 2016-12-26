@@ -36,10 +36,9 @@ TextBufferView::TextBufferView(int id, QWidget* parent, const char* name,
 			       const QColor* cmap, const QFont& font,
 			       TextBuffer* cTextBuffer,
 			       bool fixBuffer):
-  QWidget(parent, /*WRepaintNoErase | WResizeNoErase |
-	  WStyle_Customize | WStyle_NormalBorder |*/ Qt::WindowTitleHint |
-    Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint ),
-  leftBorderWidth(2),
+  QWidget(parent),
+  //leftBorderWidth(2),
+  leftBorderWidth(0),
   offsetX(0), offsetY(0), columns(0), lines(0), 
   fixTextBuffer(true), 
   winID(id), blinking(false), isDefaultFont(true), 
@@ -49,16 +48,18 @@ TextBufferView::TextBufferView(int id, QWidget* parent, const char* name,
   nextCachePoint(0), maxCache(1000),
   followMode(EFM_DontFollow)
 {
+  setObjectName(name);
+
+  //setAttribute(Qt::WA_StaticContents, true); //for redraw only visible part of widget
+  setAttribute(Qt::WA_NoSystemBackground, true); //for disable repainting background by system before PaintEvent
+  setAttribute(Qt::WA_OpaquePaintEvent, true);   //also as NoSysBackground
 
   charCachePixmap = QPixmap(1,1);
-
-  setAttribute(Qt::WA_StaticContents, true);
-  setObjectName(name);
 
   fontW = fontH = fontA = 1;
   columns = lines = 1;
 
-  drawBuffer = new QPixmap(width(), height());
+  ///drawBuffer = new QPixmap(width(), height());
 
   fixTextBuffer = fixBuffer;
   if(cTextBuffer == NULL) {
@@ -295,9 +296,13 @@ void TextBufferView::paintEvent(QPaintEvent* pe) {
 void TextBufferView::resizeEvent(QResizeEvent* re) {
   //qDebug("Resizing View!");
   calcGeometry();
+/*
   QPixmap tmpP(re->size());
-  tmpP = drawBuffer->copy(0,0,drawBuffer->width(), drawBuffer->height());
+  QPainter p(&tmpP);
+  p.drawPixmap(0, 0, drawBuffer->width(), drawBuffer->height(), *drawBuffer);
+  p.end();
   *drawBuffer=tmpP;
+*/
   update();
 }
 
@@ -449,6 +454,21 @@ void TextBufferView::drawChars(QPaintDevice* pd, int lux, int luy, int w, int h)
 
 }
 
+QColor TextBufferView::getBGColor(ColorChar &cc) {
+  QColor bg;
+  if(cc.checkAttribute(ColorChar::A_DEFAULTBG))
+    bg = colorTable[16];
+  else if(cc.getBg() < 16)
+    bg = colorTable[cc.getBg()];
+  else {
+    int base = cc.getBg() - 16;
+    int red = base / 36;
+    int green = (base - red*36) / 6;
+    int blue = (base - red*36 - green*6);
+    bg = QColor(red * 51, green * 51, blue * 51);
+  }
+}
+
 void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
 #ifndef NODRAWING
   QRect rect(x*fontW, y*fontH, fontW, fontH);
@@ -459,20 +479,15 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
 
   if (selecting && 
       ((bufY>selStartY && bufY<selEndY) || // Line in between
-
-       (bufY==selStartY && bufX>=selStartX &&
-	(bufY!=selEndY || bufX<selEndX)) || // starting line
-       
-       (bufY==selEndY && bufX<selEndX &&
-	(bufY!=selStartY || bufX>=selStartX)) // ending line
+       (bufY==selStartY && bufX>=selStartX && (bufY!=selEndY || bufX<selEndX)) || // starting line
+       (bufY==selEndY && bufX<selEndX && (bufY!=selStartY || bufX>=selStartX)) // ending line
        )) {
-    cc.setAttribute(ColorChar::A_REVERSE,
-		    !cc.checkAttribute(ColorChar::A_REVERSE));
+    cc.setAttribute(ColorChar::A_REVERSE, !cc.checkAttribute(ColorChar::A_REVERSE));
   }
 
   if((blinking && cc.checkAttribute(ColorChar::A_BLINK)) ||
      cc.checkAttribute(ColorChar::A_CONCEALED)) {
-    cc.setChar(' ');
+    cc.setChar(QChar::Space);
   }
 
   if(charCachePixmap.height() != fontH) {
@@ -481,13 +496,15 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
       // allways use the max. size if set
       QPixmap tmpPix(fontW * maxCache, fontH);
       QPainter pntr(&tmpPix);
-      pntr.drawPixmap(0,0, charCachePixmap);
+      pntr.setBackgroundMode(Qt::OpaqueMode);
+      pntr.drawPixmap(0, 0, charCachePixmap);
       pntr.end();
       charCachePixmap = tmpPix;
     } else {
       // start with 30 and expand
       QPixmap tmpPix(fontW * 30, fontH);
       QPainter pntr(&tmpPix);
+      pntr.setBackgroundMode(Qt::OpaqueMode);
       pntr.drawPixmap(0,0, charCachePixmap);
       pntr.end();
       charCachePixmap = tmpPix;
@@ -513,6 +530,7 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
           // but it's not full yet (perhaps a width change)
           QPixmap tmpPix(maxCache * fontW, charCachePixmap.height());
           QPainter pntr(&tmpPix);
+          pntr.setCompositionMode(QPainter::CompositionMode_Source);
           pntr.drawPixmap(0,0, charCachePixmap);
           pntr.end();
           charCachePixmap = tmpPix;
@@ -538,7 +556,8 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
 	// no cache limit, just go on
         QPixmap tmpPix(charCachePixmap.width() * 2, charCachePixmap.height());
         QPainter pntr(&tmpPix);
-        pntr.drawPixmap(0,0, charCachePixmap);
+        pntr.setCompositionMode(QPainter::CompositionMode_Source);
+        pntr.drawPixmap(0, 0, charCachePixmap);
         pntr.end();
         charCachePixmap = tmpPix;
 	      ++nextCachePoint;
@@ -553,18 +572,8 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
     it = charCache.insert(charCacheT::value_type(cc, offset)).first;
 
     // background color
-    QColor bg;
-    if(cc.checkAttribute(ColorChar::A_DEFAULTBG)) 
-      bg = colorTable[16];
-    else if(cc.getBg() < 16)
-      bg = colorTable[cc.getBg()];
-    else {
-      int base = cc.getBg() - 16;
-      int red = base / 36;
-      int green = (base - red*36) / 6;
-      int blue = (base - red*36 - green*6);
-      bg = QColor(red * 51, green * 51, blue * 51);
-    }
+    QColor bg=getBGColor(cc);
+
     
     // pen color
     QColor pen;
@@ -598,14 +607,18 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
     
     QPainter charPaint;
     charPaint.begin(&charCachePixmap);
-
     charPaint.setBackgroundMode(Qt::TransparentMode);
+    //charPaint.setBackgroundMode(Qt::OpaqueMode);
     charPaint.setFont(drawFont);
     QBrush bb = charPaint.background();
     bb.setColor(bg);
     charPaint.setBackground(bb);
     charPaint.setPen(pen);
-    
+
+    ///qDebug() << QString("%1").arg(cc.getChar()) << int(cc.getChar().toLatin1());
+
+
+    //charPaint.eraseRect(offset * fontW, 0, fontW, fontA);
     charPaint.eraseRect(offset * fontW, 0, fontW, fontH);
     charPaint.drawText(offset * fontW, fontA, cc.getChar());
     charPaint.end();
@@ -614,8 +627,12 @@ void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
 
   //qDebug() << QString("bitblitting %1").arg(it->second);
   QPainter painter(pd);
-  painter.drawPixmap(rect.x()+leftBorderWidth, rect.y(), charCachePixmap, it->second * fontW, 0, fontW, fontH);
+  painter.setCompositionMode(QPainter::CompositionMode_Source);
+  //workaround about space criple
+  if (cc.getChar().isSpace()) painter.fillRect(rect.x()+leftBorderWidth, rect.y(), fontW, fontH, getBGColor(cc));
+  else painter.drawPixmap(rect.x()+leftBorderWidth, rect.y(), charCachePixmap, it->second * fontW , 0, fontW, fontH);
   painter.end();
+  //qDebug() << QString(cc.getChar()) << int(cc.getChar().toLatin1());
 /*
   bitBlt(pd, rect.x()+leftBorderWidth, rect.y(),
   	 &charCachePixmap, it->second * fontW, 0, fontW, fontH,

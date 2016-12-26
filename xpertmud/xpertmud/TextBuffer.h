@@ -171,99 +171,98 @@ protected:
     return line;
   }
 
-  void insertOneChar(QChar c, int& minX, int& maxX, int& minY, int& maxY) {
-    /* bottleneck!
-       the deque operator[] resize and pop_front are the
-       most called functions here... how can we possibly avert this?
-       lazy parsing? 
-    */
-    assert(cursorX <= ansiViewWidth || (!autoFeedForward && growBuffer));
-    assert(cursorY <= ansiViewHeight);
+    void insertOneChar(QChar c, int& minX, int& maxX, int& minY, int& maxY) {
+        /* bottleneck!
+           the deque operator[] resize and pop_front are the
+           most called functions here... how can we possibly avert this?
+           lazy parsing?
+        */
+        assert(cursorX <= ansiViewWidth || (!autoFeedForward && growBuffer));
+        assert(cursorY <= ansiViewHeight);
 
-    //qDebug(QString("Character: %1").arg(c));
+        //qDebug(QString("Character: %1").arg(c));
 
-    unsigned int line = getLine(cursorY);
+        unsigned int line = getLine(cursorY);
 
-    if(autoFeedForward &&
-       ((cursorX == ansiViewWidth) || // we'll never wrap outside the ansi view
-	(wordWrapColumn > 0 &&
-	 cursorX >= (unsigned int)wordWrapColumn + 1) || // >= because it's possible to jump behind
-	(wordWrapColumn < 0 &&             //    the scene via setCursorX()
-	 cursorX >= (ansiViewWidth + 1 + wordWrapColumn)))) {
-      // auto feed (with word wrap)
-      
-      if(!growBuffer && cursorY == ansiViewHeight-1)
-	return;
-      
-      // remember what it looked like...
-      // if line >= buffer.size() then there's nothing to wrap, just
-      // break the line
-      // if cursorX > buffer[line].size(), then the cursor is out of
-      // the area, so just break the line
-      bool noWordToWrap =
-	(wordWrapColumn == 0   ||
-	 line >= buffer.size() || cursorX > buffer[line].size());
+        if(autoFeedForward &&
+           ((cursorX == ansiViewWidth) || // we'll never wrap outside the ansi view
+            (wordWrapColumn > 0 &&
+             cursorX >= (unsigned int)wordWrapColumn + 1) || // >= because it's possible to jump behind
+            (wordWrapColumn < 0 &&             //    the scene via setCursorX()
+             cursorX >= (ansiViewWidth + 1 + wordWrapColumn)))) {
+            // auto feed (with word wrap)
 
-      // now create the new line
-      cursorX = 0;
-      if(cursorY < ansiViewHeight-1)
-	++cursorY;
-      QString qLine;
-      for(unsigned int ddd=0; ddd<buffer[line].size(); ++ddd)
-	qLine += buffer[line][ddd].getChar();
-      //qDebug(QString("End of Line: \"%1\"").arg(qLine));
-      ++line;
+            if(!growBuffer && cursorY == ansiViewHeight-1)
+                return;
 
-      if(!noWordToWrap) {
-	if(c == QChar(' ')) {
-	  createPosition(cursorX, line, minX, maxX, minY, maxY);
-	  return; // um, we don't really need to place an empty space
-	  // at the beginning of the next line, do we?
-	}
-	//qDebug("Wrapping...");
-	for(int c1 = buffer[line-1].size()-1; c1 >= 0; --c1) {
-	  if(buffer[line-1][c1].getChar() == QChar(' ')) {
-	    //qDebug(QString("Found QChar(' ') at %1").arg(c1));
-	    // copy last word 
-	    for(int c2 = c1+1; c2 < (int)buffer[line-1].size(); ++c2) {
-	      createPosition(cursorX, line, minX, maxX, minY, maxY);
-	      buffer[line][cursorX] = buffer[line-1][c2];
-	      ++cursorX;
-	    }
-	    unsigned int columns = buffer[line-1].size();
-	    buffer[line-1].erase(buffer[line-1].begin() + c1,
-				 buffer[line-1].end());
-	    if(!growBuffer)
-	      buffer[line-1].resize(columns, defaultAttributes);
-	    minX = 0;
-	    maxX = ansiViewWidth-1;
-	    break;
-	  }
-	}
-      }
+            // remember what it looked like...
+            // if line >= buffer.size() then there's nothing to wrap, just
+            // break the line
+            // if cursorX > buffer[line].size(), then the cursor is out of
+            // the area, so just break the line
+            bool noWordToWrap =
+                    (wordWrapColumn == 0   ||
+                     line >= buffer.size() || cursorX > buffer[line].size());
 
-      createPosition(cursorX, line, minX, maxX, minY, maxY);
-      buffer[line][cursorX] = ColorChar(c, currentAttributes);
-      ++cursorX;
-      return;
+            // now create the new line
+            cursorX = 0;
+            if(cursorY < ansiViewHeight-1) ++cursorY;
+            QString qLine;
+            for(unsigned int ddd=0; ddd<buffer[line].size(); ++ddd)
+                qLine += buffer[line][ddd].getChar();
+            //qDebug(QString("End of Line: \"%1\"").arg(qLine));
+            ++line;
+
+            if(!noWordToWrap) {
+                if(c == QChar(' ')) {
+                    createPosition(cursorX, line, minX, maxX, minY, maxY);
+                    return; // um, we don't really need to place an empty space
+                    // at the beginning of the next line, do we?
+                }
+//qDebug("Wrapping...");
+                for(int c1 = buffer[line-1].size()-1; c1 >= 0; --c1) {
+                    if(buffer[line-1][c1].getChar() == QChar(' ')) {
+                        //qDebug(QString("Found QChar(' ') at %1").arg(c1));
+                        // copy last word
+                        for(int c2 = c1+1; c2 < (int)buffer[line-1].size(); ++c2) {
+                            createPosition(cursorX, line, minX, maxX, minY, maxY);
+                            buffer[line][cursorX] = buffer[line-1][c2];
+                            ++cursorX;
+                        }
+                        unsigned int columns = buffer[line-1].size();
+                        buffer[line-1].erase(buffer[line-1].begin() + c1,
+                                             buffer[line-1].end());
+                        if(!growBuffer)
+                            buffer[line-1].resize(columns, defaultAttributes);
+                        minX = 0;
+                        maxX = ansiViewWidth-1;
+                        break;
+                    }
+                }
+            }
+
+            createPosition(cursorX, line, minX, maxX, minY, maxY);
+            buffer[line][cursorX] = ColorChar(c, currentAttributes);
+            ++cursorX;
+            return;
+        }
+
+        if(!autoFeedForward && cursorX == ansiViewWidth && !growBuffer) {
+            // can't draw anything more
+            return;
+        }
+        if(cursorX == ansiViewWidth) {
+            qWarning("*** word wrap did something completely wrong ***");
+            //      qDebug(QString("X: %1, WWC: %2, AnsiWidth: %3")
+            //	     .arg(cursorX).arg(wordWrapColumn).arg(ansiViewWidth));
+            return;
+        }
+
+        // default:
+        createPosition(cursorX, line, minX, maxX, minY, maxY);
+        buffer[line][cursorX] = ColorChar(c, currentAttributes);
+        ++cursorX;
     }
-    
-    if(!autoFeedForward && cursorX == ansiViewWidth && !growBuffer) {
-      // can't draw anything more
-      return;
-    }
-    if(cursorX == ansiViewWidth) {
-      qWarning("*** word wrap did something completely wrong ***");
-      //      qDebug(QString("X: %1, WWC: %2, AnsiWidth: %3")
-      //	     .arg(cursorX).arg(wordWrapColumn).arg(ansiViewWidth));
-      return;
-    }
-    
-    // default:
-    createPosition(cursorX, line, minX, maxX, minY, maxY);
-    buffer[line][cursorX] = ColorChar(c, currentAttributes);
-    ++cursorX;
-  }
 
   /**
    * if y is popped front, then the argument is changed..
