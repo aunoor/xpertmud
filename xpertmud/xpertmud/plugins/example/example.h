@@ -2,9 +2,9 @@
 #ifndef XMUD_EXAMPLE_H
 #define XMUD_EXAMPLE_H
 
-#include <qwidget.h>
-#include <qvariant.h>
-class QButton;
+#include <QWidget>
+
+class QPushButton;
 class QLabel;
 
 class XmudExample:public QWidget {
@@ -23,7 +23,7 @@ public slots:
 protected slots:
   void slotButtonDown(); 
 protected:
-  QButton * myButton;
+  QPushButton * myButton;
   QLabel * myLabel;
 };
 

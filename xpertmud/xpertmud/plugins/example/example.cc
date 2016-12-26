@@ -1,20 +1,21 @@
 #include "example.h"
 #include <kgenericfactory.h>
-#include <qpushbutton.h>
-#include <qlabel.h>
-#include <qlayout.h>
+#include <QPushButton>
+#include <QLabel>
+#include <QLayout>
 #include <qvariant.h>
 
 XmudExample::XmudExample(QWidget * parent, const char * name,
 			 const QStringList & /* unused: args*/):
-    QWidget(parent,name) {
-  QBoxLayout * layout=new QVBoxLayout(this,2);
+    QWidget(parent) {
+  setObjectName(name);
+  QBoxLayout * layout=new QVBoxLayout(this);
+  layout->setContentsMargins(0,0,0,0);
   myButton=new QPushButton(this);
   myButton->setText("Hallo");
-  myButton->setFocusPolicy(NoFocus);
+  myButton->setFocusPolicy(Qt::NoFocus);
   layout->addWidget(myButton);
-  connect(myButton,SIGNAL(clicked()),
-	  this,SLOT(slotButtonDown()));
+  connect(myButton, SIGNAL(clicked()), this, SLOT(slotButtonDown()));
   myLabel=new QLabel(this);
   layout->addWidget(myLabel);
 }

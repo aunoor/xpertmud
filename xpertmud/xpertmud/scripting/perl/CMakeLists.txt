@@ -6,17 +6,12 @@ endif()
 
 project(xmperlinterpreter)
 
-#incs: $PERL -MExtUtils::Embed -e perl_inc| $PERL -pe 's/-I//g'
-#lib path: perl -MExtUtils::Embed -e ldopts | perl -ne 'if (m/-L(\S+)/) {print $1}'
-
 include(FindPerl)
 include(FindPerlLibs)
 
 #for manual link against Perl use PERL_LIBRARY and PERL_INCLUDE_PATH
 
 if (NOT PERL_INCLUDE_PATH)
-    #execute_process(COMMAND "${PERL_EXECUTABLE} -MExtUtils::Embed -e perl_inc | ${PERL_EXECUTABLE} -pe 's/-I//g'" OUTPUT_VARIABLE PERL_INCLUDE_PATH)
-    #execute_process(COMMAND bash "-c" "perl -le 'print \"aaa\"'" OUTPUT_VARIABLE PERL_INCLUDE_PATH)
     execute_process(COMMAND bash "-c" "${PERL_EXECUTABLE} -MExtUtils::Embed -e perl_inc| ${PERL_EXECUTABLE} -pe 's/-I//g'" OUTPUT_VARIABLE PERL_INCLUDE_PATH)
     execute_process(COMMAND bash "-c" "${PERL_EXECUTABLE} -MExtUtils::Embed -e ldopts | ${PERL_EXECUTABLE} -ne 'if (m/-L(\\S+)/) {print $1}'" OUTPUT_VARIABLE PERL_LIBRARY_PATH)
     set(PERL_LIBRARY perl)

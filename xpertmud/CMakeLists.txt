@@ -114,14 +114,13 @@ xpertmud/scripting/Scripting.cc
 file(GLOB UI_GEN ui_*.h *_automoc.*)
 
 source_group("Autogen files" FILES ${UI_GEN})
-set(CMAKE_AUTOMOC ON)
 
 set(MAIN_PROJ_NAME ${PROJECT_NAME})
 set_property(GLOBAL PROPERTY MCCP_SUPPORT OFF)
 set_property(GLOBAL PROPERTY PYTHON_SUPPORT ON)
 set_property(GLOBAL PROPERTY PERL_SUPPORT ON)
 
-set(MACOSX_BUNDLE_GUI_IDENTIFIER "XPM.\${PRODUCT_NAME:identifier}")
+set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.xpertmud.Xpertmud")
 
 if (WIN32 OR APPLE)
     set(QTDIR "" CACHE PATH "Qt root dir")
@@ -217,13 +216,10 @@ endif(WIN32)
 
 if("${CMAKE_SYSTEM}" MATCHES "Linux")
     if(CMAKE_COMPILER_IS_GNUCXX)
-	#RPATH work
-	set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
-	set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
-	
-	#set(CMAKE_SKIP_RPATH TRUE)
-	#set(CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath=$ORIGIN/lib")
+	#RPATH work for standalone install
+#	set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+#	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+#	set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
     endif()
 endif()
 
@@ -263,5 +259,5 @@ endif (APPLE)
 #install(FILES ${MARBLE_LIBRARIES}/ DESTINATION ${CMAKE_INSTALL_PREFIX}/field_x/)
 
 #SETUP_APPLICATION(${PROJECT_NAME})
-#add_subdirectory(plugins)
+add_subdirectory(xpertmud/plugins)
 add_subdirectory(xpertmud/scripting)

@@ -37,7 +37,7 @@ QStringList KStandardDirs::findAllResources(const QString& type,
         while ( it.hasNext() ) {
             fi = it.next();
             QString name = fi.filePath();
-            cout << name.toLocal8Bit().data() << endl;
+            cout << "found icon: " << name.toLocal8Bit().data() << endl;
             ret.append(name);
         }
     }
@@ -63,7 +63,7 @@ void KStandardDirs::findModules(const QString& dir, const QString &cfilter,
 #endif
         isDotLa = true;
     }
-    cout << "Final Filter: " << filter.toLatin1().data() << endl;
+    cout << "Final Filter: " << filter.toLocal8Bit().data() << endl;
     const QFileInfoList fList = d.entryInfoList(QStringList() << filter);
 
     if(fList.isEmpty()) return;
@@ -84,7 +84,7 @@ void KStandardDirs::findModules(const QString& dir, const QString &cfilter,
         name.replace(QRegExp("\\.so"), ".la");
 #endif
 #endif
-        cout << name.toLocal8Bit().data() << endl;
+        cout << "module found: " << name.toLocal8Bit().data() << endl;
         ret.append(name);
     }
 }

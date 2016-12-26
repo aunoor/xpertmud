@@ -191,7 +191,8 @@ int Xpertmud::XM_TextWindow_initialize() {
   int id=childWidgets.size(); 
 
   QextMdiChildView * neuWrapper = new QextMdiChildView();
-  QBoxLayout* pLayout = new QHBoxLayout(neuWrapper);
+  QHBoxLayout* pLayout = new QHBoxLayout(neuWrapper);
+  pLayout->setContentsMargins(1,1,1,1);
   TextBufferView * neu= new TextBufferView(id,neuWrapper,0,colorMap,defaultFont);
   pLayout->addWidget(neu);
 
@@ -475,6 +476,7 @@ int Xpertmud::XM_TextBufferWindow_initialize() {
 
   return id;
 }
+
 int Xpertmud::XM_TextBufferWindow_getWordWrapColumn(int id) {
   TextBufferViewIface * tbw = getChildTextBufferWidget(id);
   if (tbw) {

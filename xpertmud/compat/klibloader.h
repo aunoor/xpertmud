@@ -64,7 +64,7 @@ class KLibLoader {
   }
 
   KLibFactory* factory(const QString& libname) {
-    cout << "trying to load lib " << libname.toLatin1().data() << endl;
+    cout << "trying to load lib " << libname.toLocal8Bit().data() << endl;
 #ifdef WIN32
     QString name = libname + ".dll";
 #else
