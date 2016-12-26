@@ -1519,22 +1519,29 @@ void QextMdiMainFrm::updateSysButtonConnections( QextMdiChildFrm* oldChild, Qext
    // if there is no menubar given, those system buttons aren't possible
    if( m_pMainMenuBar == 0L)
       return;
-      
+
+  QAction *ta = NULL;
+
    if (newChild) {
       if (frameDecorOfAttachedViews() == QextMdi::KDE2LaptopLook) {
          //m_pMainMenuBar->insertItem( QPixmap(kde2laptop_closebutton_menu), newChild, SLOT(closePressed()), 0, -1, 0);
-         QAction *ta=m_pMainMenuBar->addAction(QString(),newChild, SLOT(closePressed()));
+         ta=m_pMainMenuBar->addAction(QString(),newChild, SLOT(closePressed()));
          ta->setIcon(QPixmap(kde2laptop_closebutton_menu));
       }
       else {
          //m_pMainMenuBar->insertItem( *newChild->icon(), newChild->systemMenu(), -1, 0);
-         QAction *ta=m_pMainMenuBar->addMenu(newChild->systemMenu());
+         ta=m_pMainMenuBar->addMenu(newChild->systemMenu());
          ta->setIcon(*newChild->icon());
       }
+     //move action to first position
+     if (m_pMainMenuBar->actions().count()>1) {
+       m_pMainMenuBar->insertAction(m_pMainMenuBar->actions().first(), ta);
+     }
    }
    if (oldChild) {
       //m_pMainMenuBar->removeItem( m_pMainMenuBar->idAt(1));
-      m_pMainMenuBar->removeAction(m_pMainMenuBar->actions().at(1));
+      if (m_pMainMenuBar->actions().count()>1)
+        m_pMainMenuBar->removeAction(m_pMainMenuBar->actions().at(1));
    }
    if (oldChild) {
       QObject::disconnect( m_pUndock, SIGNAL(clicked()), oldChild, SLOT(undockPressed()) );
