@@ -181,7 +181,11 @@ void BattleMap::resize(unsigned int width, unsigned int height)
 {
   if(height > 0) {
     if(width > 0) {
-      myMap.resize(size_t(height), QValueVector<MapTile>(size_t(width)));
+      //myMap.resize(size_t(height), QVector<MapTile>(size_t(width)));
+      myMap.resize(height);
+      foreach(QVector<MapTile> tv, myMap) {
+          tv.resize(width);
+      }
     } else {
       myMap.resize(size_t(height));
     }
@@ -298,7 +302,7 @@ void BattleCore::updateMechsLOS(const map<QString, MechInfo>& currentMechs) {
 
 void BattleCore::setMechInfo(const MechInfo& mechInfo) {
   MechInfo oldMechInfo = getMechInfo(mechInfo.getId());
-  mechInfos[mechInfo.getId().upper()] = mechInfo;
+  mechInfos[mechInfo.getId().toUpper()] = mechInfo;
 
   if(mechInfo.getId() == getOwnId()) {
     if(mechInfo.getPos().getZ() != oldMechInfo.getPos().getZ())

@@ -39,11 +39,11 @@ BattleCoreWidget::~BattleCoreWidget() {
 void BattleCoreWidget::slotFunctionCall(int func, const QVariant & arg, QVariant & result) {
   QVariant args(arg);
   if (func==0) {
-    core->slotParseHUD(args.asString());
+    core->slotParseHUD(args.toString());
   } else if (func==1) {
-    core->slotSetTacticalInterval(args.asString().toInt());
+    core->slotSetTacticalInterval(args.toString().toInt());
   } else if (func==2) {
-    core->slotSetStatusInterval(args.asString().toInt());
+    core->slotSetStatusInterval(args.toString().toInt());
   } else if (func==3) {
     result=core->getOwnId();
   } else if (func==4) { // getContacts
@@ -54,21 +54,21 @@ void BattleCoreWidget::slotFunctionCall(int func, const QVariant & arg, QVariant
     }
     result=acc.left(acc.length()-1);
   } else if (func==5) {
-    core->slotSetContactsInterval(args.asString().toInt());
+    core->slotSetContactsInterval(args.toString().toInt());
   } else if (func==6) { // getContact
-    MechInfo o = core->getMechInfo(args.asString());
+    MechInfo o = core->getMechInfo(args.toString());
     if(o.isValid())
       result=o.toString(core->getMechInfo(core->getOwnId()));
     else
       result.clear();
   } else if (func==7) { // setContact
-    core->setMechInfo(args.asString());
+    core->setMechInfo(args.toString());
   } else if (func==8) { // deleteContact
-    core->deleteMechInfo(args.asString());
+    core->deleteMechInfo(args.toString());
   } else if (func==9) { // setWeaponsInterval
-    core->slotSetWeaponsInterval(args.asString().toInt());
+    core->slotSetWeaponsInterval(args.toString().toInt());
   } else if (func==10) { // parse with text parser
-    core->slotParseText(args.asString());
+    core->slotParseText(args.toString());
   } else if (func==11) {
     core->startSecondary();
   }

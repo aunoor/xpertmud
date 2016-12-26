@@ -15,7 +15,8 @@ using std::endl;
 void HUDParser::parse(const QString & sn) {
   // first check some special cases
   QString s;
-  int pos = sn.findRev('\n');
+  //int pos = sn.findRev('\n');
+  int pos = sn.lastIndexOf('\n');
   if(pos > 0)
     s = sn.left(pos);
   else
@@ -108,7 +109,8 @@ void HUDParser::parse(const QString & sn) {
    FL: Unit status flags
 */
 void HUDParser::parseGeneralStatus(const QString & line) {
-  QStringList params=QStringList::split(',',line,true);
+  //QStringList params=QStringList::split(',',line,true);
+  QStringList params=line.split(',');
   for (unsigned int pi=0; pi<params.count(); ++pi) 
     if (params[pi]=="-") 
       params[pi]="";
@@ -161,7 +163,8 @@ void HUDParser::parseGeneralStatus(const QString & line) {
 
 
 void HUDParser::parseStaticGeneralInfo(const QString & line) {
-  QStringList params=QStringList::split(',',line,true);
+  ///QStringList params=QStringList::split(',',line,true);
+  QStringList params=line.split(',');
   for (unsigned int pi=0; pi<params.count(); ++pi) 
     if (params[pi]=="-") 
       params[pi]="";
@@ -246,7 +249,8 @@ void HUDParser::parseContacts(const QString & con) {
     }
     
   } else if (con.startsWith("L#")) { // CONTACT LINE
-    QStringList params=QStringList::split(',',con.mid(3),true);
+    //QStringList params=QStringList::split(',',con.mid(3),true);
+    QStringList params=con.mid(3).split(',');
     for (unsigned int pi=0; pi<params.count(); ++pi) 
       if (params[pi]=="-") 
 	params[pi]="";
@@ -298,7 +302,8 @@ void HUDParser::parseContacts(const QString & con) {
   }
 }
 void HUDParser::parseTacticalStart(const QString & coords) {
-  QStringList params=QStringList::split(',',coords,true);
+  //QStringList params=QStringList::split(',',coords,true);
+  QStringList params=coords.split(',');
   for (unsigned int pi=0; pi<params.count(); ++pi) 
     if (params[pi]=="-") 
       params[pi]="";
@@ -310,14 +315,16 @@ void HUDParser::parseTacticalStart(const QString & coords) {
 }
 
 void HUDParser::parseTacticalLine(const QString & line) {
-  QStringList params=QStringList::split(',',line,true);
+  //QStringList params=QStringList::split(',',line,true);
+  QStringList params=line.split(',');
   for (unsigned int pi=0; pi<params.count(); ++pi) 
     if (params[pi]=="-") 
       params[pi]="";
   if (params.count()>=2) {
     int line=params[0].toInt();
     if (line>=tacLeftUpper.getY() && line <= tacRightLower.getY()) {
-      QTextIStream str(&params[1]);
+      //QTextIStream str(&params[1]);
+      QTextStream str(&params[1], QIODevice::ReadOnly);
       HEXPos hpos(tacLeftUpper.getX(),line);
       while (!str.atEnd() && hpos.getX()<=tacRightLower.getX()) {
 	MapTile mapTile;
@@ -363,7 +370,8 @@ c. Weapon List
    HT: heat measure, weapon heat per salvo
 */
 void HUDParser::parseWeaponListLine(const QString& line) {
-  QStringList params=QStringList::split(',',line,true);
+  //QStringList params=QStringList::split(',',line,true);
+  QStringList params=line.split(',');
   for (unsigned int pi=0; pi<params.count(); ++pi) 
     if (params[pi]=="-") 
       params[pi]="";
@@ -412,7 +420,8 @@ b. Weapon Status
    AT: ammo type, the type of ammo selected
 */
 void HUDParser::parseWeaponStatusLine(const QString& line) {
-  QStringList params=QStringList::split(',',line,true);
+  //QStringList params=QStringList::split(',',line,true);
+  QStringList params=line.split(',');
   for (unsigned int pi=0; pi<params.count(); ++pi) 
     if (params[pi]=="-") 
       params[pi]="";
@@ -480,7 +489,8 @@ g. Original Armor Status
 void HUDParser::parseOriginalArmorStatus(const QString & line) {
   if (line.startsWith("L#")) {
  
-    QStringList params=QStringList::split(',',line.mid(3),true);
+    //QStringList params=QStringList::split(',',line.mid(3),true);
+    QStringList params=line.mid(3).split(',');
     for (unsigned int pi=0; pi<params.count(); ++pi) 
       if (params[pi]=="-") 
         params[pi]="0";
@@ -537,7 +547,8 @@ h. Armor Status
 void HUDParser::parseArmorStatus(const QString & line) {
   if (line.startsWith("L#")) {
  
-    QStringList params=QStringList::split(',',line.mid(3),true);
+    //QStringList params=QStringList::split(',',line.mid(3),true);
+    QStringList params=line.mid(3).split(',');
     for (unsigned int pi=0; pi<params.count(); ++pi) 
       if (params[pi]=="-") 
         params[pi]="0";

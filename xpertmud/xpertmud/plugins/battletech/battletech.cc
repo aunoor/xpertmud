@@ -95,7 +95,14 @@ BattleMapView::BattleMapView(QWidget * parent, const char * name):
   lowerBorder = 20;
   rightBorder = 30;
 
-  buffer->resize(width(), height());
+  //buffer->resize(width(), height());
+
+  QPixmap tmpPix(width(), height());
+  QPainter pntr(&tmpPix);
+  pntr.drawPixmap(0, 0, *buffer);
+  pntr.end();
+  *buffer = tmpPix;
+
   updateInternal(); 
 
 }
@@ -168,11 +175,19 @@ void BattleMapView::paintEvent(QPaintEvent *pe) {
   //  if(scrolling && pe->erased()) {
   //  cout << "WHUAAAAAAAAAAAAA NOOOOOO!!!!!!" << endl;
   //}
-  
+
+/*
   bitBlt(this, pe->rect().x(), pe->rect().y(),
 	 buffer, pe->rect().x(), pe->rect().y(), 
 	 pe->rect().width(), pe->rect().height(), Qt::CopyROP, true);
-  
+*/
+
+  QPainter pBlt(this);
+  pBlt.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+  pBlt.drawPixmap(pe->rect().x(), pe->rect().y(), *buffer, pe->rect().x(),
+                  pe->rect().y(), pe->rect().width(), pe->rect().height());
+  pBlt.end();
+
   //  setUpdatesEnabled( true );
 }
 
@@ -298,14 +313,23 @@ void BattleMapView::updateNumbers(QPaintDevice* device, const QRegion &area) {
       // intersect it with the redraw region and BINGO we have
       // we have a home brewed clipping. nbot sure it is better, but
       // at least test it :)
-      if(QRegion(bnd).intersect(area).isEmpty())
-	continue;
+      //if(QRegion(bnd).intersect(area).isEmpty())
+      if(QRegion(bnd).intersected(area).isEmpty()) continue;
+      /*
       QPointArray bound(5);
       bound[0] = QPoint(fromX, fromY-1);
       bound[1] = QPoint(fromX, fromY+toHeight);
       bound[2] = QPoint(fromX+toWidth/2, fromY+toHeight+3);
       bound[3] = QPoint(fromX+toWidth, fromY+toHeight);
       bound[4] = QPoint(fromX+toWidth, fromY-1);
+*/
+      QPoint bound[5] = {
+        QPoint(fromX, fromY-1),
+        QPoint(fromX, fromY+toHeight),
+        QPoint(fromX+toWidth/2, fromY+toHeight+3),
+        QPoint(fromX+toWidth, fromY+toHeight),
+        QPoint(fromX+toWidth, fromY-1)
+      };
       
       // the numbers update at schorschs Laptop as if the brush is not set correctly 
       // but I cant see a flaw here.
@@ -313,12 +337,8 @@ void BattleMapView::updateNumbers(QPaintDevice* device, const QRegion &area) {
       // luck its working. WIld guess but all I can think of
       paint.setBrush(inC);
       paint.setPen(borderC);
-#if QT_VERSION<300
-      paint.drawPolygon(bound);
-#else
-      paint.drawConvexPolygon(bound);
-#endif
-      
+      paint.drawConvexPolygon(bound,5);
+
       paint.setPen(lightC);
       paint.drawLine(bound[0]+QPoint(1,0), bound[1]+QPoint(1,-1));
       paint.setPen(darkC);
@@ -333,7 +353,7 @@ void BattleMapView::updateNumbers(QPaintDevice* device, const QRegion &area) {
   }
 
   // just a try... shouldn't be so bad to performance
-  paint.flush();
+  //paint.flush(); //XXX:????
 
   int incY = (int)(ceil((double)textHeightNum / 
 			((double)layout.getHeight()*0.5)));
@@ -348,21 +368,32 @@ void BattleMapView::updateNumbers(QPaintDevice* device, const QRegion &area) {
       int fromY = pupperLeft.y()-y+layout.getHeight()/4+yInc-textHeightNum/2;
       int toWidth = textWidthNum-4;
       int toHeight = textHeightNum;
-      
+/*
       QPointArray bound(5);
       bound[0] = QPoint(fromX-1, fromY);
       bound[1] = QPoint(fromX+toWidth, fromY);
       bound[2] = QPoint(fromX+toWidth+3, fromY+toHeight/2);
       bound[3] = QPoint(fromX+toWidth, fromY+toHeight);
       bound[4] = QPoint(fromX-1, fromY+toHeight);
+*/
+      QPoint bound[5] = {
+          QPoint(fromX-1, fromY),
+          QPoint(fromX+toWidth, fromY),
+          QPoint(fromX+toWidth+3, fromY+toHeight/2),
+          QPoint(fromX+toWidth, fromY+toHeight),
+          QPoint(fromX-1, fromY+toHeight)
+      };
+
+
       paint.setBrush(inC);
       paint.setPen(borderC);
 // diabling convex polygom for testing purposes
 // wild guess mode on
+//TODO: return to convex!
 //#if QT_VERSION<300
-      paint.drawPolygon(bound);
+      paint.drawPolygon(bound,5);
 //#else
-//     paint.drawConvexPolygon(bound);
+//     paint.drawConvexPolygon(bound,5);
 //#endif
       
       paint.setPen(lightC);
@@ -450,13 +481,26 @@ void BattleMapView::scrollMap(int dx, int dy) {
     cout << "bitBlt (0, 0) from (" << dx << ", " << dy 
 	 << ", " << width() << ", " << height() << ")" << endl;
     */
-    doubleBuffer->resize(buffer->size());
+    //doubleBuffer->resize(buffer->size());
+    QPixmap tmpPix(buffer->size());
+    QPainter pntr(&tmpPix);
+    pntr.drawPixmap(0, 0, *doubleBuffer);
+    pntr.end();
+    *doubleBuffer = tmpPix;
+
+
     /*
     cout << "DefaultOpt: " << QPixmap::defaultOptimization() << endl;
     cout << "NormalOptim: " << QPixmap::NormalOptim << endl;
     */
+/*
     bitBlt(doubleBuffer, 0, 0,
     	   buffer, dx, dy, width(), height(), Qt::CopyROP, true);
+*/
+    QPainter pBlt(doubleBuffer);
+    pBlt.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+    pBlt.drawPixmap(0, 0, *buffer, dx, dy, width(), height());
+    pBlt.end();
 
     // switch buffers
     // cool variable swap code, just not sure if ^ is XOR... 
@@ -518,7 +562,7 @@ void BattleMapView::scrollMap(int dx, int dy) {
     // nope, in linux update() is also much, much
     // slower than repaint(false)...
     // I think we have to stick with repaint
-    repaint(false);
+    repaint();
   }
 }
 
@@ -533,7 +577,7 @@ void BattleMapView::saveImage(const KURL & fn, const HEXPos & tL, const HEXPos &
   QPoint areaEnd = layout.hexToPixel(HEXPos(bR.getX()+1,bR.getY()+2));
   QSize areaSize=QRect(beginArea,areaEnd).size();
   { // limit lifetime of qpixmap
-    QPixmap savepix(areaSize,-1,QPixmap::MemoryOptim);
+    QPixmap savepix(areaSize);
     QRect gcc_bug_preventer(QPoint(0,0),areaSize);
     QRegion area(gcc_bug_preventer);
     updateMap(&savepix, area);
@@ -600,7 +644,12 @@ void BattleMapView::setZoomInternal(double newZoom, int midx, int midy) {
 }
 
 void BattleMapView::resizeEvent(QResizeEvent* ev) {
-  buffer->resize(ev->size());
+  //buffer->resize(ev->size());
+  QPixmap tmpPix(ev->size());
+  QPainter pntr(&tmpPix);
+  pntr.drawPixmap(0, 0, *buffer);
+  pntr.end();
+  *buffer = tmpPix;
 
   // TOOD: optimize by only updating new areas in buffer, this is awfully slow
   updateInternal();
