@@ -267,12 +267,14 @@ QPoint QextMdiChildArea::getCascadePoint(int indexOfWindow)
 
 //================ childMinimized ===============//
 
-void QextMdiChildArea::childMinimized(QextMdiChildFrm *lpC,bool bWasMaximized)
+void QextMdiChildArea::childMinimized(QextMdiChildFrm *lpC, bool bWasMaximized)
 {
-   if(m_pZ->indexOf(lpC) == -1)return;
-   if(m_pZ->count() > 1){
-      m_pZ->removeAll(lpC);
-      m_pZ->insert(0,lpC);
+   int idx = m_pZ->indexOf(lpC);
+
+   if(idx == -1)return;
+
+   if(m_pZ->count() > 1) {
+      m_pZ->move(idx,0);
       if(bWasMaximized){
          // Need to maximize the top child
          lpC = m_pZ->last();
@@ -290,9 +292,9 @@ void QextMdiChildArea::childMinimized(QextMdiChildFrm *lpC,bool bWasMaximized)
 
 void QextMdiChildArea::focusTopChild()
 {
-   QextMdiChildFrm *lpC = NULL;
+   QextMdiChildFrm *lpC = topChild();
 
-   if (!m_pZ->isEmpty()) lpC=m_pZ->last();
+   //if (!m_pZ->isEmpty()) lpC=m_pZ->last();
 
    if(!lpC) {
       emit lastChildFrmClosed();
@@ -300,7 +302,7 @@ void QextMdiChildArea::focusTopChild()
    }
    //disable the labels of all the other children
    foreach(QextMdiChildFrm *pC, *m_pZ) {
-      if(pC != lpC)pC->m_pCaption->setActive(false);
+      if(pC != lpC) pC->m_pCaption->setActive(false);
    }
    lpC->raise();
    if(!lpC->hasFocus()) {

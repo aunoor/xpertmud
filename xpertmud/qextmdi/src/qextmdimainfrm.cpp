@@ -753,7 +753,8 @@ void QextMdiMainFrm::activateView(QextMdiChildView* pWnd)
 	          m_pCurrentWindow->showNormal();
        } else {
           if (m_pCurrentWindow->mdiParent()!=NULL)
-	             m_pCurrentWindow->mdiParent()->restorePressed();
+             //XXX: execute of this code tend to impossibility minimization of mdi windows
+	             ;//m_pCurrentWindow->mdiParent()->restorePressed();
        }
      }
       m_pCurrentWindow = pWnd;
