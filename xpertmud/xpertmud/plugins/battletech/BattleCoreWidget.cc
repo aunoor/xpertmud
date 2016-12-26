@@ -1,15 +1,16 @@
 #include "BattleCoreWidget.h"
 #include "BattleCore.h"
 
-#include <qtextedit.h>
-#include <qlayout.h>
-#include <qpushbutton.h>
+#include <QTextEdit>
+#include <QLayout>
+#include <QPushButton>
 #include <klocale.h>
 
 BattleCoreWidget::BattleCoreWidget(QWidget * parent, const char * name,
 				   const QStringList & args):
-  QWidget(parent,name), core(BattleCore::getInstance()) {
-
+  QWidget(parent), core(BattleCore::getInstance())
+{
+  setObjectName(name);
   QVBoxLayout* l =new QVBoxLayout(this);
   logViewer=new QTextEdit(this);
   logViewer->setReadOnly(true);

@@ -50,7 +50,7 @@ TextBufferView::TextBufferView(int id, QWidget* parent, const char* name,
 {
   setObjectName(name);
 
-  //setAttribute(Qt::WA_StaticContents, true); //for redraw only visible part of widget
+  setAttribute(Qt::WA_StaticContents, true); //for redraw only visible part of widget
   setAttribute(Qt::WA_NoSystemBackground, true); //for disable repainting background by system before PaintEvent
   setAttribute(Qt::WA_OpaquePaintEvent, true);   //also as NoSysBackground
 

@@ -1,7 +1,8 @@
 #include "HUDParser.h"
 
-#include <qstringlist.h>
-#include <qtextstream.h>
+#include <QStringList>
+#include <QTextStream>
+
 #include <vector>
 using std::vector;
 
@@ -118,12 +119,12 @@ void HUDParser::parseGeneralStatus(const QString & line) {
     // if no mechinfo there, get the static info of your mech
     if(!om.isValid())
       core->slotSend("hudinfo sgi\n");
-    core->setOwnId(params[0].lower());
+    core->setOwnId(params[0].toLower());
     // TODO: construct mechinfo for oneself.
     
     MechInfo old_om = om;
     MechInfo update;
-    update.setId(params[0].lower());
+    update.setId(params[0].toLower());
     update.setInLOS(true);
     double corr = 180.0 + params[14].toDouble();
     if(corr >= 360)
@@ -293,7 +294,7 @@ void HUDParser::parseContacts(const QString & con) {
     update.setHeat(params[17].toInt());
     update.setStatus(params[18]);
 
-    currentMechs[params[0].upper()]=update;
+    currentMechs[params[0].toUpper()]=update;
   }
 }
 void HUDParser::parseTacticalStart(const QString & coords) {

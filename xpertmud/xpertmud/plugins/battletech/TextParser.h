@@ -2,9 +2,10 @@
 #ifndef TEXTPARSER_H
 #define TEXTPARSER_H
 
-#include <qregexp.h>
-#include <qstring.h>
 #include "BattleCore.h"
+
+#include <QRegExp>
+#include <QString>
 
 class TextParser: public BattleParser {
   static const int LAG_PROTECT_TIME;

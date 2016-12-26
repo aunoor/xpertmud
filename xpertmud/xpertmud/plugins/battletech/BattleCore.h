@@ -9,17 +9,15 @@ using std::min;
 #include <map>
 using std::map;
 
-#include <qobject.h>
-
-#include <qstring.h>
+#include <QString>
 
 // TODO: remove if un-inline done
-#include <qtextstream.h>
+#include <QTextStream>
 
-#include <qvaluevector.h>
+#include <QDateTime>
+#include <QFile>
+#include <QVector>
 
-#include <qdatetime.h>
-#include <qfile.h>
 #include <kurl.h>
 
 #include "Positions.h"
@@ -226,7 +224,7 @@ protected:
 //////////////////////////////////////////////////////////////////////
 
 class BattleMap {
-  typedef QValueVector< QValueVector<MapTile> > mapT;
+  typedef QVector< QVector<MapTile> > mapT;
 public:
   BattleMap(const QString& id, unsigned int width=0, unsigned int height=0);
   BattleMap(const QString& id, QTextStream& text);
@@ -274,7 +272,7 @@ class BattleCore: public QObject {
   // and will not be saved anywhere
   typedef map<QString, MechInfo> mechsT;
 
-  typedef QValueVector<WeaponInfo> weaponsT;
+  typedef QVector<WeaponInfo> weaponsT;
 public:
   typedef mechsT::const_iterator mechIteratorT;
 
@@ -295,7 +293,7 @@ public:
     if(!url.isLocalFile())
       return;
     QFile f(url.directory()+'/'+url.fileName());
-    if(!f.open(IO_ReadOnly))
+    if(!f.open(QIODevice::ReadOnly))
       return;
     {
       unsigned int oldW=current->getWidth();
@@ -321,7 +319,7 @@ public:
     if(!url.isLocalFile())
       return;
     QFile f(url.directory()+'/'+url.fileName());
-    if(!f.open(IO_WriteOnly))
+    if(!f.open(QIODevice::WriteOnly))
       return;
     {
       QTextStream fs(&f);
@@ -361,7 +359,7 @@ public:
   }
   
   void deleteMechInfo(const QString &id) {
-    mechsT::iterator mi = mechInfos.find(id.upper());
+    mechsT::iterator mi = mechInfos.find(id.toUpper());
     MechInfo oldMechInfo;
     if(mi != mechInfos.end()) {
       oldMechInfo=mi->second;
@@ -377,13 +375,13 @@ public:
   void updateMechsLOS(const map<QString, MechInfo>& toUpdate);
 
   MechInfo getMechInfo(const QString& id) const {
-    mechsT::const_iterator mi = mechInfos.find(id.upper());
+    mechsT::const_iterator mi = mechInfos.find(id.toUpper());
     if(mi != mechInfos.end())
       return mi->second;
     return MechInfo();
   }
   void setVisibleOverride(const QString & id, bool override, bool vis) {
-    mechsT::iterator mi = mechInfos.find(id.upper());
+    mechsT::iterator mi = mechInfos.find(id.toUpper());
       if(mi != mechInfos.end())
         mi->second.setVisibleOverride(override, vis);
   }

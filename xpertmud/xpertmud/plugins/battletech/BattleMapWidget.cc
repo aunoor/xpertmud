@@ -1,12 +1,12 @@
 #include "BattleMapWidget.h"
-#include <qlayout.h>
-#include <qslider.h>
-#include <qlabel.h>
-#include <qtextstream.h>
-#include <qaction.h>
-#include <qstringlist.h>
-#include <qcursor.h>
-#include <qpopupmenu.h>
+#include <QLayout>
+#include <QSlider>
+#include <QLabel>
+#include <QTextStream>
+#include <QAction>
+#include <QStringList>
+#include <QCursor>
+#include <QMenu>
 
 #include <kstandarddirs.h>
 #include <kfiledialog.h>
@@ -20,10 +20,11 @@ using std::endl;
 
 BattleMapWidget::BattleMapWidget(QWidget *parent, 
 				 const char *name, const QStringList& /* params*/):
-  QWidget(parent, name),
+  QWidget(parent),
   zoomLock(false),
   core(BattleCore::getInstance())
 {
+  setObjectName(name);
   /* Please leave in for debuggin purposes
   MechInfo m("ab", SubHEXPos(4, 6, M_PI, 0.3), M_PI/2.0);
   core->setMechInfo(m);

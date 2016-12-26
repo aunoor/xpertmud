@@ -3,13 +3,18 @@
 #include "EasyStyle.h"
 
 #include <cassert>
-
+#include <cmath>
+/*
 #include <algorithm>
 using std::max;
 using std::min;
+*/
 
-#include <cmath>
-#include <qfile.h>
+#include <QFile>
+#include <QBitmap>
+#include <QPainter>
+#include <QPixmap>
+#include <QMouseEvent>
 #include <kimageio.h>
 
 const int BattleMapView::MIN_ZOOM = 1;
@@ -18,17 +23,17 @@ const int BattleMapView::MIN_X = -35;
 const int BattleMapView::MIN_Y = -20;
 
 BattleMapView::BattleMapView(QWidget * parent, const char * name):
-  QWidget(parent, name,
-	  WResizeNoErase|
-	  WStaticContents|
-	  WRepaintNoErase|
-	  WPaintClever
-	  ),
+  QWidget(parent),
   x(0), y(0),
   style(new EasyStyle()),
   core(BattleCore::getInstance()),
   zoom(50.0), deformation(1.0)
 {
+  setObjectName(name);
+  setAttribute(Qt::WA_StaticContents, true); //for redraw only visible part of widget
+  setAttribute(Qt::WA_NoSystemBackground, true); //for disable repainting background by system before PaintEvent
+  setAttribute(Qt::WA_OpaquePaintEvent, true);   //also as NoSysBackground
+
   buffer = new QPixmap();
   doubleBuffer = new QPixmap();
 
@@ -535,7 +540,7 @@ void BattleMapView::saveImage(const KURL & fn, const HEXPos & tL, const HEXPos &
     updateNumbers(&savepix, area);
     // No mechs in saved image
     //    updateMechs(&savepix, area);
-    savepix.save(file,type);
+    savepix.save(file,type.toLocal8Bit().data());
   }
   x=saved_x;
   y=saved_y;
@@ -778,7 +783,7 @@ void BattleMapView::mechPosition(const SubHEXPos& hexPos,
 
 
 void BattleStyle::updateTileMask(int width,int height) {
-   if (tileMask.width() != width || tileMask.height() != height) {
+  if (tileMask.width() != width || tileMask.height() != height) {
 /*
   QMemArray<uchar> zerobits((int(width/8)+1)*height+1);
   zerobits.fill(0x00);
@@ -786,8 +791,9 @@ void BattleStyle::updateTileMask(int width,int height) {
   tileMask=QBitmap(width, height, zerobits.data());
 
 */
-    tileMask=QBitmap(width,height,true);
-    
+    //tileMask=QBitmap(width,height, true);
+    tileMask=QBitmap(width, height);
+
     QPainter pixPaint;
     pixPaint.begin(&tileMask);
 //    pixPaint.begin(debuglabel);
@@ -800,26 +806,27 @@ void BattleStyle::updateTileMask(int width,int height) {
     QPoint se = QPoint(width*3/4-1, height-1);
     QPoint eUpper = QPoint(width-2, height/2-1);
     QPoint eLower = QPoint(width-2, height/2);
-      
-    QPointArray bound(8);
-    bound[0]=wLower;
-    bound[1]=wUpper;
-    bound[2]=nw;
-    bound[3]=ne;
-    bound[4]=eUpper;
-    bound[5]=eLower;
-    bound[6]=se;
-    bound[7]=sw;
-      
+
+    QPoint bound[8] = {
+            wLower,
+            wUpper,
+            nw,
+            ne,
+            eUpper,
+            eLower,
+            se,
+            sw
+    };
+
+
     pixPaint.setBrush(Qt::color1);
     pixPaint.setPen(Qt::color1);
 
 
-    pixPaint.drawConvexPolygon(bound);
-//    pixPaint.drawPolygon(bound);
-////
+    pixPaint.drawConvexPolygon(bound, 8);
 
-      pixPaint.end();
+
+    pixPaint.end();
 #ifdef DEBUG_MASK
     debuglabel->setPixmap(tileMask);
 #endif

@@ -1,9 +1,8 @@
 // -*- c++ -*-
 #ifndef BATTLEHEAT_H
 #define BATTLEHEAT_H
-#include <qvariant.h>
-#include <qwidget.h>
 
+#include <QWidget>
 
 class BattleCore;
 

@@ -2,13 +2,13 @@
 #ifndef BATTLEWEAPONS_H
 #define BATTLEWEAPONS_H
 
-#include <qwidget.h>
+#include <QWidget>
 #include <qvariant.h>
 #include <vector>
 
 class BattleCore;
-class QListView;
-class QPopupMenu;
+class QTreeWidget;
+class QMenu;
 
 class WeaponViewItem;
 class WeaponView: public QWidget {
@@ -35,8 +35,8 @@ private:
   void updateEntries();
 
   BattleCore* core;
-  QListView* listView;
-  QPopupMenu* popup;
+  QTreeWidget* listView;
+  QMenu* popup;
   std::vector<WeaponViewItem *> items;
 
   // for heat calculations:

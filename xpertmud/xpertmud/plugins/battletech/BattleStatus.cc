@@ -1,22 +1,13 @@
 #include "BattleStatus.h"
 #include "BattleCore.h"
-#include <qvariant.h>
-#include <qwidget.h>
-#include <qpainter.h>
-#include <qpixmap.h>
-#include <qimage.h>
-#include <qstringlist.h>
+
+#include <QWidget>
+#include <QPainter>
+#include <QPixmap>
+#include <QImage>
+#include <QStringList>
 #include <kglobal.h>
 #include <kstandarddirs.h>
-
-#include <algorithm>
-#ifndef WIN32
-using std::max;
-using std::min;
-#else
-#define max(x,y) ((x) > (y)?(x):(y))
-#define min(x,y) ((x) > (y)?(y):(x))
-#endif
 
 class BattleStatusDrawConfig {
 public:
@@ -28,9 +19,13 @@ public:
 BattleStatusWidget::BattleStatusWidget(QWidget *parent, 
 				   const char *name, 
 				   const QStringList& args):
-  QWidget(parent,name,WResizeNoErase| WRepaintNoErase ),
+  QWidget(parent),
   core(BattleCore::getInstance()),hasArmorStatus(false),currentDrawConfig(NULL)
 {
+  setObjectName(name);
+  setAttribute(Qt::WA_NoSystemBackground, true); //for disable repainting background by system before PaintEvent
+  setAttribute(Qt::WA_OpaquePaintEvent, true);   //also as NoSysBackground
+
   setMaximumSize(150,150);
   connect(core, SIGNAL(queueMechInfoChange(const MechInfo&,
 					   const MechInfo&)),
@@ -44,11 +39,11 @@ BattleStatusWidget::BattleStatusWidget(QWidget *parent,
       KGlobal::dirs()->findResource("appdata", 
 				    "status/status.def");
 
-   qDebug("Reading status defs from [%s]",(const char *)(path.local8Bit()));
+   qDebug("Reading status defs from [%s]",(const char *)(path.toLocal8Bit()));
    
    if (path.isEmpty()) return;
    QFile f(path);
-   if (!f.open(IO_ReadOnly)) return;
+   if (!f.open(QIODevice::ReadOnly)) return;
    QTextStream s(&f);
    QString currentTemplate;
    BattleStatusDrawConfig * currentConfig=NULL;
@@ -59,7 +54,7 @@ BattleStatusWidget::BattleStatusWidget(QWidget *parent,
        if (!te.isEmpty()) {
          currentConfig=new BattleStatusDrawConfig;
          currentTemplate=te;
-	 qDebug("CurrentTemplate: [%s]",(const char *)(currentTemplate.local8Bit()));
+	 qDebug("CurrentTemplate: [%s]",(const char *)(currentTemplate.toLocal8Bit()));
          drawConfig[currentTemplate]=currentConfig;
        }
      } else if (currentConfig && l.startsWith("IMAGE:")) {
@@ -72,7 +67,7 @@ BattleStatusWidget::BattleStatusWidget(QWidget *parent,
        }
     } else if (currentConfig && l.startsWith("SECTION:")) {
       QString rem=l.mid(8).simplifyWhiteSpace();
-      QTextStream li(&rem, IO_ReadOnly);
+      QTextStream li(&rem, QIODevice::ReadOnly);
       int x,y;
       QString sec;
       li >> x >> y >> sec;
@@ -105,9 +100,9 @@ void BattleStatusWidget::paintEvent ( QPaintEvent *e ) {
     erase();
   }
 
-  painter.setPen(lightGray);
+  painter.setPen(Qt::lightGray);
   QString pos=QString("(%1,%2,%3)").arg(ownPosition.getX()).arg(ownPosition.getY()).arg(ownPosition.getZ());
-  painter.drawText(rect(),AlignTop|AlignHCenter|SingleLine,pos);
+  painter.drawText(rect(), Qt::AlignTop|Qt::AlignHCenter|Qt::TextSingleLine, pos);
 
   if (currentDrawConfig && hasArmorStatus) {
     painter.save();
@@ -125,15 +120,15 @@ void BattleStatusWidget::paintEvent ( QPaintEvent *e ) {
         int per=oarmor?(armor*100)/oarmor:1;
         QString arm=QString::number(armor);
 	if (per>90) {
-          painter.setPen(green);
+          painter.setPen(Qt::green);
         } else if (per>75) {
-           painter.setPen(darkGreen);
+           painter.setPen(Qt::darkGreen);
         } else if (per>45) {
-           painter.setPen(yellow);
+           painter.setPen(Qt::yellow);
         } else {
-           painter.setPen(red);
+           painter.setPen(Qt::red);
  	}
-        painter.drawText(re,AlignCenter,arm);
+        painter.drawText(re,Qt::AlignCenter,arm);
       }
     }
     painter.restore();
@@ -163,8 +158,8 @@ void BattleStatusWidget::paintEvent ( QPaintEvent *e ) {
     flags.append("Hulldown");
 
   if (!flags.isEmpty()) {
-    painter.setPen(red);
-    painter.drawText(rect(),AlignBottom|AlignHCenter,flags.join("\n"));
+    painter.setPen(Qt::red);
+    painter.drawText(rect(),Qt::AlignBottom|Qt::AlignHCenter,flags.join("\n"));
   }
   painter.end();
 }

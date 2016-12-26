@@ -3,14 +3,14 @@
 #define BATTLEMAPWIDGET_H
 
 #include "battletech.h" // BattleMapView
-#include <qwidget.h>
+#include <QWidget>
 #include <kurl.h>
 
 class QSlider;
 class QLabel;
 class QAction;
-class QPopupMenu;
 class BattleCore;
+class QMenu;
 
 class BattleMapWidget: public QWidget {
   Q_OBJECT
@@ -62,10 +62,10 @@ private slots:
 private:
 
   bool zoomLock;
-  QPopupMenu *tilePopup;
-  QPopupMenu *mechPopup;
-  QPopupMenu *settingsPopup;
-  QPopupMenu *lockHexPopup;
+  QMenu *tilePopup;
+  QMenu *mechPopup;
+  QMenu *settingsPopup;
+  QMenu *lockHexPopup;
   QWidget *speedbar;
   QSlider *slider;
   QLabel *centered;

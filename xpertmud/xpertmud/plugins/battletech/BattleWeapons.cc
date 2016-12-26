@@ -1,16 +1,17 @@
 #include "BattleWeapons.h"
 #include "BattleCore.h"
 
-#include <qlistview.h>
-#include <qlayout.h>
-#include <qpopupmenu.h>
+#include <QTreeWidget>
+#include <QVBoxLayout>
+#include <QMenu>
+
 #include <klocale.h>
 #include <cassert>
 
-class WeaponViewItem: public QListViewItem {
+class WeaponViewItem: public QTreeWidgetItem {
 public:
-  WeaponViewItem(QListView* parent, const WeaponInfo& wi, const WeaponStat &stat): 
-    QListViewItem(parent), heatColor(0, 0, 0), textColor("lightgrey")
+  WeaponViewItem(QTreeWidget* parent, const WeaponInfo& wi, const WeaponStat &stat):
+      QTreeWidgetItem(parent), heatColor(0, 0, 0), textColor("lightgrey")
   {
     setInfo(wi,stat,0,30);
   }
@@ -61,7 +62,7 @@ public:
     if(stat.hasMinRange() && stat.hasShortRange() &&
        stat.hasMidRange() && stat.hasLongRange()) {
       QString ranges;
-      QTextStream str(&ranges, IO_WriteOnly);
+      QTextStream str(&ranges, QIODevice::WriteOnly);
       str << stat.getMinRange() << " "
 	  << stat.getShortRange() << " "
 	  << stat.getMidRange() << " "
@@ -84,7 +85,7 @@ public:
     QColorGroup newGroup(cg);
     newGroup.setColor(QColorGroup::Text, textColor);
     newGroup.setBrush(QColorGroup::Base, heatColor);
-    QListViewItem::paintCell(p, newGroup, column, width, align);
+    QTreeWidgetItem::paintCell(p, newGroup, column, width, align);
   }
 
 private:
@@ -95,8 +96,9 @@ private:
 //////////////////////////////////////////////////////////////////////
 
 WeaponView::WeaponView(QWidget* parent, const char* name, const QStringList& /*args*/):
-  QWidget(parent, name), core(BattleCore::getInstance())
+  QWidget(parent), core(BattleCore::getInstance())
 {
+  setObjectName(name);
   connect(core, SIGNAL(weaponChange(int)),
 	  this, SLOT(slotUpdateEntry(int)));
   connect(core, SIGNAL(nrWeaponsChange(int)),
@@ -106,9 +108,10 @@ WeaponView::WeaponView(QWidget* parent, const char* name, const QStringList& /*a
   connect(core,SIGNAL(heatDissipationChanged(int)),
 	  this, SLOT(heatDissipationChanged(int)));
   QVBoxLayout *l = new QVBoxLayout(this);
-  l->setAutoAdd(true);
+  l->setContentsMargins(0,0,0,0);
 
-  listView=new QListView(this);
+  listView=new QTreeWidget(this);
+  l->addWidget(listView);
 
 #if QT_VERSION < 300
   listView->setBackgroundColor(QColor(0,0,0));
@@ -116,8 +119,8 @@ WeaponView::WeaponView(QWidget* parent, const char* name, const QStringList& /*a
   listView->setPaletteBackgroundColor(QColor(0,0,0));
 #endif
 
-  listView->setFocusPolicy(NoFocus);
-  listView->viewport()->setFocusPolicy(NoFocus);
+  listView->setFocusPolicy(Qt::NoFocus);
+  listView->viewport()->setFocusPolicy(Qt::NoFocus);
   
   listView->addColumn(""); // 0  Nr
   listView->addColumn(""); // 1  Section

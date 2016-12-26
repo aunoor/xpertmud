@@ -19,9 +19,6 @@ file (GLOB SRCS
 
 find_package(Qt5Widgets REQUIRED)
 
-#for perl 3.18 we need this
-#add_definitions(-Wno-reserved-user-defined-literal)
-
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

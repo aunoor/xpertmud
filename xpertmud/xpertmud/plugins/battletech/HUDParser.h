@@ -3,7 +3,7 @@
 #define HUD_PARSER_H
 
 #include "BattleCore.h"
-#include <qmap.h>
+#include <QMap>
 
 #define HUDINFO_VERSION "0.6"
 

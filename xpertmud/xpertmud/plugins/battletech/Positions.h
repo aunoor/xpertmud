@@ -12,7 +12,7 @@
 #endif
 #endif
 #include <algorithm>
-#include <qpoint.h>
+#include <QPoint>
 #include <iostream>
 using std::cout;
 using std::endl;

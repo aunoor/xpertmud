@@ -1,25 +1,30 @@
 #include "BattleSpeed.h"
 #include "BattleCore.h"
-#include <qvariant.h>
-#include <qwidget.h>
-#include <qpainter.h>
-#include <algorithm>
+#include <QPainter>
+#include <QMouseEvent>
+#include <QTextStream>
+//#include <algorithm>
+
 #ifndef WIN32
-using std::max;
-using std::min;
+//using std::max;
+//using std::min;
 #else
-#define max(x,y) ((x) > (y)?(x):(y))
-#define min(x,y) ((x) > (y)?(y):(x))
+//#define max(x,y) ((x) > (y)?(x):(y))
+//#define min(x,y) ((x) > (y)?(y):(x))
 #endif
 
 BattleSpeedWidget::BattleSpeedWidget(QWidget *parent, 
 				   const char *name, 
 				   const QStringList& args):
-  QWidget(parent,name,WResizeNoErase| WRepaintNoErase ),
+  QWidget(parent),
   core(BattleCore::getInstance()), maxRunningSpeed(53.0), 
   maxWalkingSpeed(35.0),maxBackingSpeed(35.0),
   currentSpeed(0.0),lastScale(0.1),lastBack(35.0)
 {
+  setObjectName(name);
+  setAttribute(Qt::WA_NoSystemBackground, true); //for disable repainting background by system before PaintEvent
+  setAttribute(Qt::WA_OpaquePaintEvent, true);   //also as NoSysBackground
+
   connect(core,SIGNAL(speedChanged(double)),
 	  this, SLOT(speedChanged(double)));
 
@@ -179,7 +184,7 @@ void BattleSpeedWidget::mouseReleaseEvent ( QMouseEvent * e ) {
   double d = ((rect().height()-e->y()-3)/lastScale)-lastBack;
   // cout << "e.y(): " << e->y() << " rect.height() " << rect().height() << " lastBack:" << lastBack << " lastScale: " << lastScale << endl;
   QString str;
-  QTextStream stream(str,IO_WriteOnly);
+  QTextStream stream(&str, QIODevice::WriteOnly);
   stream << "speed ";
   if(fabs(d) < 5.0)
     stream << "stop" << endl;
@@ -190,9 +195,9 @@ void BattleSpeedWidget::mouseReleaseEvent ( QMouseEvent * e ) {
   else if(fabs(d+maxBackingSpeed) < 5.0)
     stream << "back" << endl;
   else if(d < 0)
-    stream << max(d, maxBackingSpeed*-1.0) << endl;
+    stream << qMax(d, maxBackingSpeed*-1.0) << endl;
   else
-    stream << min(d, maxRunningSpeed) << endl;
+    stream << qMin(d, maxRunningSpeed) << endl;
   core->slotSend(str);
   emit changeSpeed(d);
 }

@@ -4,8 +4,8 @@
 // This is a Widget used as Perl/Python representation of the BattleCore data
 
 
-#include <qwidget.h>
-#include <qvariant.h>
+#include <QWidget>
+#include <QVariant>
 
 class BattleCore;
 class QTextEdit;

@@ -2,13 +2,16 @@
 #ifndef EASYSTYLE_H
 #define EASYSTYLE_H
 
-#include <qbitmap.h>
-#include <qimage.h>
+#include "battletech.h"
+#include "BattleCore.h"
+
 #include <kglobal.h>
 #include <kstandarddirs.h>
 
-#include "battletech.h"
-#include "BattleCore.h"
+#include <QBitmap>
+#include <QImage>
+#include <QPainter>
+
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -17,7 +20,7 @@ using std::endl;
 
 //#define DEBUG_MASK
 #ifdef DEBUG_MASK
-#include <qlabel.h>
+#include <QLabel>
 QLabel * debuglabel=NULL;
 
 #endif
@@ -201,42 +204,46 @@ public:
       }
       // and paint
       mc->second.pixmap = new QPixmap(mWidth, mHeight);
-      mc->second.pixmap->setMask(QBitmap(mWidth, mHeight, true));
+      mc->second.pixmap->setMask(QBitmap(mWidth, mHeight));
 
       mc->second.width = mWidth;
       mc->second.height = mHeight;
       mc->second.heading = heading;
       QPixmap scaled(mWidth, mHeight);
-      scaled.setMask(QBitmap(mWidth, mHeight, true));
+      scaled.setMask(QBitmap(mWidth, mHeight));
       if(rtype == "B" || rtype == "V") {
 	scaled.convertFromImage
-	  (iMechs[rtype].smoothScale(mWidth, mHeight));
+	  (iMechs[rtype].scaled(mWidth, mHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
       } else {
 	QPixmap under;
 	under.convertFromImage
-	  (iMechs["T"+rtype].smoothScale(mWidth, mHeight));
+	  (iMechs["T"+rtype].scaled(mWidth, mHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	QPixmap body;
 	body.convertFromImage
-	  (iMechs["TB"].smoothScale(mWidth, mHeight));
+	  (iMechs["TB"].scaled(mWidth, mHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 	QPixmap scaledTurrent;
 	scaledTurrent.convertFromImage
-	  (iMechs["TU"].smoothScale(mWidth, mHeight));
-	
+	  (iMechs["TU"].scaled(mWidth, mHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+
+  QBitmap tmpMask = scaled.mask();
 	QPainter p2;
-	p2.begin(scaled.mask());
-	p2.setRasterOp(Qt::OrROP);
+	p2.begin(&tmpMask);
+	//p2.setRasterOp(Qt::OrROP);
+  //Qt5 has no multiplatform compatible ROP. Try to select more likely...
+  p2.setCompositionMode(QPainter::CompositionMode_SourceAtop);
 
 	// draw body alphamap
 	p2.translate(mWidth/2, mHeight/2);
-	p2.drawPixmap(QPoint(-mWidth/2, -mHeight/2), *under.mask());
-	p2.drawPixmap(QPoint(-mWidth/2, -mHeight/2), *body.mask());
+	p2.drawPixmap(QPoint(-mWidth/2, -mHeight/2), under.mask());
+	p2.drawPixmap(QPoint(-mWidth/2, -mHeight/2), body.mask());
 
 	// draw turned turrent alphamap
 	if(mechInfo.hasTurretOffset())
 	  p2.rotate(-(180.0-mechInfo.getTurretOffset()*180.0/M_PI));
-	p2.drawPixmap(QPoint(-mWidth/2, -mHeight/2), *scaledTurrent.mask());
+	p2.drawPixmap(QPoint(-mWidth/2, -mHeight/2), scaledTurrent.mask());
 
 	p2.end();
+  scaled.setMask(tmpMask);
 
 	p2.begin(&scaled);
 
@@ -265,12 +272,13 @@ public:
       pixPaint.end();
 
       // copy bitmask
-      pixPaint.begin(mc->second.pixmap->mask());
+      QBitmap tmpMask = mc->second.pixmap->mask();
+      pixPaint.begin(&tmpMask);
       pixPaint.translate(mWidth/2, mHeight/2);
       pixPaint.rotate(heading);
-      pixPaint.drawPixmap(QPoint(-mWidth/2, -mHeight/2), *scaled.mask());
+      pixPaint.drawPixmap(QPoint(-mWidth/2, -mHeight/2), scaled.mask());
       pixPaint.end();
-
+      mc->second.pixmap->setMask(tmpMask);
     }
 
     paintMechName(device, clipArea, x+mWidth/2, y+mHeight/2, mechInfo);
@@ -280,7 +288,7 @@ public:
     if(drawHeading) {
       int xInc = (int)(headingLength * cos(heading*M_PI/180.0 - M_PI/2.0));
       int yInc = (int)(headingLength * sin(heading*M_PI/180.0 - M_PI/2.0));
-      if(mechInfo.getId() == mechInfo.getId().upper() && mechInfo.getId() != "**") {
+      if(mechInfo.getId() == mechInfo.getId().toUpper() && mechInfo.getId() != "**") {
 	p.setPen(QColor(210, 10, 15));
       } else {
 	p.setPen(QColor(10, 210, 15));
@@ -312,7 +320,7 @@ public:
     p.setPen(lightC);
     p.drawLine(rect.x()+1, rect.y()+1, rect.x()+1, rect.y()+rect.height()-2);
     p.drawLine(rect.x()+1, rect.y()+1, rect.x()+rect.width()-2, rect.y()+1);
-    if(mechInfo.getId() == mechInfo.getId().upper() && 
+    if(mechInfo.getId() == mechInfo.getId().toUpper() &&
        mechInfo.getId() != "**")
       p.setPen(QColor(70,10,5));
     else
@@ -324,96 +332,102 @@ public:
     
   }
 
-  void paintTile(QPaintDevice* device, const QRegion& clipArea,
-		 int x, int y, int width, int height,
-		 const MapTile& mapTile, 
-		 bool borders,
-		 int cliffs,
-		 bool cliffN, bool cliffNW, bool cliffSW) {
+    void paintTile(QPaintDevice* device, const QRegion& clipArea,
+                   int x, int y, int width, int height,
+                   const MapTile& mapTile,
+                   bool borders,
+                   int cliffs,
+                   bool cliffN, bool cliffNW, bool cliffSW) {
 
-    // skip this whole pixmap stuff when painting a tile smaller than a few pixels
+      // skip this whole pixmap stuff when painting a tile smaller than a few pixels
       if (width <=3) {
-	  QPainter p;
-	  p.begin(device);
-	  // draw the tile and the left upper and
-	  // the left lower tile
-	  p.fillRect(x,y,width,height,getColor(mapTile));
+        QPainter p;
+        p.begin(device);
+        // draw the tile and the left upper and
+        // the left lower tile
+        p.fillRect(x,y,width,height,getColor(mapTile));
 
-	  p.end();
-		     
+        p.end();
 
-      } else { 
+
+      } else {
         updateTileMask(width,height);
 
-    QString key;
-    QTextStream keyStream(&key, IO_WriteOnly);
-    // TODO: make this efficient (use an extra key class)
-    keyStream << (int)mapTile.hasType() << " "
-	      << mapTile.getType() << " "
-	      << (int)mapTile.hasHeight() << " "
-	      << mapTile.getHeight();
+        QString key;
+        QTextStream keyStream(&key, QIODevice::WriteOnly);
+        // TODO: make this efficient (use an extra key class)
+        keyStream << (int)mapTile.hasType() << " "
+                  << mapTile.getType() << " "
+                  << (int)mapTile.hasHeight() << " "
+                  << mapTile.getHeight();
 
-    tileCacheT::iterator tc = tileCache.find(key);
-    if(tc == tileCache.end() ||
-       tc->second.width != width ||
-       tc->second.height != height) {
-      //      cout << "Caching tile: \"" << key.latin1() << "\"" << endl;
-
-      
-      // generate new cache entry
-      if(tc != tileCache.end()) {
-	for(tileCacheT::iterator it = tileCache.begin();
-	    it != tileCache.end();++it)
-	  delete it->second.pixmap;
-	tileCache.clear();
-      }
-      tc = tileCache.insert
-	(tileCacheT::value_type(key, TileCacheEntry())).first;
-      tc->second.pixmap = new QPixmap(width, height);
-      tc->second.pixmap->setMask(tileMask);
-      tc->second.width = width;
-      tc->second.height = height;
-
-      QPainter pixPaint;
-      pixPaint.begin(tc->second.pixmap);
-      paintTile(pixPaint, 0, 0, width, height, mapTile, borders); 
-      pixPaint.end();
+        tileCacheT::iterator tc = tileCache.find(key);
+        if(tc == tileCache.end() ||
+           tc->second.width != width ||
+           tc->second.height != height) {
+          //      cout << "Caching tile: \"" << key.latin1() << "\"" << endl;
 
 
+          // generate new cache entry
+          if(tc != tileCache.end()) {
+            for(tileCacheT::iterator it = tileCache.begin();
+                it != tileCache.end();++it)
+              delete it->second.pixmap;
+            tileCache.clear();
+          }
+          tc = tileCache.insert
+                  (tileCacheT::value_type(key, TileCacheEntry())).first;
+          tc->second.pixmap = new QPixmap(width, height);
+          tc->second.pixmap->setMask(tileMask);
+          tc->second.width = width;
+          tc->second.height = height;
 
-    }
-    QRect blitArea(x, y, width, height); 
-    if(blitArea.isValid()) {
+          QPainter pixPaint;
+          pixPaint.begin(tc->second.pixmap);
+          paintTile(pixPaint, 0, 0, width, height, mapTile, borders);
+          pixPaint.end();
 
-      QRect rect = (clipArea & blitArea).boundingRect();
-	int inX = rect.x()-x;
-	int inY = rect.y()-y;
-	
+
+
+        }
+        QRect blitArea(x, y, width, height);
+        if(blitArea.isValid()) {
+
+          QRect rect = (clipArea & blitArea).boundingRect();
+          int inX = rect.x()-x;
+          int inY = rect.y()-y;
+
+/*
 	bitBlt(device, rect.x(), rect.y(),
 	       tc->second.pixmap, inX, inY, 
 	       rect.width(), rect.height(),
 	       Qt::CopyROP,false);
+*/
+          QPainter pBlt(device);
+          pBlt.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+          pBlt.drawPixmap(rect.x(), rect.y(), *tc->second.pixmap, inX, inY, rect.width(), rect.height());
+          pBlt.end();
 
-      QPoint wUpper = QPoint(blitArea.x(), blitArea.y()+height/2-1);
-      QPoint wLower = QPoint(blitArea.x(), blitArea.y()+height/2);
-      QPoint nw = QPoint(blitArea.x()+width/4-1, blitArea.y());
-      QPoint ne = QPoint(blitArea.x()+width*3/4-1, blitArea.y());
-      QPoint sw = QPoint(blitArea.x()+width/4-1, blitArea.y()+height-1);
-      
-      QPainter painter;
-      painter.begin(device);
-      //      painter.setClipRegion(clipArea);
-      painter.setPen(QPen(QColor(250,50,0), cliffs));
-      if (cliffNW)
-	painter.drawLine(nw, wUpper);
-      if (cliffN)
-	painter.drawLine(nw, ne);
-      if (cliffSW)
-	painter.drawLine(sw, wLower);
-      painter.end();
-    }
+          QPoint wUpper = QPoint(blitArea.x(), blitArea.y()+height/2-1);
+          QPoint wLower = QPoint(blitArea.x(), blitArea.y()+height/2);
+          QPoint nw = QPoint(blitArea.x()+width/4-1, blitArea.y());
+          QPoint ne = QPoint(blitArea.x()+width*3/4-1, blitArea.y());
+          QPoint sw = QPoint(blitArea.x()+width/4-1, blitArea.y()+height-1);
+
+          QPainter painter;
+          painter.begin(device);
+          //      painter.setClipRegion(clipArea);
+          painter.setPen(QPen(QColor(250,50,0), cliffs));
+          if (cliffNW)
+            painter.drawLine(nw, wUpper);
+          if (cliffN)
+            painter.drawLine(nw, ne);
+          if (cliffSW)
+            painter.drawLine(sw, wLower);
+          painter.end();
+        }
       }
-  }
+    }
   
 private:
     QColor getColor(const MapTile & mapTile) {
@@ -510,37 +524,39 @@ private:
     QPoint eUpper = QPoint(x+width-2, y+height/2-1);
     QPoint eLower = QPoint(x+width-2, y+height/2);
       
-    QPointArray bound(8);
-    bound[0]=wLower;
-    bound[1]=wUpper;
-    bound[2]=nw;
-    bound[3]=ne;
-    bound[4]=eUpper;
-    bound[5]=eLower;
-    bound[6]=se;
-    bound[7]=sw;
-      
+  QPoint bound[8] = {
+          wLower,
+          wUpper,
+          nw,
+          ne,
+          eUpper,
+          eLower,
+          se,
+          sw
+  };
+
+
     QColor c=getColor(mapTile);
     pixPaint.setBrush(c);
     pixPaint.setPen(c);
 
 
-    pixPaint.drawConvexPolygon(bound);
+    pixPaint.drawConvexPolygon(bound, 8);
     if (width>20 && height>20) {
 
     if((int)mapTile.getType()==MapTile::LIGHT_WOODS) {
       QPixmap scaled;
-      scaled.convertFromImage(iLightWood.smoothScale(width, height));
+      scaled.convertFromImage(iLightWood.scaled(width, height, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
       pixPaint.drawPixmap(QPoint(x, y), scaled);
     }
     else if((int)mapTile.getType()==MapTile::HEAVY_WOODS) {
       QPixmap scaled;
-      scaled.convertFromImage(iHeavyWood.smoothScale(width, height));
+      scaled.convertFromImage(iHeavyWood.scaled(width, height, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
       pixPaint.drawPixmap(QPoint(x, y), scaled);
     }
     else if((int)mapTile.getType()==MapTile::BUILDING) {
       QPixmap scaled;
-      scaled.convertFromImage(iBuilding.smoothScale(width, height));
+      scaled.convertFromImage(iBuilding.scaled(width, height, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
       pixPaint.drawPixmap(QPoint(x, y), scaled);
     }
     }

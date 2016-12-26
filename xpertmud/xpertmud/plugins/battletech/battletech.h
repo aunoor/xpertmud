@@ -2,15 +2,12 @@
 #ifndef BATTLETECH_H
 #define BATTLETECH_H
 
-#include <qwidget.h>
-#include <qvariant.h>
-#include <qpainter.h>
-#include <qevent.h>
-#include <qpixmap.h>
-#include <qbitmap.h>
-
 #include "Positions.h"
 #include "BattleCore.h"
+
+#include <QWidget>
+#include <QBitmap>
+
 class MechInfo;
 class BattleStyle {
 public:

@@ -1,10 +1,10 @@
 // -*- c++ -*-
 #ifndef BATTLESTATUS_H
 #define BATTLESTATUS_H
-#include <qvariant.h>
-#include <qwidget.h>
+
+#include <QWidget>
 #include "Positions.h"
-#include <qmap.h>
+#include <QMap>
 
 class BattleCore;
 class MechInfo;

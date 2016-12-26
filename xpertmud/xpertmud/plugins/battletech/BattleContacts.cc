@@ -2,20 +2,18 @@
 #include "BattleCore.h"
 #include "MechInfo.h"
 #include "BattleHeat.h"
-#include <qlistview.h>
-#include <qlayout.h>
-#include <qpopupmenu.h>
+#include <QTreeWidget>
+#include <QLayout>
+#include <QMenu>
 #include <klocale.h>
 
 #include <iostream>
 //////////////////////////////////////////////////////////////////////
 
-class ContactItem:public QListViewItem {
+class ContactItem:public QTreeWidgetItem {
 public:
-  ContactItem(QListView * parent, const MechInfo & mi, 
-	      double dist, double bearing):
-    QListViewItem(parent),
-    bgColor(255,255,255),distance(dist)
+  ContactItem(QTreeWidget * parent, const MechInfo & mi, double dist, double bearing):
+    QTreeWidgetItem(parent), bgColor(255,255,255), distance(dist)
   {
     setInfo(mi, dist, bearing);
   }  
@@ -28,7 +26,7 @@ public:
 		  .arg(mi.getPos().getY(),3).arg(mi.getPos().getZ(),3),
 		  QString("r: %1 b: %2").arg(dist,3,'f',1)
 		  .arg(bearing,3,'f',0),
-		  QString("s: %1 h: %2°").arg(mi.getSpeed(),3,'f',0)
+		  QString("s: %1 h: %2ï¿½").arg(mi.getSpeed(),3,'f',0)
 		  .arg(mi.getHeadingDeg(),3,'f',0),
 		  // TODO: v-Speed if applicable
 		  mi.getStatus(),
@@ -41,7 +39,7 @@ public:
 	    .arg(mi.getPos().getY(),3).arg(mi.getPos().getZ(),3));
     setText(4, QString("r: %1 b: %2").arg(dist,3,'f',1)
 	    .arg(bearing,3,'f',0));
-    setText(5, QString("s: %1 h: %2°").arg(mi.getSpeed(),3,'f',0)
+    setText(5, QString("s: %1 h: %2ï¿½").arg(mi.getSpeed(),3,'f',0)
 	    .arg(mi.getHeadingDeg(),3,'f',0));
     setText(6, mi.getStatus());
     setText(7, QString::number(mi.age()));
@@ -87,7 +85,7 @@ public:
     else
       k+='Z';
 
-    if (text(1).upper()==text(1))
+    if (text(1).toUpper()==text(1))
       k+='A';
     else
       k+='Z';

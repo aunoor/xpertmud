@@ -2,16 +2,17 @@
 
 #include "BattleHeat.h"
 #include "BattleCore.h"
-#include <qvariant.h>
-#include <qwidget.h>
-#include <qpainter.h>
+#include <QPainter>
 
 BattleHeatWidget::BattleHeatWidget(QWidget *parent, 
 				   const char *name, 
 				   const QStringList& args):
-  QWidget(parent,name,WResizeNoErase| WRepaintNoErase ),
+  QWidget(parent),
   core(BattleCore::getInstance()), heatDissipation(0), heat(0)
 {
+  setObjectName(name);
+  setAttribute(Qt::WA_NoSystemBackground, true); //for disable repainting background by system before PaintEvent
+  setAttribute(Qt::WA_OpaquePaintEvent, true);   //also as NoSysBackground
   connect(core,SIGNAL(heatChanged(int)),
 	  this, SLOT(heatChanged(int)));
   connect(core,SIGNAL(heatDissipationChanged(int)),

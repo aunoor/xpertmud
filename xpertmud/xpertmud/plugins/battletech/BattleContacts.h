@@ -2,15 +2,15 @@
 #ifndef BATTLE_CONTACT_WIDGET_H
 #define BATTLE_CONTACT_WIDGET_H
 
-#include <qwidget.h>
-#include <qvariant.h>
+#include <QWidget>
+#include <QVariant>
 #include <map>
 
 class BattleCore;
-class QListView;
-class QListViewItem;
+class QTreeWidget;
+class QTreeWidgetItem;
 class MechInfo;
-class QPopupMenu;
+class QMenu;
 class ContactItem;
 
 class BattleContactWidget: public QWidget {
@@ -28,7 +28,7 @@ public slots:
   // </Plugin Interface> //////////////////////////////////////////////////////
 
 public slots:
-  void popmeup(QListViewItem *, const QPoint &, int);  
+  void popmeup(QTreeWidgetItem *, const QPoint &, int);
 
 protected slots:
   void slotUpdateMechInfo(const MechInfo &,const MechInfo &);
@@ -37,8 +37,8 @@ protected slots:
 
 private:
   BattleCore * core;
-  QListView* listView;
-  QPopupMenu * popup;
+  QTreeWidget* listView;
+  QMenu * popup;
   QString currentID;
   std::map<QString, ContactItem*> items;
 };

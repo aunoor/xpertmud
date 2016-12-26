@@ -3,9 +3,8 @@
 //#include "TextParser.h"
 
 #include <cassert>
-#include <qtextstream.h>
-#include <qstringlist.h>
-#include <qtimer.h>
+#include <QStringList>
+#include <QTimer>
 #include <map>
 #include <kglobal.h>
 #include <kstandarddirs.h>

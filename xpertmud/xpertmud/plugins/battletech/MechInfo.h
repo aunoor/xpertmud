@@ -4,9 +4,9 @@
 
 #include "Positions.h"
 //#include "BattleCore.h"
-#include <qstring.h>
-#include <qdatetime.h>
-#include <qmap.h>
+#include <QString>
+#include <QDateTime>
+#include <QMap>
 
 class QStringList;
 //////////////////////////////////////////////////////////////////////
@@ -240,7 +240,7 @@ public:
   /////////////////////////
   // informational stuff
 
-  bool isEnemy() const { return getId().upper() == getId(); };
+  bool isEnemy() const { return getId().toUpper() == getId(); };
   bool isCliff(const MapTile &,const MapTile &) const;
   QString scanStatus() const;
 

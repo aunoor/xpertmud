@@ -1,6 +1,6 @@
 #include "MechInfo.h"
 #include "BattleCore.h"
-#include <qstringlist.h>
+#include <QStringList>
 
 MechInfo::MechInfo():
   valid(false), los(false), name("something"), pHasPos(false),
@@ -21,7 +21,7 @@ MechInfo::MechInfo():
 void MechInfo::update(const MechInfo &u) {
   if(u.isValid()) {
     // don't compare with u.id.lower(), so FoF info won't be disrupted with seismic updates
-    if(!valid || id.lower() == u.id) {
+    if(!valid || id.toLower() == u.id) {
       setId(u.getId());
     }
   }
