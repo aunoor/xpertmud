@@ -467,6 +467,7 @@ QColor TextBufferView::getBGColor(ColorChar &cc) {
     int blue = (base - red*36 - green*6);
     bg = QColor(red * 51, green * 51, blue * 51);
   }
+  return bg;
 }
 
 void TextBufferView::drawChar(QPaintDevice* pd, int x, int y) {
