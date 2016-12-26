@@ -120,8 +120,6 @@ QextMdiChildFrm::QextMdiChildFrm(QextMdiChildArea *parent)
    ,m_oldLayoutResizeMode(QLayout::SetMinimumSize)
 {
    setObjectName("qextmdi_childfrm");
-  /*  QBoxLayout *h = new QVBoxLayout(this); //shit, doesn't work
-      h->setAutoAdd(true);*/
    m_pCaption  = new QextMdiChildFrmCaption(this);
 
    m_pManager  = parent;
@@ -155,7 +153,7 @@ QextMdiChildFrm::QextMdiChildFrm(QextMdiChildArea *parent)
 
    setFrameStyle(QFrame::WinPanel|QFrame::Raised);
    setFocusPolicy(Qt::NoFocus);
-
+   setAutoFillBackground(true);
    setMouseTracking(true);
 
    setMinimumSize(QEXTMDI_MDI_CHILDFRM_MIN_WIDTH, m_pCaption->heightHint());
