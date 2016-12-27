@@ -25,7 +25,8 @@ class KLibFactory: public QObject {
   Q_OBJECT
  public:
   KLibFactory() {}
-  KLibFactory(QObject *parent, const char* name) {
+  KLibFactory(QObject *parent, const char* name): QObject(parent) {
+    setObjectName(name);
   }
   virtual ~KLibFactory() {}
 
@@ -41,15 +42,25 @@ class KLibFactory: public QObject {
 
 class KLibrary {
  public:
-  KLibrary(KLibFactory *f): f(f) {}
+  KLibrary(KLibFactory *f): f(f) {
+    name = f->objectName();
+  }
   KLibFactory *factory() { return f; }
+  QString libName() {return name;}
+  bool unload() {
+    QLibrary lib(libName());
+    delete f;
+    f=NULL;
+    return lib.unload();
+  }
  private:
   KLibFactory *f;
+  QString name;
 };
 
 class KLibLoader {
  public:
-  void unloadLibrary(const QString& name) {
+  bool unloadLibrary(const QString& name) {
   }
 
   static KLibLoader* self() { 
@@ -80,18 +91,19 @@ class KLibLoader {
       cout << "Couldn't find library " << name.toLocal8Bit().data() << endl;
       return 0; 
     }
-    cout << list.first().toLocal8Bit().data() << endl;
+    //cout << list.first().toLocal8Bit().data() << endl;
     
     QString function = QString("init_") + libname;
-    cout << "QLibrary::resolve('" << list.first().toLatin1().data() << "', '" << function.toLatin1().data() << "');" << endl;
+    cout << "QLibrary::resolve('" << list.first().toLocal8Bit().data() << "', '" << function.toLatin1().data() << "');" << endl;
     QFunctionPointer symAddr = QLibrary::resolve(list.first(), function.toLatin1().data());
     //void *symAddr = QLibrary::resolve(list.first(), function.toLocal8Bit().data());
 
-    if(symAddr == NULL) { cout << "buuuuh2" << endl; return 0; }
+    if(symAddr == NULL) { cout << "Can't load library or resolve func" << endl; return 0; }
     
     KLibFactory* fac = ((KLibFactory* (*)())symAddr)();
+    fac->setObjectName(list.first());
     
-    cout << "got a fac..." << endl;
+    cout << "got a factory..." << endl;
     return fac;
   }
 

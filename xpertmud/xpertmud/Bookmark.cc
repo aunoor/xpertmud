@@ -16,11 +16,11 @@
  ***************************************************************************/
 
 #include "Bookmark.h"
-#include <QFile>
-#include <qtextstream.h>
 #include <klocale.h>
 #include <kio/netaccess.h>
 #include <QVector>
+#include <QFile>
+#include <QTextStream>
 
 #include <cassert>
 

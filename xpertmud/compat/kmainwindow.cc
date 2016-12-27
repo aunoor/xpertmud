@@ -150,12 +150,16 @@ void KMainWindow::createGUI(QWidget *) {
   menu->addMenu(file);
   //menu->insertItem("&Connection", connection);
   menu->addMenu(connection);
-  //if(scriptingMenu) { menu->insertItem("&Scripting",
-	//			       scriptingMenu->popupMenu()); }
   //menu->insertItem("&Settings", options);
   menu->addMenu(options);
   //menu->insertItem("&Help", help);
   menu->addMenu(help);
+
+  if(scriptingMenu) {
+    QAction *ta = options->addMenu(scriptingMenu->popupMenu());
+    ta->setText("Scripting");
+  }
+
 
   this->setMenuBar(menu);
 

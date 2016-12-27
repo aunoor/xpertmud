@@ -475,10 +475,10 @@ void Xpertmud::scriptingMenuAboutToShow() {
     QAction* id;
     if (availableLanguages[i] == currentLanguage) { 
       id = scriptingMenu->popupMenu()->addAction(i18n("Restart &%1 interpreter").arg(availableLanguages[i]), this,
-						  SLOT( slotSwitchLanguage( int ) ));
+						  SLOT( slotSwitchLanguage() ));
     } else {
       id = scriptingMenu->popupMenu()->addAction(i18n("Start &%1 interpreter").arg(availableLanguages[i]), this,
-						  SLOT( slotSwitchLanguage( int ) ));
+						  SLOT( slotSwitchLanguage() ));
     }
     //scriptingMenu->popupMenu()->setItemParameter(id, i);
     id->setProperty("id",i);
@@ -591,8 +591,14 @@ void Xpertmud::slotFindLanguages() {
   availableLanguages.sort();
 }
 
-void Xpertmud::slotSwitchLanguage(int nr) {
+void Xpertmud::slotSwitchLanguage() {
   //TODO: parse parametr from QAction!
+
+  QAction *ta = dynamic_cast<QAction*>(sender());
+  if (ta==NULL) return;
+
+  int nr = ta->property("id").toInt();
+
   if (nr<(int)availableLanguages.count() && nr >= 0) {
     QString lang = availableLanguages[nr];
 
@@ -601,18 +607,18 @@ void Xpertmud::slotSwitchLanguage(int nr) {
   }
 }
 
-void Xpertmud::slotSwitchLanguage(const QString& langParam) {
+void Xpertmud::slotSwitchLanguage(const QString &langParam) {
   QString lang = langParam;
   if (scriptInterp) {
     qDebug("delete scriptInterp");
     delete scriptInterp;
     scriptInterp = NULL;
 
-    currentLanguage="";
-    statusBar()->changeItem(i18n("stopped interpreter"),6);
+    currentLanguage = "";
+    statusBar()->changeItem(i18n("stopped interpreter"), 6);
   }
   //  if (!scriptLibName.isEmpty()) {
-  if(currentLib != NULL) {
+  if (currentLib != NULL) {
     // unload lib
 #ifdef DEBUG_DLL
     cout << "unloading " << scriptLibName << endl;
@@ -623,55 +629,55 @@ void Xpertmud::slotSwitchLanguage(const QString& langParam) {
     // won't work, but we have to call it, because
     // the library object can only be deleted this way...
     //    currentLib->unload();
-    statusBar()->changeItem(i18n("unloaded interpreter"),6);
-    scriptLibName="";
+    //bool res = currentLib->unload();
+    //if (!res) qDebug() << "Can't unload library" << currentLib->libName();
+    statusBar()->changeItem(i18n("unloaded interpreter"), 6);
+    scriptLibName = "";
+    //delete currentLib;
     currentLib = NULL;
   }
 
-  if (!lang.isEmpty()) { 
-    if(lang == "__DEFAULT__") {
-      if(availableLanguages.count() > 0) {
-	lang = availableLanguages[0];
-	defaultLanguage = lang;
+  if (!lang.isEmpty()) {
+    if (lang == "__DEFAULT__") {
+      if (availableLanguages.count() > 0) {
+        lang = availableLanguages[0];
+        defaultLanguage = lang;
       } else {
-	return;
+        return;
       }
     }
 
-    QString newLibName=QString("libxm%1interpreter").arg(lang);
+    QString newLibName = QString("libxm%1interpreter").arg(lang);
 
     // call to globalLibrary to get the exported symbols from
     // the library
     currentLib = KLibLoader::self()->globalLibrary(newLibName);
-    KLibFactory* fac = NULL;
-    if(currentLib)
+    KLibFactory *fac = NULL;
+    if (currentLib)
       fac = currentLib->factory();
 
     if (fac) {
       // beware! it could be, that fac is not valid, this is
       // probably some evil KLibLoader bug
-      scriptLibName=newLibName;
-      QObject * scripting = fac->create(this,"myXMScripting","XMScripting");
+      scriptLibName = newLibName;
+      QObject *scripting = fac->create(this, "myXMScripting", "XMScripting");
       if (scripting && scripting->inherits("XMScripting")) {
-	scriptInterp=static_cast<XMScripting*>(scripting);
-	qDebug() << QString("create scriptInterp %1").arg((unsigned long)scriptInterp);
+        scriptInterp = static_cast<XMScripting *>(scripting);
+        qDebug() << QString("create scriptInterp %1").arg((unsigned long) scriptInterp);
       } else {
-	if (scripting)
-	  delete scripting;
+        if (scripting)
+          delete scripting;
       }
       if (scriptInterp) {
-	scriptInterp->setCallback(this);
-	statusBar()->changeItem(lang,6);
-	currentLanguage=lang;
+        scriptInterp->setCallback(this);
+        statusBar()->changeItem(lang, 6);
+        currentLanguage = lang;
       } else {
-	KMessageBox::error
-	  (this,i18n("Library loaded, but no ScriptInterpreter created"), 
-	   i18n("Error!"));
+        KMessageBox::error(this, i18n("Library loaded, but no ScriptInterpreter created"), i18n("Error!"));
       }
     } else {
-      KMessageBox::error(this,i18n("Library could not be loaded: \n%1").
-			 arg(KLibLoader::self()->lastErrorMessage()),
-			 i18n("Error while loading %1!").arg(lang));
+      KMessageBox::error(this, i18n("Library could not be loaded: \n%1").arg(KLibLoader::self()->lastErrorMessage()),
+                         i18n("Error while loading %1!").arg(lang));
     }
   }
 }

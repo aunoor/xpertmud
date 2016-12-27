@@ -227,7 +227,7 @@ private slots:
   void slotFindLanguages();
    
   void slotSwitchLanguage(const QString &lang);
-  void slotSwitchLanguage(int);
+  void slotSwitchLanguage();
   void slotUnloadLanguage();
   void windowMenuAboutToShow();
   void scriptingMenuAboutToShow();
