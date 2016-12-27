@@ -95,7 +95,7 @@ BattleMapWidget::BattleMapWidget(QWidget *parent,
 	  this, SLOT(createLockHexMenu()));
   //QAction ( const QString & text, const QString & menuText, QKeySequence accel, QObject * parent, const char * name = 0, bool toggle = FALSE )  (obsolete)
   //showBar = new QAction("Show Quickbar", "&Show Quickbar", 0, settingsPopup, 0, true);
-  showBar = settingsPopup->addAction("Show Quickbar");
+  showBar = new QAction("Show Quickbar", NULL);
   //showBar->setOn(false);
   showBar->setCheckable(true);
   showBar->setEnabled(false);
@@ -373,15 +373,15 @@ void BattleMapWidget::createLockHexMenu() {
   lockHexPopup->addAction(i18n("Lock &Hex"), this, SLOT(lockCurrentHex(int)),0,4);
 */
   QAction *ta;
-  ta=lockHexPopup->addAction(i18n("&Lock IDF"), this, SLOT(lockCurrentHex(int)));
+  ta=lockHexPopup->addAction(i18n("&Lock IDF"), this, SLOT(lockCurrentHex()));
   ta->setProperty("id",0);
-  ta=lockHexPopup->addAction(i18n("Lock &Building"), this, SLOT(lockCurrentHex(int)));
+  ta=lockHexPopup->addAction(i18n("Lock &Building"), this, SLOT(lockCurrentHex()));
   ta->setProperty("id",2);
-  ta=lockHexPopup->addAction(i18n("Lock &Clear"), this, SLOT(lockCurrentHex(int)));
+  ta=lockHexPopup->addAction(i18n("Lock &Clear"), this, SLOT(lockCurrentHex()));
   ta->setProperty("id",3);
-  ta=lockHexPopup->addAction(i18n("Lock &Ignite"), this, SLOT(lockCurrentHex(int)));
+  ta=lockHexPopup->addAction(i18n("Lock &Ignite"), this, SLOT(lockCurrentHex()));
   ta->setProperty("id",4);
-  ta=lockHexPopup->addAction(i18n("Lock &Hex"), this, SLOT(lockCurrentHex(int)));
+  ta=lockHexPopup->addAction(i18n("Lock &Hex"), this, SLOT(lockCurrentHex()));
   ta->setProperty("id",5);
 }
 
