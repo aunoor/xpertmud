@@ -33,10 +33,12 @@ BattleMapWidget::BattleMapWidget(QWidget *parent,
   */
 
   QVBoxLayout *l = new QVBoxLayout(this);
+  l->setContentsMargins(0,0,0,0);
   //l->setAutoAdd(true);
   speedbar = new QWidget(this);
   l->addWidget(speedbar);
   QHBoxLayout *ls = new QHBoxLayout(speedbar);
+  ls->setContentsMargins(0,0,0,0);
   //ls->setAutoAdd(true);
   //slider = new QSlider(0, 1000, 100, 0, QSlider::Horizontal,speedbar);
   slider = new QSlider(Qt::Horizontal, speedbar);

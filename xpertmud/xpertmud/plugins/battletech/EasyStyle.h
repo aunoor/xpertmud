@@ -230,7 +230,7 @@ public:
 	p2.begin(&tmpMask);
 	//p2.setRasterOp(Qt::OrROP);
   //Qt5 has no multiplatform compatible ROP. Try to select more likely...
-  p2.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+  ////p2.setCompositionMode(QPainter::CompositionMode_SourceAtop);
 
 	// draw body alphamap
 	p2.translate(mWidth/2, mHeight/2);
@@ -404,7 +404,7 @@ public:
 	       Qt::CopyROP,false);
 */
           QPainter pBlt(device);
-          pBlt.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+          ///pBlt.setCompositionMode(QPainter::CompositionMode_SourceAtop);
           pBlt.drawPixmap(rect.x(), rect.y(), *tc->second.pixmap, inX, inY, rect.width(), rect.height());
           pBlt.end();
 

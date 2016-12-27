@@ -60,7 +60,7 @@ class KLibrary {
 
 class KLibLoader {
  public:
-  bool unloadLibrary(const QString& name) {
+  void unloadLibrary(const QString& name) {
   }
 
   static KLibLoader* self() { 

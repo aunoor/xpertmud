@@ -183,7 +183,7 @@ void BattleMapView::paintEvent(QPaintEvent *pe) {
 */
 
   QPainter pBlt(this);
-  pBlt.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+  //pBlt.setCompositionMode(QPainter::CompositionMode_SourceAtop);
   pBlt.drawPixmap(pe->rect().x(), pe->rect().y(), *buffer, pe->rect().x(),
                   pe->rect().y(), pe->rect().width(), pe->rect().height());
   pBlt.end();
@@ -703,26 +703,24 @@ void BattleMapView::flushDisplayChange() {
 }
 
 
-void BattleMapView::queueMapChange(const HEXPos & from, const HEXPos& to) {
+void BattleMapView::queueMapChange(const HEXPos &from, const HEXPos &to) {
   QPoint leftUpper = layout.hexToPixel(from);
   QPoint rightLower = layout.hexToPixel(to);
-  if(to.getX() > from.getX()) {
-    leftUpper.setY(min(leftUpper.y(), 
-		       layout.hexToPixel(from+HEXPos(1, 0)).y()));
-    rightLower.setY(max(rightLower.y(),
-		       layout.hexToPixel(to+HEXPos(-1, 0)).y()));
+  if (to.getX() > from.getX()) {
+    leftUpper.setY(min(leftUpper.y(), layout.hexToPixel(from + HEXPos(1, 0)).y()));
+    rightLower.setY(max(rightLower.y(), layout.hexToPixel(to + HEXPos(-1, 0)).y()));
   }
-  rightLower +=	QPoint(layout.getWidth(),layout.getHeight());
-  
-  leftUpper-=QPoint(x,y); //(leftUpper.x-x,leftUpper.y-y);
-  rightLower-=QPoint(x,y);
+  rightLower += QPoint(layout.getWidth(), layout.getHeight());
+
+  leftUpper -= QPoint(x, y); //(leftUpper.x-x,leftUpper.y-y);
+  rightLower -= QPoint(x, y);
   //  QPoint rl=rightL(rightLower.x-x,rightLower.y-y);
 
-  QRect boundingRect(leftUpper,rightLower);
+  QRect boundingRect(leftUpper, rightLower);
   // Only queue the part visible 
   QRect visibleArea = boundingRect & rect();
-  
-  if (!visibleArea.isEmpty()) 
+
+  if (!visibleArea.isEmpty())
     displayQueue += QRegion(visibleArea);
 }
 

@@ -491,32 +491,33 @@ void Xpertmud::XM_TextBufferWindow_setWordWrapColumn(int id, int col) {
   }
 }
 
-int Xpertmud::XM_Plugin_initialize(const QString& libname,
-				   const QString& classname) {
+int Xpertmud::XM_Plugin_initialize(const QString &libname,
+                                   const QString &classname) {
   // Remember old focus .. this is a evil Workaround for a QT bug
-  QWidget * oldFocus=focusWidget();
+  QWidget *oldFocus = focusWidget();
 
-  QWidget * plugin=NULL;
+  QWidget *plugin = NULL;
 
-  KLibFactory * fac = KLibLoader::self()->factory(libname);
+  KLibFactory *fac = KLibLoader::self()->factory(libname);
   if (fac) {
-    QextMdiChildView * neuWrapper = new QextMdiChildView();
-    QObject * plg = fac->create(neuWrapper,NULL,classname);
+    QextMdiChildView *neuWrapper = new QextMdiChildView();
+    QObject *plg = fac->create(neuWrapper, NULL, classname);
 
     if (plg && plg->inherits("QWidget")) {
-      plugin=static_cast<QWidget*>(plg);
+      plugin = static_cast<QWidget *>(plg);
     } else {
       if (plg)
-	delete plg;
+        delete plg;
       if (neuWrapper)
-	delete neuWrapper;
+        delete neuWrapper;
     }
     if (plugin) {
-      QBoxLayout* pLayout = new QHBoxLayout(neuWrapper);
+      QBoxLayout *pLayout = new QHBoxLayout(neuWrapper);
+      pLayout->setContentsMargins(0, 0, 0, 0);
       pLayout->addWidget(plugin);
 
-      int id=childWidgets.size(); 
-      plugin->setFocusPolicy( Qt::NoFocus );
+      int id = childWidgets.size();
+      plugin->setFocusPolicy(Qt::NoFocus);
 
       neuWrapper->removeEventFilterForAllChildren();
 
@@ -524,20 +525,22 @@ int Xpertmud::XM_Plugin_initialize(const QString& libname,
 
       wrapperWidgets.push_back(neuWrapper);
       childWidgets.push_back(plugin);
-      PluginWrapper * pw=new PluginWrapper(plugin,id);
+      PluginWrapper *pw = new PluginWrapper(plugin, id);
       pluginWrappers.push_back(pw);
 
       //ASSERT(childWidgets.size()==pluginWrappers.size());
-      
-      connect(pw,SIGNAL(callback(int, int, const QVariant &, QVariant &)),
-	      this,SLOT(pluginCallbackCollector(int, int, const QVariant &, QVariant &)));
+
+      connect(pw, SIGNAL(callback(int, int,
+                                 const QVariant &, QVariant &)),
+              this, SLOT(pluginCallbackCollector(int, int,
+                                 const QVariant &, QVariant &)));
 
       addWindow(neuWrapper, QextMdi::Hide);
 
       // BUGFIX/Workaround
-      if (oldFocus!=NULL)
-	oldFocus->setFocus();
-      
+      if (oldFocus != NULL)
+        oldFocus->setFocus();
+
       return id;
     } else {
       // TODO: Segfaults

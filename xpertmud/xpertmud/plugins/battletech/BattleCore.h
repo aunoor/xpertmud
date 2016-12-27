@@ -329,7 +329,7 @@ public:
   }
 
   void setMapTile(const HEXPos & pos, const MapTile& mapTile, bool doEmit=true) {
-    if (current->setMapTile(pos, mapTile) && doEmit) 
+    if (current->setMapTile(pos, mapTile) && doEmit)
       emit queueMapChange(pos, pos);
   }
 

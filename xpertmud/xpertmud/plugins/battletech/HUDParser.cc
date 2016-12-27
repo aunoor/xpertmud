@@ -2,6 +2,7 @@
 
 #include <QStringList>
 #include <QTextStream>
+#include <QDebug>
 
 #include <vector>
 using std::vector;
@@ -12,25 +13,25 @@ using std::endl;
 
 #define LAG_PROTECT_TIME 120
 
-void HUDParser::parse(const QString & sn) {
+void HUDParser::parse(const QString &sn) {
   // first check some special cases
+  //cout << sn.toLatin1().data() <<endl;
   QString s;
   //int pos = sn.findRev('\n');
   int pos = sn.lastIndexOf('\n');
-  if(pos > 0)
+  if (pos > 0)
     s = sn.left(pos);
   else
     s = sn;
-  
+
   if (s.startsWith("#HUD hudinfo version ")) {
-    serverVersion=s.mid(21);
+    serverVersion = s.mid(21);
     core->slotLog("Version check: Server is " + serverVersion + " Client is " HUDINFO_VERSION);
-  } else if (s.startsWith("#HUD:"+sessionKey+":")) {
-    QString cmd=s.mid(6+sessionKey.length());
+  } else if (s.startsWith("#HUD:" + sessionKey + ":")) {
+    QString cmd = s.mid(6 + sessionKey.length());
     if (cmd.startsWith("C:")) {
       parseContacts(cmd.mid(2));
     } else if (cmd.startsWith("T:S# ")) {
-
       parseTacticalStart(cmd.mid(5));
     } else if (cmd.startsWith("T:L# ")) {
       parseTacticalLine(cmd.mid(5));
@@ -41,17 +42,17 @@ void HUDParser::parse(const QString & sn) {
       // hudingo gs event ?
       core->flushDisplay();
       if (tacProtect) {
-	tacCount-=LAG_PROTECT_TIME;
-	if (tacCount<=0) {
-	  tacTime-=tacCount/3-1;
-	  core->slotLog(QString("LAG Protect: setting tacTime to %1").arg(tacTime));
-	  tacCount=1;
-	}
-	tacProtect=false;
+        tacCount -= LAG_PROTECT_TIME;
+        if (tacCount <= 0) {
+          tacTime -= tacCount / 3 - 1;
+          core->slotLog(QString("LAG Protect: setting tacTime to %1").arg(tacTime));
+          tacCount = 1;
+        }
+        tacProtect = false;
       }
       // TODO: CALL UPDATE HERE with both tacHEX pos!
-      tacLeftUpper=HEXPos(0,0);
-      tacRightLower=HEXPos(0,0);
+      tacLeftUpper = HEXPos(0, 0);
+      tacRightLower = HEXPos(0, 0);
     } else if (cmd.startsWith("GS:R# ")) {
       parseGeneralStatus(cmd.mid(6));
     } else if (cmd.startsWith("SGI:R# ")) {
@@ -71,16 +72,16 @@ void HUDParser::parse(const QString & sn) {
       core->setNrWeapons(maxWeaponId + 1);
       maxWeaponId = -1;
       if (weProtect) {
-	weCount-=LAG_PROTECT_TIME;
-	if (weCount<=0) {
-	  weTime-=weCount/3-1;
-	  core->slotLog(QString("LAG Protect: setting weTime to %1").arg(weTime));
-	  weCount=1;
-	}
-	weProtect=false;
+        weCount -= LAG_PROTECT_TIME;
+        if (weCount <= 0) {
+          weTime -= weCount / 3 - 1;
+          core->slotLog(QString("LAG Protect: setting weTime to %1").arg(weTime));
+          weCount = 1;
+        }
+        weProtect = false;
       }
     } else {
-      core->slotLog("Unrecognized HUDINFO reply ["+cmd+"]");
+      core->slotLog("Unrecognized HUDINFO reply [" + cmd + "]");
     }
   } // else simply ignore it
 
@@ -301,38 +302,38 @@ void HUDParser::parseContacts(const QString & con) {
     currentMechs[params[0].toUpper()]=update;
   }
 }
-void HUDParser::parseTacticalStart(const QString & coords) {
+
+void HUDParser::parseTacticalStart(const QString &coords) {
   //QStringList params=QStringList::split(',',coords,true);
-  QStringList params=coords.split(',');
-  for (unsigned int pi=0; pi<params.count(); ++pi) 
-    if (params[pi]=="-") 
-      params[pi]="";
-  if (params.count()>=4) {
-    tacLeftUpper=HEXPos(params[0].toInt(),params[1].toInt());
-    tacRightLower=HEXPos(params[2].toInt(),params[3].toInt());
+  QStringList params = coords.split(',');
+  for (unsigned int pi = 0; pi < params.count(); ++pi)
+    if (params[pi] == "-")
+      params[pi] = "";
+  if (params.count() >= 4) {
+    tacLeftUpper = HEXPos(params[0].toInt(), params[1].toInt());
+    tacRightLower = HEXPos(params[2].toInt(), params[3].toInt());
     //    core->slotLog("Tactical INFO Start: "+coords);
   }
 }
 
-void HUDParser::parseTacticalLine(const QString & line) {
+void HUDParser::parseTacticalLine(const QString &line) {
   //QStringList params=QStringList::split(',',line,true);
-  QStringList params=line.split(',');
-  for (unsigned int pi=0; pi<params.count(); ++pi) 
-    if (params[pi]=="-") 
-      params[pi]="";
-  if (params.count()>=2) {
-    int line=params[0].toInt();
-    if (line>=tacLeftUpper.getY() && line <= tacRightLower.getY()) {
+  QStringList params = line.split(',');
+  for (unsigned int pi = 0; pi < params.count(); ++pi)
+    if (params[pi] == "-")
+      params[pi] = "";
+  if (params.count() >= 2) {
+    int line = params[0].toInt();
+    if (line >= tacLeftUpper.getY() && line <= tacRightLower.getY()) {
       //QTextIStream str(&params[1]);
       QTextStream str(&params[1], QIODevice::ReadOnly);
-      HEXPos hpos(tacLeftUpper.getX(),line);
-      while (!str.atEnd() && hpos.getX()<=tacRightLower.getX()) {
-	MapTile mapTile;
-	str >> mapTile;
-	core->setMapTile(hpos,mapTile);
-	//	core->slotLog(QString("Set HEX (%1,%2) -> (%3)").arg(hpos.getX())
-	//			      .arg(hpos.getY()).arg(mapTile.getType()));
-	hpos.setX(hpos.getX()+1);
+      HEXPos hpos(tacLeftUpper.getX(), line);
+      while (!str.atEnd() && hpos.getX() <= tacRightLower.getX()) {
+        MapTile mapTile;
+        str >> mapTile;
+        core->setMapTile(hpos, mapTile);
+        core->slotLog(QString("Set HEX (%1,%2) -> (%3)").arg(hpos.getX()).arg(hpos.getY()).arg(mapTile.getType()));
+        hpos.setX(hpos.getX() + 1);
       }
     }
   }

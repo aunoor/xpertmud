@@ -2,12 +2,15 @@
 #include "HUDParser.h"
 //#include "TextParser.h"
 
-#include <cassert>
-#include <QStringList>
-#include <QTimer>
-#include <map>
+
 #include <kglobal.h>
 #include <kstandarddirs.h>
+
+#include <QStringList>
+#include <QTimer>
+#include <QDebug>
+#include <cassert>
+#include <map>
 
 const char MapTile::UNKNOWN_HEIGHT = 1;
 
@@ -42,126 +45,126 @@ MapTile::MapTile(QTextStream & ts) {
 }
 
 
- bool BattleMap::setMapTile(const HEXPos & pos, const MapTile& mapTile) {
-    if(pos.getY() >= (int)myMap.size()) {
-      myMap.resize(pos.getY()+1);
-      if (pos.getY() >= (int)height) 
-	height = pos.getY()+1;
-    }
-    if(pos.getX() >= (int)myMap[pos.getY()].size()) {
-      myMap[pos.getY()].resize(pos.getX()+1);
-      if (pos.getX() >= (int)width)
-	width = pos.getX()+1;
-    }
-    if (myMap[pos.getY()][pos.getX()] != mapTile) {
-      if (mapTile.hasType())
-	myMap[pos.getY()][pos.getX()].setType(mapTile.getType());
-      if (mapTile.hasHeight())
-	myMap[pos.getY()][pos.getX()].setHeight(mapTile.getHeight());
- 
-      HEXPos n_pos;
-
-///////////
-       n_pos=pos.N();
-       if(n_pos.getY()>=0 && n_pos.getY() < (int)myMap.size()  &&
-          n_pos.getX()>=0 && n_pos.getX() < (int)myMap[n_pos.getY()].size()) {
-
-
-          if (myMap[n_pos.getY()][n_pos.getX()].getKind() ==
-		 myMap[pos.getY()][pos.getX()].getKind()) {
-
-            myMap[pos.getY()][pos.getX()].setSameFlagN();
-            myMap[n_pos.getY()][n_pos.getX()].setSameFlagS();  
-        } else {
-            myMap[pos.getY()][pos.getX()].resetSameFlagN();
-            myMap[n_pos.getY()][n_pos.getX()].resetSameFlagS();  
-	} 
-      }
-///////////
-       n_pos=pos.NE();
-       if(n_pos.getY()>=0 && n_pos.getY() < (int)myMap.size()  &&
-          n_pos.getX()>=0 && n_pos.getX() < (int)myMap[n_pos.getY()].size()) {
-
-
-          if (myMap[n_pos.getY()][n_pos.getX()].getKind() ==
-		 myMap[pos.getY()][pos.getX()].getKind()) {
-
-            myMap[pos.getY()][pos.getX()].setSameFlagNE();
-            myMap[n_pos.getY()][n_pos.getX()].setSameFlagSW();  
-        } else {
-            myMap[pos.getY()][pos.getX()].resetSameFlagNE();
-            myMap[n_pos.getY()][n_pos.getX()].resetSameFlagSW();  
-	} 
-      }
-///////////
-       n_pos=pos.SE();
-       if(n_pos.getY()>=0 && n_pos.getY() < (int)myMap.size()  &&
-          n_pos.getX()>=0 && n_pos.getX() < (int)myMap[n_pos.getY()].size()) {
-
-
-          if (myMap[n_pos.getY()][n_pos.getX()].getKind() ==
-		 myMap[pos.getY()][pos.getX()].getKind()) {
-
-            myMap[pos.getY()][pos.getX()].setSameFlagSE();
-            myMap[n_pos.getY()][n_pos.getX()].setSameFlagNW();  
-        } else {
-            myMap[pos.getY()][pos.getX()].resetSameFlagSE();
-            myMap[n_pos.getY()][n_pos.getX()].resetSameFlagNW();  
-	} 
-      }
-///////////
-       n_pos=pos.S();
-       if(n_pos.getY()>=0 && n_pos.getY() < (int)myMap.size()  &&
-          n_pos.getX()>=0 && n_pos.getX() < (int)myMap[n_pos.getY()].size()) {
-
-
-          if (myMap[n_pos.getY()][n_pos.getX()].getKind() ==
-		 myMap[pos.getY()][pos.getX()].getKind()) {
-
-            myMap[pos.getY()][pos.getX()].setSameFlagS();
-            myMap[n_pos.getY()][n_pos.getX()].setSameFlagN();  
-        } else {
-            myMap[pos.getY()][pos.getX()].resetSameFlagS();
-            myMap[n_pos.getY()][n_pos.getX()].resetSameFlagN();  
-	} 
-      }
-///////////
-       n_pos=pos.SW();
-       if(n_pos.getY()>=0 && n_pos.getY() < (int)myMap.size()  &&
-          n_pos.getX()>=0 && n_pos.getX() < (int)myMap[n_pos.getY()].size()) {
-
-
-          if (myMap[n_pos.getY()][n_pos.getX()].getKind() ==
-		 myMap[pos.getY()][pos.getX()].getKind()) {
-
-            myMap[pos.getY()][pos.getX()].setSameFlagSW();
-            myMap[n_pos.getY()][n_pos.getX()].setSameFlagNE();  
-        } else {
-            myMap[pos.getY()][pos.getX()].resetSameFlagSW();
-            myMap[n_pos.getY()][n_pos.getX()].resetSameFlagNE();  
-	} 
-      }
-///////////
-       n_pos=pos.NW();
-       if(n_pos.getY()>=0 && n_pos.getY() < (int)myMap.size()  &&
-          n_pos.getX()>=0 && n_pos.getX() < (int)myMap[n_pos.getY()].size()) {
-
-
-          if (myMap[n_pos.getY()][n_pos.getX()].getKind() ==
-		 myMap[pos.getY()][pos.getX()].getKind()) {
-
-            myMap[pos.getY()][pos.getX()].setSameFlagNW();
-            myMap[n_pos.getY()][n_pos.getX()].setSameFlagSE();  
-        } else {
-            myMap[pos.getY()][pos.getX()].resetSameFlagNW();
-            myMap[n_pos.getY()][n_pos.getX()].resetSameFlagSE();  
-	} 
-      }
-
-      return true;
-    }
-    return false;
+bool BattleMap::setMapTile(const HEXPos &pos, const MapTile &mapTile) {
+  if (pos.getY() >= (int) myMap.size()) {
+    myMap.resize(pos.getY() + 1);
+    if (pos.getY() >= (int) height)
+      height = pos.getY() + 1;
   }
+  if (pos.getX() >= (int) myMap[pos.getY()].size()) {
+    myMap[pos.getY()].resize(pos.getX() + 1);
+    if (pos.getX() >= (int) width)
+      width = pos.getX() + 1;
+  }
+  if (myMap[pos.getY()][pos.getX()] != mapTile) {
+    if (mapTile.hasType())
+      myMap[pos.getY()][pos.getX()].setType(mapTile.getType());
+    if (mapTile.hasHeight())
+      myMap[pos.getY()][pos.getX()].setHeight(mapTile.getHeight());
+
+    HEXPos n_pos;
+
+///////////
+    n_pos = pos.N();
+    if (n_pos.getY() >= 0 && n_pos.getY() < (int) myMap.size() &&
+        n_pos.getX() >= 0 && n_pos.getX() < (int) myMap[n_pos.getY()].size()) {
+
+
+      if (myMap[n_pos.getY()][n_pos.getX()].getKind() ==
+          myMap[pos.getY()][pos.getX()].getKind()) {
+
+        myMap[pos.getY()][pos.getX()].setSameFlagN();
+        myMap[n_pos.getY()][n_pos.getX()].setSameFlagS();
+      } else {
+        myMap[pos.getY()][pos.getX()].resetSameFlagN();
+        myMap[n_pos.getY()][n_pos.getX()].resetSameFlagS();
+      }
+    }
+///////////
+    n_pos = pos.NE();
+    if (n_pos.getY() >= 0 && n_pos.getY() < (int) myMap.size() &&
+        n_pos.getX() >= 0 && n_pos.getX() < (int) myMap[n_pos.getY()].size()) {
+
+
+      if (myMap[n_pos.getY()][n_pos.getX()].getKind() ==
+          myMap[pos.getY()][pos.getX()].getKind()) {
+
+        myMap[pos.getY()][pos.getX()].setSameFlagNE();
+        myMap[n_pos.getY()][n_pos.getX()].setSameFlagSW();
+      } else {
+        myMap[pos.getY()][pos.getX()].resetSameFlagNE();
+        myMap[n_pos.getY()][n_pos.getX()].resetSameFlagSW();
+      }
+    }
+///////////
+    n_pos = pos.SE();
+    if (n_pos.getY() >= 0 && n_pos.getY() < (int) myMap.size() &&
+        n_pos.getX() >= 0 && n_pos.getX() < (int) myMap[n_pos.getY()].size()) {
+
+
+      if (myMap[n_pos.getY()][n_pos.getX()].getKind() ==
+          myMap[pos.getY()][pos.getX()].getKind()) {
+
+        myMap[pos.getY()][pos.getX()].setSameFlagSE();
+        myMap[n_pos.getY()][n_pos.getX()].setSameFlagNW();
+      } else {
+        myMap[pos.getY()][pos.getX()].resetSameFlagSE();
+        myMap[n_pos.getY()][n_pos.getX()].resetSameFlagNW();
+      }
+    }
+///////////
+    n_pos = pos.S();
+    if (n_pos.getY() >= 0 && n_pos.getY() < (int) myMap.size() &&
+        n_pos.getX() >= 0 && n_pos.getX() < (int) myMap[n_pos.getY()].size()) {
+
+
+      if (myMap[n_pos.getY()][n_pos.getX()].getKind() ==
+          myMap[pos.getY()][pos.getX()].getKind()) {
+
+        myMap[pos.getY()][pos.getX()].setSameFlagS();
+        myMap[n_pos.getY()][n_pos.getX()].setSameFlagN();
+      } else {
+        myMap[pos.getY()][pos.getX()].resetSameFlagS();
+        myMap[n_pos.getY()][n_pos.getX()].resetSameFlagN();
+      }
+    }
+///////////
+    n_pos = pos.SW();
+    if (n_pos.getY() >= 0 && n_pos.getY() < (int) myMap.size() &&
+        n_pos.getX() >= 0 && n_pos.getX() < (int) myMap[n_pos.getY()].size()) {
+
+
+      if (myMap[n_pos.getY()][n_pos.getX()].getKind() ==
+          myMap[pos.getY()][pos.getX()].getKind()) {
+
+        myMap[pos.getY()][pos.getX()].setSameFlagSW();
+        myMap[n_pos.getY()][n_pos.getX()].setSameFlagNE();
+      } else {
+        myMap[pos.getY()][pos.getX()].resetSameFlagSW();
+        myMap[n_pos.getY()][n_pos.getX()].resetSameFlagNE();
+      }
+    }
+///////////
+    n_pos = pos.NW();
+    if (n_pos.getY() >= 0 && n_pos.getY() < (int) myMap.size() &&
+        n_pos.getX() >= 0 && n_pos.getX() < (int) myMap[n_pos.getY()].size()) {
+
+
+      if (myMap[n_pos.getY()][n_pos.getX()].getKind() ==
+          myMap[pos.getY()][pos.getX()].getKind()) {
+
+        myMap[pos.getY()][pos.getX()].setSameFlagNW();
+        myMap[n_pos.getY()][n_pos.getX()].setSameFlagSE();
+      } else {
+        myMap[pos.getY()][pos.getX()].resetSameFlagNW();
+        myMap[n_pos.getY()][n_pos.getX()].resetSameFlagSE();
+      }
+    }
+
+    return true;
+  }
+  return false;
+}
 
 
 BattleMap::BattleMap(const QString& id, 
