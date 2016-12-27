@@ -37,7 +37,7 @@ private slots:
   void mechDoubleClicked(QPoint p, const QString& mech);
   void zoomChanged(double zoom);
 
-  void lockCurrentHex(int mode);
+  void lockCurrentHex();
   void tactCurrentHex();
   void jumpCurrentHex();
 

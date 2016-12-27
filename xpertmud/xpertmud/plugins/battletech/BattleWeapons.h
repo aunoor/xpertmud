@@ -3,11 +3,10 @@
 #define BATTLEWEAPONS_H
 
 #include <QWidget>
-#include <qvariant.h>
 #include <vector>
 
 class BattleCore;
-class QTreeWidget;
+class QTreeView;
 class QMenu;
 
 class WeaponViewItem;
@@ -35,7 +34,7 @@ private:
   void updateEntries();
 
   BattleCore* core;
-  QTreeWidget* listView;
+  QTreeView* listView;
   QMenu* popup;
   std::vector<WeaponViewItem *> items;
 

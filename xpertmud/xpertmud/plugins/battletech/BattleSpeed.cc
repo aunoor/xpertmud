@@ -129,32 +129,29 @@ void BattleSpeedWidget::paintEvent ( QPaintEvent *e ) {
 
   painter.setBrush(QColor(0,0,0));
   painter.setPen(QColor(0,0,0));
-  QPointArray pt2(3);
+
+  //QPointArray pt2(3);
+  QPoint pt2[3];
   pt2[0] = QPoint(bound.width(),desireY);
   pt2[1] = QPoint(bound.width()-(plength*3 /4), desireY+4);
   pt2[2] = QPoint(bound.width(), desireY+8);
-#if QT_VERSION<300
-  painter.drawPolygon(pt2);
-#else
-  painter.drawConvexPolygon(pt2);
-#endif
+
+  painter.drawConvexPolygon(pt2,3);
 
 
-  QPointArray pt(5);
+  //QPointArray pt(5);
+  QPoint pt[5];
   pt[0] = QPoint(bound.width(),speedY);
   pt[1] = QPoint(bound.width()-plength, speedY);
   pt[2] = QPoint(bound.width()-plength-3, speedY+3);
   pt[3] = QPoint(bound.width()-plength, speedY+6);
   pt[4] = QPoint(bound.width(),speedY+6);
+
   painter.setBrush(QColor(180,0,0));
   painter.setPen(QColor(0,0,0));
   
+  painter.drawConvexPolygon(pt,5);
 
-#if QT_VERSION<300
-  painter.drawPolygon(pt);
-#else
-  painter.drawConvexPolygon(pt);
-#endif
   QString sstop = "0";
   QString swalk = QString::number(int(maxWalkingSpeed));
   QString srun  = QString::number(int(mymr));

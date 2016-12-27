@@ -12,6 +12,7 @@ BattleCoreWidget::BattleCoreWidget(QWidget * parent, const char * name,
 {
   setObjectName(name);
   QVBoxLayout* l =new QVBoxLayout(this);
+  l->setContentsMargins(0,0,0,0);
   logViewer=new QTextEdit(this);
   logViewer->setReadOnly(true);
   l->addWidget(logViewer);

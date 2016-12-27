@@ -80,7 +80,7 @@ QString MechInfo::scanStatus() const {
 QString MechInfo::toString(const MechInfo &me) const {
   QString ret;
   QString buf;
-  QTextOStream os(&ret);
+  QTextStream os(&ret, QIODevice::WriteOnly);
   os << id << '|';
   if(arc == UNDEF_ARC)
     buf='-';
@@ -221,7 +221,7 @@ bool MechInfo::isCliff(const MapTile &tile1,const MapTile &tile2) const {
 }
 
 MechInfo::UnitType MechInfo::normUnitType(QChar c) {
-  switch((MechInfo::UnitType)((int)c)) {
+  switch((MechInfo::UnitType)((int)c.toLatin1())) {
   case MechInfo::UNIT_BIPED:
   case MechInfo::UNIT_QUAD:
   case MechInfo::UNIT_HOVER:
@@ -237,7 +237,7 @@ MechInfo::UnitType MechInfo::normUnitType(QChar c) {
   case MechInfo::UNIT_BATTLESUIT:
   case MechInfo::UNIT_INFANTRY:
   case MechInfo::UNIT_INSTALLATION:
-     return (MechInfo::UnitType)((int)c);
+     return (MechInfo::UnitType)((int)c.toLatin1());
     break;
   default:
     return MechInfo::UNIT_UNKNOWN;

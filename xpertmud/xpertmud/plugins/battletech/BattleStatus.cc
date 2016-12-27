@@ -1,13 +1,15 @@
 #include "BattleStatus.h"
 #include "BattleCore.h"
 
+#include <kglobal.h>
+#include <kstandarddirs.h>
+
 #include <QWidget>
 #include <QPainter>
 #include <QPixmap>
 #include <QImage>
 #include <QStringList>
-#include <kglobal.h>
-#include <kstandarddirs.h>
+#include <QPaintEvent>
 
 class BattleStatusDrawConfig {
 public:
@@ -32,7 +34,9 @@ BattleStatusWidget::BattleStatusWidget(QWidget *parent,
 	  this, SLOT(slotUpdateMechInfo(const MechInfo&,
 					const MechInfo&)));
 
-   setEraseColor(black);
+   //setEraseColor(black);
+  QPalette pal = palette();
+  pal.setColor(QPalette::Window, Qt::black);
 
    QString path;
    path = 
@@ -50,7 +54,7 @@ BattleStatusWidget::BattleStatusWidget(QWidget *parent,
    while (!s.atEnd()) {
      QString l=s.readLine();
      if (l.startsWith("TEMPLATE:")) {
-       QString te=l.mid(9).simplifyWhiteSpace();
+       QString te=l.mid(9).simplified();
        if (!te.isEmpty()) {
          currentConfig=new BattleStatusDrawConfig;
          currentTemplate=te;
@@ -58,15 +62,16 @@ BattleStatusWidget::BattleStatusWidget(QWidget *parent,
          drawConfig[currentTemplate]=currentConfig;
        }
      } else if (currentConfig && l.startsWith("IMAGE:")) {
-       QString te=KGlobal::dirs()->findResource("appdata", l.mid(6).simplifyWhiteSpace());
+       QString te=KGlobal::dirs()->findResource("appdata", l.mid(6).simplified());
        if (!te.isEmpty()) {
          QImage img(te);
          if (!img.isNull()) {
-           currentConfig->pixmap=QPixmap(img/*.smoothScale(150,150)*/);
+           ///currentConfig->pixmap=QPixmap(img/*.smoothScale(150,150)*/);
+           currentConfig->pixmap=QPixmap::fromImage(img);
          }
        }
     } else if (currentConfig && l.startsWith("SECTION:")) {
-      QString rem=l.mid(8).simplifyWhiteSpace();
+      QString rem=l.mid(8).simplified();
       QTextStream li(&rem, QIODevice::ReadOnly);
       int x,y;
       QString sec;
@@ -80,10 +85,10 @@ BattleStatusWidget::BattleStatusWidget(QWidget *parent,
 
 BattleStatusWidget::~BattleStatusWidget() {
   BattleCore::returnInstance();
-  for (QMap<QString,BattleStatusDrawConfig*>::iterator it=drawConfig.begin();
-	it!=drawConfig.end(); ++it) {
-     delete it.data();
+  for (QMap<QString,BattleStatusDrawConfig*>::iterator it=drawConfig.begin(); it!=drawConfig.end(); ++it) {
+     delete it.value();
   }
+  drawConfig.clear();
 }
 
 
@@ -97,7 +102,8 @@ void BattleStatusWidget::paintEvent ( QPaintEvent *e ) {
   if (currentDrawConfig && !currentDrawConfig->pixmap.isNull()) {
      painter.drawPixmap(0,0,currentDrawConfig->pixmap);
   } else {
-    erase();
+    //erase();
+    painter.fillRect(e->rect(),palette().color(QPalette::Window));
   }
 
   painter.setPen(Qt::lightGray);
@@ -113,7 +119,7 @@ void BattleStatusWidget::paintEvent ( QPaintEvent *e ) {
     for (QMap<QString,QPoint>::iterator it=currentDrawConfig->armorLocations.begin();
 	 it != currentDrawConfig->armorLocations.end(); ++it) {
       if (currentArmor.contains(it.key())) {
-        QPoint loc=it.data();
+        QPoint loc=it.value();
         QRect re(loc.x()-5,loc.y()-5,10,10);
         int armor=currentArmor[it.key()];
         int oarmor=originalArmor[it.key()];

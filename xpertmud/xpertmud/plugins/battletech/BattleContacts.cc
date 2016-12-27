@@ -10,6 +10,11 @@
 #include <iostream>
 //////////////////////////////////////////////////////////////////////
 
+class ContactItem: public QObject {
+
+};
+
+#if 0
 class ContactItem:public QTreeWidgetItem {
 public:
   ContactItem(QTreeWidget * parent, const MechInfo & mi, double dist, double bearing):
@@ -99,33 +104,41 @@ protected:
   QColor bgColor;
   double distance;
 };
+#endif
 
 //////////////////////////////////////////////////////////////////////
-BattleContactWidget::BattleContactWidget(QWidget *parent, 
-				       const char *name, 
-				       const QStringList& args):
-  QWidget(parent,name),core(BattleCore::getInstance()) {
+BattleContactWidget::BattleContactWidget(QWidget *parent,
+                                         const char *name,
+                                         const QStringList &args) :
+        QWidget(parent), core(BattleCore::getInstance())
+{
+  setObjectName(name);
 
-  connect(core, SIGNAL(queueMechInfoChange(const MechInfo&,
-					   const MechInfo&)),
-	  this, SLOT(slotUpdateMechInfo(const MechInfo&,
-					const MechInfo&)));
+  connect(core, SIGNAL(queueMechInfoChange(
+                               const MechInfo&,
+                               const MechInfo&)),
+          this, SLOT(slotUpdateMechInfo(
+                             const MechInfo&,
+                             const MechInfo&)));
 
   //  connect(core, SIGNAL(flushDisplayChange()),
   //	  this, SLOT(updateList()));
 
   QVBoxLayout *l = new QVBoxLayout(this);
-  l->setAutoAdd(true);
-  BattleHeatWidget * bh=new BattleHeatWidget(this,"HeatBar",QStringList());
+  l->setContentsMargins(0,0,0,0);
+  //l->setAutoAdd(true);
+  BattleHeatWidget *bh = new BattleHeatWidget(this, "HeatBar", QStringList());
+  l->addWidget(bh);
   bh->setFixedHeight(15);
-  listView=new QListView(this);
+  listView = new QTreeView(this);
+  l->addWidget(listView);
   //  listView->setPalette(QPalette(QColor(0,0,0),QColor(200,200,200)));
 
 
-  listView->setFocusPolicy(NoFocus);
-  listView->viewport()->setFocusPolicy(NoFocus);
+  listView->setFocusPolicy(Qt::NoFocus);
+  listView->viewport()->setFocusPolicy(Qt::NoFocus);
 
-
+#if 0
   listView->addColumn(""); // SE 0
   listView->addColumn(""); // ID 1
   listView->addColumn("Name"); // 2
@@ -135,44 +148,62 @@ BattleContactWidget::BattleContactWidget(QWidget *parent,
   listView->addColumn(""); // Status 6
   listView->addColumn("Age"); // 7
 
-  listView->setColumnAlignment(1,AlignHCenter);
-  listView->setColumnAlignment(4,AlignHCenter);
-  listView->setColumnAlignment(5,AlignHCenter);
-  listView->setColumnAlignment(6,AlignHCenter);
-  listView->setColumnAlignment(7,AlignRight);
+  listView->setColumnAlignment(1, AlignHCenter);
+  listView->setColumnAlignment(4, AlignHCenter);
+  listView->setColumnAlignment(5, AlignHCenter);
+  listView->setColumnAlignment(6, AlignHCenter);
+  listView->setColumnAlignment(7, AlignRight);
   listView->setAllColumnsShowFocus(true);
   listView->setSelectionMode(QListView::NoSelection);
-  connect(listView,SIGNAL(rightButtonPressed(QListViewItem *, const QPoint &, int)),
-	  this,SLOT(popmeup(QListViewItem *, const QPoint &, int)));
+  connect(listView, SIGNAL(rightButtonPressed(QListViewItem * ,
+                                   const QPoint &, int)),
+          this, SLOT(popmeup(QListViewItem * ,
+                             const QPoint &, int)));
 
+#endif
 
-  popup=new QPopupMenu(this);
-  popup->insertItem(i18n("&Lock"),this, SLOT(slotPopup(int)),0,1);
-  popup->insertItem(i18n("&Scan"),this, SLOT(slotPopup(int)),0,2);
-  popup->insertItem(i18n("&Report"),this, SLOT(slotPopup(int)),0,3);
-  popup->insertItem(i18n("&Face towards"),this, SLOT(slotPopup(int)),0,4);
-  popup->insertItem(i18n("R&emove"),this, SLOT(slotPopup(int)),0,5);
-  popup->insertSeparator();
-  popup->insertItem(i18n("&Always show"),this, SLOT(slotPopup(int)),0,6);
-  popup->insertItem(i18n("Always &hide"),this, SLOT(slotPopup(int)),0,7);
-  popup->insertItem(i18n("Auto&matic"),this, SLOT(slotPopup(int)),0,8);
-  
+  popup = new QMenu(this);
+  QAction *ta;
+  ta = popup->addAction(i18n("&Lock"), this, SLOT(slotPopup(int)));
+  ta->setProperty("id", 1);
+  ta = popup->addAction(i18n("&Scan"), this, SLOT(slotPopup(int)));
+  ta->setProperty("id", 2);
+  ta = popup->addAction(i18n("&Report"), this, SLOT(slotPopup(int)));
+  ta->setProperty("id", 3);
+  ta = popup->addAction(i18n("&Face towards"), this, SLOT(slotPopup(int)));
+  ta->setProperty("id", 4);
+  ta = popup->addAction(i18n("R&emove"), this, SLOT(slotPopup(int)));
+  ta->setProperty("id", 5);
+  ta = popup->addSeparator();
+  ta = popup->addAction(i18n("&Always show"), this, SLOT(slotPopup(int)));
+  ta->setProperty("id", 6);
+  ta = popup->addAction(i18n("Always &hide"), this, SLOT(slotPopup(int)));
+  ta->setProperty("id", 7);
+  ta = popup->addAction(i18n("Auto&matic"), this, SLOT(slotPopup(int)));
+  ta->setProperty("id", 8);
 
-  setFocusPolicy(NoFocus);
+  setFocusPolicy(Qt::NoFocus);
 }
 
 BattleContactWidget::~BattleContactWidget() {
   BattleCore::returnInstance();
 }
 
-void BattleContactWidget::popmeup(QListViewItem *li, const QPoint &p, int) {
+void BattleContactWidget::popmeup(QTreeViewItem *li, const QPoint &p, int) {
+#if 0
   if (li) {
     currentID=li->text(1);
     popup->exec(p);
   }
+#endif
 }
 
-void  BattleContactWidget::slotPopup(int fun) {
+void  BattleContactWidget::slotPopup() {
+  QAction *ta = dynamic_cast<QAction*>(sender());
+  if (ta==NULL) return;
+
+  int fun = ta->property("id").toInt();
+
   switch (fun) {
   case 1:
     core->slotSend("lock "+currentID+"\n");
@@ -215,19 +246,19 @@ void BattleContactWidget::slotFunctionCall(int func, const QVariant & args,
   // None usefull yet
 }
 
-void BattleContactWidget::slotUpdateMechInfo(const MechInfo & oldInfo, 
-					     const MechInfo & mechInfo) {
-  if(oldInfo.getId() == core->getOwnId() ||
-     mechInfo.getId() == core->getOwnId()) {
+void BattleContactWidget::slotUpdateMechInfo(const MechInfo & oldInfo,
+                                             const MechInfo & mechInfo) {
+#if 0
+  if((oldInfo.getId() == core->getOwnId()) || (mechInfo.getId() == core->getOwnId())) {
 
-    if(oldInfo.isValid() && items.find(oldInfo.getId().upper()) != items.end()) {
-      delete items[oldInfo.getId().upper()];
-      items.erase(oldInfo.getId().upper());
+    if(oldInfo.isValid() && items.find(oldInfo.getId().toUpper()) != items.end()) {
+      delete items[oldInfo.getId().toUpper()];
+      items.erase(oldInfo.getId().toUpper());
     }
 
-    if(mechInfo.isValid() && items.find(mechInfo.getId().upper()) != items.end()) {
-      delete items[mechInfo.getId().upper()];
-      items.erase(mechInfo.getId().upper());
+    if(mechInfo.isValid() && items.find(mechInfo.getId().toUpper()) != items.end()) {
+      delete items[mechInfo.getId().toUpper()];
+      items.erase(mechInfo.getId().toUpper());
     }
 
     return;
@@ -236,22 +267,22 @@ void BattleContactWidget::slotUpdateMechInfo(const MechInfo & oldInfo,
   if (mechInfo.isValid()) {
     MechInfo self = core->getMechInfo(core->getOwnId());
     SubPos dist = NormHexLayout::difference(self.getPos(),mechInfo.getPos());
-    if(items.find(mechInfo.getId().upper()) != items.end()) {
-      items[mechInfo.getId().upper()]->setInfo(mechInfo, dist.getDistance(),
-				       dist.getAngleDeg());
+    if(items.find(mechInfo.getId().toUpper()) != items.end()) {
+      items[mechInfo.getId().toUpper()]->setInfo(mechInfo, dist.getDistance(),
+                                                 dist.getAngleDeg());
     } else {
-      ContactItem * i=new ContactItem
-	(listView,mechInfo,dist.getDistance(),dist.getAngleDeg());
-      items[mechInfo.getId().upper()] = i;
+      ContactItem * i=new ContactItem(listView,mechInfo,dist.getDistance(),dist.getAngleDeg());
+      items[mechInfo.getId().toUpper()] = i;
     }
     listView->sort();
   } else {
-    if(items.find(oldInfo.getId().upper()) != items.end()) {
-      delete items[oldInfo.getId().upper()];
-      items.erase(oldInfo.getId().upper());
+    if(items.find(oldInfo.getId().toUpper()) != items.end()) {
+      delete items[oldInfo.getId().toUpper()];
+      items.erase(oldInfo.getId().toUpper());
     }
     // sorting info isn't changed...
   }
+#endif
 }
 
 /*

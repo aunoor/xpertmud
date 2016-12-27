@@ -4,7 +4,7 @@ if(POLICY CMP0042)
     cmake_policy(SET CMP0042 NEW)
 endif()
 
-project(battletech)
+project(xmud_battletech)
 
 file (GLOB HDR
         battletech.h
@@ -38,10 +38,10 @@ file (GLOB SRCS
         BattleHeat.cc
         BattleStatus.cc
         Positions.cc
-        BattleWeapons.cc
         MechInfo.cc
         WeaponInfo.cc
         BattleContacts.cc
+        BattleWeapons.cc
         ${CMAKE_SOURCE_DIR}/compat/kglobal.cc
         )
 

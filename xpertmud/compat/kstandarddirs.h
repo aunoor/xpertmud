@@ -17,7 +17,12 @@ using std::endl;
 
 class KStandardDirs {
  public:
-  QString findResource(const QString& type, const QString& name);
+  QString findResource(const QString& type, const QString& name) {
+      if(type == "appdata") {
+        return type + '/' + name;
+      }
+      return name;
+  }
 
   QStringList findAllResources(const QString& type, const QString& cfilter, bool, bool);
 

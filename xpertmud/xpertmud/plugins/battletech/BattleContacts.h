@@ -7,11 +7,14 @@
 #include <map>
 
 class BattleCore;
-class QTreeWidget;
-class QTreeWidgetItem;
+class QTreeView;
 class MechInfo;
 class QMenu;
 class ContactItem;
+
+class QTreeViewItem: public QObject {
+
+};
 
 class BattleContactWidget: public QWidget {
   Q_OBJECT
@@ -28,16 +31,16 @@ public slots:
   // </Plugin Interface> //////////////////////////////////////////////////////
 
 public slots:
-  void popmeup(QTreeWidgetItem *, const QPoint &, int);
+  void popmeup(QTreeViewItem *, const QPoint &, int);
 
 protected slots:
   void slotUpdateMechInfo(const MechInfo &,const MechInfo &);
 //  void updateList();
-  void slotPopup(int);
+  void slotPopup();
 
 private:
   BattleCore * core;
-  QTreeWidget* listView;
+  QTreeView* listView;
   QMenu * popup;
   QString currentID;
   std::map<QString, ContactItem*> items;

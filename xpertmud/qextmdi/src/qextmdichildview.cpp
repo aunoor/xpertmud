@@ -558,7 +558,8 @@ bool QextMdiChildView::eventFilter(QObject *obj, QEvent *e )
       QObject* pLostChild = ((QChildEvent*)e)->child();
       if (pLostChild != 0L) {
          QWidgetList list = pLostChild->findChildren<QWidget*>();
-         list.insert(0, (QWidget*)pLostChild);        // add the lost child to the list too, just to save code
+         QWidget *tw = dynamic_cast<QWidget*>(pLostChild);
+         if (tw!=NULL) list.insert(0, (QWidget*)pLostChild);        // add the lost child to the list too, just to save code
          foreach(QWidget* widg, list) {
             widg->removeEventFilter(this);
             if((widg->focusPolicy() == Qt::StrongFocus) ||

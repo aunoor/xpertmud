@@ -5,13 +5,6 @@
 
 #include "kstandarddirs.h"
 
-QString KStandardDirs::findResource(const QString& type, const QString& name) {
-    if(type == "appdata") {
-        return type + '/' + name;
-    }
-    return name;
-}
-
 QStringList KStandardDirs::findAllResources(const QString& type,
                              const QString& cfilter,
                              bool, bool) {

@@ -33,14 +33,23 @@ BattleMapWidget::BattleMapWidget(QWidget *parent,
   */
 
   QVBoxLayout *l = new QVBoxLayout(this);
-  l->setAutoAdd(true);
+  //l->setAutoAdd(true);
   speedbar = new QWidget(this);
+  l->addWidget(speedbar);
   QHBoxLayout *ls = new QHBoxLayout(speedbar);
-  ls->setAutoAdd(true);
-  slider = new QSlider(0, 1000, 100, 0, QSlider::Horizontal,speedbar);
+  //ls->setAutoAdd(true);
+  //slider = new QSlider(0, 1000, 100, 0, QSlider::Horizontal,speedbar);
+  slider = new QSlider(Qt::Horizontal, speedbar);
+  slider->setMinimum(0);
+  slider->setMaximum(1000);
+  slider->setPageStep(100);
+  slider->setValue(0);
+  ls->addWidget(slider);
   centered = new QLabel("", speedbar);
+  ls->addWidget(centered);
   speedbar->hide();
   view = new BattleMapView(this, "mapview");
+  l->addWidget(view);
   centeredChanged();
   connect(view, SIGNAL(tileLeftClicked(QPoint, SubHEXPos)),
 	  this, SLOT(tileLeftClicked(QPoint, SubHEXPos)));
@@ -67,25 +76,27 @@ BattleMapWidget::BattleMapWidget(QWidget *parent,
   slider->setValue((int)((view->getZoom()-view->getMinZoom()) /
 			 (view->getMaxZoom()-view->getMinZoom())*1000.0));
 
-  settingsPopup = new QPopupMenu(this);
+  settingsPopup = new QMenu(this);
   connect(settingsPopup, SIGNAL(aboutToShow()), 
 	  this, SLOT(createSettingsMenu()));
 
-  tilePopup = new QPopupMenu(this);
+  tilePopup = new QMenu(this);
   connect(tilePopup, SIGNAL(aboutToShow()), 
 	  this, SLOT(createTileMenu()));
 
-  mechPopup = new QPopupMenu(this);
+  mechPopup = new QMenu(this);
   connect(mechPopup, SIGNAL(aboutToShow()), 
 	  this, SLOT(createMechMenu()));
 
-  lockHexPopup = new QPopupMenu(this);
+  lockHexPopup = new QMenu(this);
   connect(lockHexPopup, SIGNAL(aboutToShow()), 
 	  this, SLOT(createLockHexMenu()));
-
-  showBar = new QAction("Show Quickbar", "&Show Quickbar", 0, 
-			settingsPopup, 0, true);
-  showBar->setOn(false);
+  //QAction ( const QString & text, const QString & menuText, QKeySequence accel, QObject * parent, const char * name = 0, bool toggle = FALSE )  (obsolete)
+  //showBar = new QAction("Show Quickbar", "&Show Quickbar", 0, settingsPopup, 0, true);
+  showBar = settingsPopup->addAction("Show Quickbar");
+  //showBar->setOn(false);
+  showBar->setCheckable(true);
+  showBar->setEnabled(false);
   connect(showBar, SIGNAL(toggled(bool)), this, SLOT(slotShowBar(bool)));
 
   // TODO: Not needed for QT-only version
@@ -103,7 +114,8 @@ void BattleMapWidget::slotFunctionCall(int func, const QVariant & args,
     view->setFollowedMech(args.toString());
     centeredChanged();
   } else if(func == 1) { // scroll(dx, dy)
-    QStringList l = QStringList::split(',', args.toString());
+    //QStringList l = QStringList::split(',', args.toString());
+    QStringList l = args.toString().split(',', QString::SkipEmptyParts);
     if(l.count() >= 2) {
       view->scrollMap(l[0].toInt(), l[1].toInt());
     }
@@ -111,11 +123,12 @@ void BattleMapWidget::slotFunctionCall(int func, const QVariant & args,
     // TODO: Set Slider!!!
     view->setZoom(args.toDouble());
   } else if(func == 3) { // showQuickbar()
-    showBar->setOn(true);
+    showBar->setEnabled(true);
   } else if(func == 4) { // hideQuickbar()
-    showBar->setOn(false);
+    showBar->setEnabled(false);
   } else if(func == 5) { // saveImage
-      QStringList a=QStringList::split(',', args.toString());
+      //QStringList a=QStringList::split(',', args.toString());
+      QStringList a=args.toString().split(',', QString::SkipEmptyParts);
       if (a.count() >= 5) {
 	  view->saveImage(KURL(a[0]),
 			  HEXPos(a[1].toInt(),a[2].toInt()),
@@ -142,7 +155,7 @@ void BattleMapWidget::tileMiddlePressed(QPoint p, SubHEXPos hex) {
   SubHEXPos myPos = core->getMechInfo(core->getOwnId()).getPos();
   SubPos dir = NormHexLayout::difference(myPos,hex);
   QString str;
-  QTextStream stream(str,IO_WriteOnly);
+  QTextStream stream(&str, QIODevice::WriteOnly);
   stream << "heading " << dir.getAngleDeg()  << endl;
   core->slotSend(str);
 }
@@ -181,9 +194,14 @@ void BattleMapWidget::zoomChanged(double zoom) {
   }
 }
 
-void BattleMapWidget::lockCurrentHex(int mode) {
+void BattleMapWidget::lockCurrentHex() {
+  QAction *ta = dynamic_cast<QAction*>(sender());
+  if (ta==NULL) return;
+
+  int mode = ta->property("name").toInt();
+
   QString s;
-  QTextStream str(&s, IO_WriteOnly);
+  QTextStream str(&s, QIODevice::WriteOnly);
   str << "lock " << currentHex.getX() << " " << currentHex.getY();
 
   if (mode==1)
@@ -204,7 +222,7 @@ void BattleMapWidget::tactCurrentHex() {
   SubPos p = NormHexLayout::difference
     (ownP, currentHex);
   QString s=QString("hudinfo t 20 %1 %2\n").arg((int)p.getAngleDeg()).arg((int)p.getDistance());
-  cout << "TODO: send(" << s.latin1() << ")" << endl;
+  cout << "TODO: send(" << s.toLatin1().data() << ")" << endl;
   core->slotSend(s);
 }
 
@@ -218,7 +236,7 @@ void BattleMapWidget::jumpCurrentHex() {
 
 void BattleMapWidget::lockCurrentMech() {
   QString s;
-  QTextStream str(&s, IO_WriteOnly);
+  QTextStream str(&s, QIODevice::WriteOnly);
   str << "lock " << currentMech << endl;
   // Kein TODO, da das lock-command nix mit hudinfo zu tun hat
   //  cout << "TODO: send(" << s.latin1() << ")" << endl;
@@ -227,7 +245,7 @@ void BattleMapWidget::lockCurrentMech() {
 
 void BattleMapWidget::scanCurrentMech() {
   QString s;
-  QTextStream str(&s, IO_WriteOnly);
+  QTextStream str(&s, QIODevice::WriteOnly);
   str << "scan " << currentMech << endl;
   // Kein TODO, da das scan-command nix mit hudinfo zu tun hat
   //  cout << "TODO: send(" << s.latin1() << ")" << endl;
@@ -258,7 +276,7 @@ void BattleMapWidget::saveMap() {
     if(!url.isLocalFile())
       return; // TODO: notify?
     QString fn = url.fileName();
-    if(fn.find('.') == -1) {
+    if(fn.indexOf('.') == -1) {
       url.setFileName(fn + ".btmap");
     }
     core->saveMap(url);
@@ -277,12 +295,12 @@ void BattleMapWidget::clearMap() {
   core->clearMap();
 }
 void BattleMapWidget::saveImage() {
-  KURL url=KFileDialog::getSaveURL(QString::null,
+  KURL url=KFileDialog::getSaveURL(QString(),
 				   KImageIO::pattern(),
 				   this, i18n("Save map image as ..."));
   if(!url.isEmpty()) {
     QString fn = url.fileName();
-    if(fn.find('.') == -1) {
+    if(fn.indexOf('.') == -1) {
       url.setFileName(fn + ".png");
     }
     view->saveImage(url,HEXPos(-1,-1),HEXPos(core->getMapWidth()+1,
@@ -309,58 +327,70 @@ void BattleMapWidget::slotShowBar(bool show) {
 
 void BattleMapWidget::createMechMenu() {
   mechPopup->clear();
-  mechPopup->insertItem(i18n("&Lock"), this, SLOT(lockCurrentMech()));
-  mechPopup->insertItem(i18n("&Scan"), this, SLOT(scanCurrentMech()));
-  mechPopup->insertItem(i18n("&Follow"), this, SLOT(followCurrentMech()),0,1);
+  mechPopup->addAction(i18n("&Lock"), this, SLOT(lockCurrentMech()));
+  mechPopup->addAction(i18n("&Scan"), this, SLOT(scanCurrentMech()));
+  QAction *ta=mechPopup->addAction(i18n("&Follow"), this, SLOT(followCurrentMech()));
   if(view->getFollowedMech() == currentMech)
-    mechPopup->setItemChecked(1, true);
-  mechPopup->insertSeparator();
-  mechPopup->insertItem(i18n("Follow S&elf"), this, SLOT(followSelf()),0,2);
-  if(view->getFollowedMech() != "" &&
-     view->getFollowedMech() == core->getOwnId()) 
-    mechPopup->setItemChecked(2, true);
-  mechPopup->insertSeparator();
-  mechPopup->insertItem(i18n("&Misc"), settingsPopup);
+    ta->setChecked(true);
+  mechPopup->addSeparator();
+  ta=mechPopup->addAction(i18n("Follow S&elf"), this, SLOT(followSelf()));
+  if (view->getFollowedMech() != "" && view->getFollowedMech() == core->getOwnId())
+    ta->setChecked(true);
+  mechPopup->addSeparator();
+  ta = mechPopup->addMenu(settingsPopup);
+  ta->setText(i18n("&Misc"));
 }
 
 void BattleMapWidget::createTileMenu() {
   tilePopup->clear();
-  tilePopup->insertItem(i18n("&Lock"),lockHexPopup);;
-  tilePopup->insertItem(i18n("&Tactical"), this, SLOT(tactCurrentHex()));
-  tilePopup->insertItem(i18n("&Jump To"), this, SLOT(jumpCurrentHex()));
-  tilePopup->insertSeparator();
-  tilePopup->insertItem(i18n("Follow S&elf"), this, SLOT(followSelf()),0,2);
-  if(view->getFollowedMech() != "" &&
-     view->getFollowedMech() == core->getOwnId()) 
-    tilePopup->setItemChecked(2, true);
-  tilePopup->insertSeparator();
-  tilePopup->insertItem(i18n("&Misc"), settingsPopup);
+  QAction *ta=tilePopup->addMenu(lockHexPopup);;
+  ta->setText(i18n("&Lock"));
+  tilePopup->addAction(i18n("&Tactical"), this, SLOT(tactCurrentHex()));
+  tilePopup->addAction(i18n("&Jump To"), this, SLOT(jumpCurrentHex()));
+  tilePopup->addSeparator();
+  ta=tilePopup->addAction(i18n("Follow S&elf"), this, SLOT(followSelf()));
+  if (view->getFollowedMech() != "" && view->getFollowedMech() == core->getOwnId())
+    //tilePopup->setItemChecked(2, true);
+    ta->setChecked(true);
+  tilePopup->addSeparator();
+  ta = tilePopup->addMenu(settingsPopup);
+  ta->setText(i18n("&Misc"));
 }
 
 void BattleMapWidget::createLockHexMenu() {
   lockHexPopup->clear();
-  lockHexPopup->insertItem(QString("(%1, %2)")
+  lockHexPopup->addAction(QString("(%1, %2)")
 			   .arg(currentHex.getX())
 			   .arg(currentHex.getY()));;
-  lockHexPopup->insertSeparator();
-  lockHexPopup->insertItem(i18n("&Lock IDF"), this, SLOT(lockCurrentHex(int)),0,0);
-  lockHexPopup->insertItem(i18n("Lock &Building"), this, SLOT(lockCurrentHex(int)),0,1);
-  lockHexPopup->insertItem(i18n("Lock &Clear"), this, SLOT(lockCurrentHex(int)),0,2);
-  lockHexPopup->insertItem(i18n("Lock &Ignite"), this, SLOT(lockCurrentHex(int)),0,3);
-  lockHexPopup->insertItem(i18n("Lock &Hex"), this, SLOT(lockCurrentHex(int)),0,4);
+  lockHexPopup->addSeparator();
+/*
+  lockHexPopup->addAction(i18n("&Lock IDF"), this, SLOT(lockCurrentHex(int)),0,0);
+  lockHexPopup->addAction(i18n("Lock &Building"), this, SLOT(lockCurrentHex(int)),0,1);
+  lockHexPopup->addAction(i18n("Lock &Clear"), this, SLOT(lockCurrentHex(int)),0,2);
+  lockHexPopup->addAction(i18n("Lock &Ignite"), this, SLOT(lockCurrentHex(int)),0,3);
+  lockHexPopup->addAction(i18n("Lock &Hex"), this, SLOT(lockCurrentHex(int)),0,4);
+*/
+  QAction *ta;
+  ta=lockHexPopup->addAction(i18n("&Lock IDF"), this, SLOT(lockCurrentHex(int)));
+  ta->setProperty("id",0);
+  ta=lockHexPopup->addAction(i18n("Lock &Building"), this, SLOT(lockCurrentHex(int)));
+  ta->setProperty("id",2);
+  ta=lockHexPopup->addAction(i18n("Lock &Clear"), this, SLOT(lockCurrentHex(int)));
+  ta->setProperty("id",3);
+  ta=lockHexPopup->addAction(i18n("Lock &Ignite"), this, SLOT(lockCurrentHex(int)));
+  ta->setProperty("id",4);
+  ta=lockHexPopup->addAction(i18n("Lock &Hex"), this, SLOT(lockCurrentHex(int)));
+  ta->setProperty("id",5);
 }
 
 void BattleMapWidget::createSettingsMenu() {
   settingsPopup->clear();
-  showBar->addTo(settingsPopup);
-  settingsPopup->insertItem(i18n("&Save Map"), 
-			    this, SLOT(saveMap()),0,2);
-  settingsPopup->insertItem(i18n("&Load Map"), 
-			    this, SLOT(loadMap()),0,3);
-  settingsPopup->insertItem(i18n("&Clear Map"), 
-			    this, SLOT(clearMap()),0,5);
-  settingsPopup->insertItem(i18n("Save &Image"), 
-			    this, SLOT(saveImage()),0,4);
+  //showBar->addTo(settingsPopup);
+  settingsPopup->addAction(showBar);
+  settingsPopup->addAction(i18n("&Save Map"), this, SLOT(saveMap()));
+  settingsPopup->addAction(i18n("&Load Map"), this, SLOT(loadMap()));
+  settingsPopup->addAction(i18n("&Clear Map"), this, SLOT(clearMap()));
+  settingsPopup->addAction(i18n("Save &Image"), this, SLOT(saveImage()));
   
 }
 

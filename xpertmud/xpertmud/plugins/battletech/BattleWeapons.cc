@@ -1,13 +1,18 @@
 #include "BattleWeapons.h"
 #include "BattleCore.h"
 
-#include <QTreeWidget>
+#include <QTreeView>
 #include <QVBoxLayout>
 #include <QMenu>
 
 #include <klocale.h>
 #include <cassert>
 
+class WeaponViewItem: public QObject {
+
+};
+
+#if 0
 class WeaponViewItem: public QTreeWidgetItem {
 public:
   WeaponViewItem(QTreeWidget* parent, const WeaponInfo& wi, const WeaponStat &stat):
@@ -80,11 +85,11 @@ public:
     repaint();
   }
 
-  void paintCell(QPainter* p, const QColorGroup& cg, int column, int width,
+  void paintCell(QPainter* p, const QPalette::ColorGroup& cg, int column, int width,
 		 int align) {
-    QColorGroup newGroup(cg);
-    newGroup.setColor(QColorGroup::Text, textColor);
-    newGroup.setBrush(QColorGroup::Base, heatColor);
+    QPalette::ColorGroup newGroup(cg);
+    newGroup.setColor(QPalette::Text, textColor);
+    newGroup.setBrush(QPalette::Base, heatColor);
     QTreeWidgetItem::paintCell(p, newGroup, column, width, align);
   }
 
@@ -92,7 +97,7 @@ private:
   QColor heatColor;
   QColor textColor;
 };
-
+#endif
 //////////////////////////////////////////////////////////////////////
 
 WeaponView::WeaponView(QWidget* parent, const char* name, const QStringList& /*args*/):
@@ -110,14 +115,10 @@ WeaponView::WeaponView(QWidget* parent, const char* name, const QStringList& /*a
   QVBoxLayout *l = new QVBoxLayout(this);
   l->setContentsMargins(0,0,0,0);
 
-  listView=new QTreeWidget(this);
+  listView=new QTreeView(this);
   l->addWidget(listView);
-
-#if QT_VERSION < 300
-  listView->setBackgroundColor(QColor(0,0,0));
-#else
+#if 0
   listView->setPaletteBackgroundColor(QColor(0,0,0));
-#endif
 
   listView->setFocusPolicy(Qt::NoFocus);
   listView->viewport()->setFocusPolicy(Qt::NoFocus);
@@ -131,6 +132,7 @@ WeaponView::WeaponView(QWidget* parent, const char* name, const QStringList& /*a
   listView->addColumn("H"); // 4 Ammo Type
   listView->addColumn("Ranges"); // 5  
   listView->addColumn("D"); // 4 Ammo Type
+#endif
 }
 
 WeaponView::~WeaponView() {
@@ -141,6 +143,7 @@ void WeaponView::slotFunctionCall(int /*func*/, const QVariant & /*args*/, QVari
 }
 
 void WeaponView::slotUpdateEntry(int id) {
+#if 0
   assert(id>=0);
   WeaponInfo wi=core->getWeaponInfo(id);
   WeaponStat ws=core->getWeaponStat(wi.key());
@@ -151,15 +154,18 @@ void WeaponView::slotUpdateEntry(int id) {
   } else {
     items[id]->setInfo(wi,ws, heat, heatDissipation);
   }
+#endif
 }
 
 void WeaponView::slotNrWeaponsChange(int nr) {
+#if 0
   assert(nr>=0);
   for(unsigned int i=nr; i<items.size(); ++i) {
     if(items[i] != NULL)
       delete items[i];
   }
   items.resize(nr);
+#endif
 }
 
 void WeaponView::heatChanged(int nheat) {
@@ -173,7 +179,9 @@ void WeaponView::heatDissipationChanged(int nheatDissipation) {
 }
 
 void WeaponView::updateEntries() {
+#if 0
   for(unsigned int i=0; i<items.size(); ++i) {
     slotUpdateEntry(i);
   }
+#endif
 }
