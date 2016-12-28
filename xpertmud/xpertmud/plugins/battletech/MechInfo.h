@@ -70,7 +70,7 @@ public:
   int age() const {
     if (los)
       return 0;
-    return lastContact.secsTo(QDateTime::currentDateTime());
+    return (int)lastContact.secsTo(QDateTime::currentDateTime());
   }
   void setInLOS(bool l) { 
     if (los && !l) {

@@ -5,8 +5,6 @@
 #include <QVBoxLayout>
 #include <QMenu>
 #include <QHeaderView>
-#include <QFontMetrics>
-#include <QDebug>
 
 #include <klocale.h>
 #include <cassert>
@@ -220,11 +218,6 @@ WeaponView::WeaponView(QWidget* parent, const char* name, const QStringList& /*a
   l->addWidget(listView);
 
   listView->setRootIsDecorated(false);
-/*
-  QPalette pal = listView->palette();
-  pal.setColor(QPalette::Background, QColor(0,0,0));
-  listView->setPalette(pal);
-*/
   listView->setStyleSheet("QTreeView {background: black;}");
 
   weapons_model = new WeaponsModel(listView);
@@ -235,7 +228,7 @@ WeaponView::WeaponView(QWidget* parent, const char* name, const QStringList& /*a
   listView->header()->resizeSection(2, listView->fontMetrics().maxWidth()*11); //name
   listView->header()->resizeSection(3, listView->fontMetrics().maxWidth()*4); //bth
   listView->header()->resizeSection(4, listView->fontMetrics().maxWidth()*3); //status
-  listView->header()->resizeSection(5, listView->fontMetrics().maxWidth()*2);
+  listView->header()->resizeSection(5, listView->fontMetrics().maxWidth()*2); //Ammo type
   listView->header()->resizeSection(6, listView->fontMetrics().maxWidth()*4); //heat
   listView->header()->resizeSection(7, listView->fontMetrics().maxWidth()*6); //ranges
   listView->header()->resizeSection(8, listView->fontMetrics().maxWidth()*3); //damage

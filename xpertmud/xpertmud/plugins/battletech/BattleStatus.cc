@@ -37,11 +37,10 @@ BattleStatusWidget::BattleStatusWidget(QWidget *parent,
    //setEraseColor(black);
   QPalette pal = palette();
   pal.setColor(QPalette::Window, Qt::black);
+  setPalette(pal);
 
    QString path;
-   path = 
-      KGlobal::dirs()->findResource("appdata", 
-				    "status/status.def");
+   path = KGlobal::dirs()->findResource("appdata", "status/status.def");
 
    qDebug("Reading status defs from [%s]",(const char *)(path.toLocal8Bit()));
    

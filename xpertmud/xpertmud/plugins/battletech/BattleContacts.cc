@@ -6,7 +6,7 @@
 #include <QLayout>
 #include <QMenu>
 #include <QHeaderView>
-#include <QDebug>
+
 #include <klocale.h>
 
 #include <iostream>
