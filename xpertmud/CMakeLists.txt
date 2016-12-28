@@ -14,8 +14,9 @@ endif()
 
 project(xpertmud)
 
-include(FindZLIB)
-
+if (MCCP_SUPPORT)
+    include(FindZLIB)
+endif (MCCP_SUPPORT)
 # Files
 
 file (GLOB HDR
@@ -58,6 +59,7 @@ file (GLOB HDR
         compat/kdockwidget_private.h
         compat/kstandarddirs.h
         compat/kconfig.h
+        compat/kiconloader.h
         compat/arpa/telnet.h
         qextmdi/include/qextmditaskbar.h
         qextmdi/include/qextmdichildarea.h
@@ -146,14 +148,15 @@ if (WIN32 OR APPLE)
 endif(WIN32 OR APPLE)
 
 
-find_package(Qt5Gui)
+find_package(Qt5Gui REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Xml REQUIRED)
-find_package(Qt5XmlPatterns)
+#find_package(Qt5XmlPatterns)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
+find_package(Qt5PrintSupport REQUIRED)
 
 include_directories( ${Qt5Network_INCLUDE_DIRS} )
 include_directories( ${Qt5Concurrent_INCLUDE_DIRS} )
@@ -183,12 +186,8 @@ if (MCCP_SUPPORT)
     add_definitions(-DMCCP_SUPPORT)
 endif(MCCP_SUPPORT)
 
-#set(LIBRARY_OUTPUT_PATH ${FIELD_WORK_BINARY_DIR})
-#set(EXECUTABLE_OUTPUT_PATH ${FIELD_WORK_BINARY_DIR})
-
 qt5_wrap_ui(INCLUDE_LIST_FORMS ${UI_FORMS})
 qt5_add_resources(MAIN_UI_RC ${MAIN_RES})
-
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/xpertmud)
@@ -216,7 +215,8 @@ elseif(APPLE)
 	set(GUI_TYPE MACOSX_BUNDLE)
 
     set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-    set(CMAKE_INSTALL_RPATH "@loader_path/../Framework")
+    set(CMAKE_INSTALL_RPATH "@loader_path/../Frameworks;@executable_path/../Frameworks")
+#    set(CMAKE_INSTALL_RPATH "@executable_path/../Frameworks")
 
 endif(WIN32)
 
@@ -235,41 +235,80 @@ if (MCCP_SUPPORT)
     target_link_libraries(${PROJECT_NAME} ${ZLIB_LIBRARIES})
 endif(MCCP_SUPPORT)
 
-install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX})
-
 if (APPLE)
-#  install(DIRECTORY ${MARBLE_LIBRARIES} DESTINATION ${CMAKE_INSTALL_PREFIX}${PROJECT_NAME}.app/Contents/MacOs
-#          FILES_MATCHING PATTERN "lib*")
-#  install(DIRECTORY ${MARBLE_DIR}/share/marble/data DESTINATION ${CMAKE_INSTALL_PREFIX}${PROJECT_NAME}.app/Contents/MacOs/resources/)
-set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.xpertmud.Xpertmud")
-set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${APP_VERSION_SHORT})
-set(MACOSX_BUNDLE_LONG_VERSION_STRING ${APP_VERSION_DEF})
-set(MACOSX_BUNDLE_ICON_FILE "hi32-app-xpertmud")
 
+    function(QT_MODULE_DEPLOY QMODULE_NAME)
+        string(REPLACE ":" "" QMODULE_NAME ${QMODULE_NAME})
+        set(QMODULE_NAME "_${QMODULE_NAME}_OWN_INCLUDE_DIRS")
+#        message(${QMODULE_NAME})
+#list(GET _Qt5Widgets_OWN_INCLUDE_DIRS 0 QM_PATH)
+        list(GET ${QMODULE_NAME} 0 QM_PATH)
+#        message(${QM_PATH})
+        #string(FIND ${QM_PATH} "\/" <output variable> REVERSE)
+        string(STRIP ${QM_PATH} QM_PATH)
+        string(REGEX MATCH "Qt[^/].+framework$" QM_F_NAME ${QM_PATH})
+        string(REPLACE ".framework" "" QM_NAME ${QM_F_NAME})
+#        message("${QM_PATH} | ${QM_F_NAME} | ${QM_NAME}")
+
+#        if (CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]")
+#            set(QM_NAME "${QM_NAME}_debug")
+#        endif (CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]")
+
+        install(FILES
+                ${QM_PATH}/${QM_NAME}
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/Frameworks/${QM_F_NAME})
+        install(FILES ${QM_PATH}/Resources/Info.plist
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/Frameworks/${QM_F_NAME}/Versions/5/Resources/)
+        install(FILES ${QM_PATH}/Versions/5/${QM_NAME}
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/Frameworks/${QM_F_NAME}/Versions/5/)
+        install(DIRECTORY ${QM_PATH}/Versions/Current
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/Frameworks/${QM_F_NAME}/Versions/)
+
+#dirty, dirty hack... May be someone has better variant?
+        install(FILES ${QM_PATH}/../../plugins/platforms/libqcocoa.dylib
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/PlugIns/platforms)
+    endfunction()
+
+    set(MACOSX_BUNDLE_BUNDLE_NAME "Xpertmud")
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.xpertmud.Xpertmud")
+    set(MACOSX_BUNDLE_BUNDLE_VERSION ${APP_VERSION_SHORT})
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${APP_VERSION_SHORT})
+    set(MACOSX_BUNDLE_LONG_VERSION_STRING ${APP_VERSION_DEF})
+    set(MACOSX_BUNDLE_ICON_FILE "hi32-app-xpertmud.icns")
+    set(MACOSX_BUNDLE_INFO_STRING "Xpertmud is an extensible scriptable MUD client")
+
+    install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/qt.conf.macos
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/Resources/ RENAME qt.conf)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi32-app-xpertmud.icns
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/Resources/)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi32-app-xpertmud.png
+                  ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi16-app-xpertmud.png
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/MacOs/icons/)
+
+    QT_MODULE_DEPLOY(Qt5::Core)
+    QT_MODULE_DEPLOY(Qt5::Gui)
+    QT_MODULE_DEPLOY(Qt5::Widgets)
+    QT_MODULE_DEPLOY(Qt5::Xml)
+    QT_MODULE_DEPLOY(Qt5::Network)
+    QT_MODULE_DEPLOY(Qt5::Multimedia)
+#PrintSupport needed for qcocoa platform plugin
+    QT_MODULE_DEPLOY(Qt5::PrintSupport)
 
 else (APPLE)
   if (WIN32)
-#      install(DIRECTORY ${MARBLE_LIBRARIES}/ DESTINATION ${CMAKE_INSTALL_PREFIX}/
-#              FILES_MATCHING PATTERN "*.dll")
-#      install(DIRECTORY ${GEOGRAPHIC_LIBRARIES}/ DESTINATION ${CMAKE_INSTALL_PREFIX}/
-#              FILES_MATCHING PATTERN "*.dll")
+      install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/)
+      install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi32-app-xpertmud.png
+              ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi16-app-xpertmud.png
+              DESTINATION ${CMAKE_INSTALL_PREFIX}/icons/)
   else (WIN32)
-#      install(DIRECTORY ${MARBLE_LIBRARIES} DESTINATION ${CMAKE_INSTALL_PREFIX}/
-#        FILES_MATCHING PATTERN "lib*"
-#        PATTERN "marble" EXCLUDE
-#        )
-#      install(DIRECTORY ${GEOGRAPHIC_LIBRARIES} DESTINATION ${CMAKE_INSTALL_PREFIX}/
-#        FILES_MATCHING PATTERN "lib*"
-#        PATTERN "python" EXCLUDE
-#        )
+#TODO: make Linux install
+      install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+      install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi32-app-xpertmud.png
+              ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi16-app-xpertmud.png
+              DESTINATION share/xpertmud/icons/)
   endif (WIN32)
-#  install(DIRECTORY ${MARBLE_DIR}/share/marble/data DESTINATION ${CMAKE_INSTALL_PREFIX}/resources/)
-#  install(FILES ${INSTALL_PLUGLIST} DESTINATION ${CMAKE_INSTALL_PREFIX}/resources/plugins)
 endif (APPLE)
 
-
-#install(FILES ${MARBLE_LIBRARIES}/ DESTINATION ${CMAKE_INSTALL_PREFIX}/field_x/)
-
-#SETUP_APPLICATION(${PROJECT_NAME})
 add_subdirectory(xpertmud/plugins)
 add_subdirectory(xpertmud/scripting)
