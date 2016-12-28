@@ -27,9 +27,9 @@ int ContactsModel::columnCount(const QModelIndex &parent) const {
 
 QModelIndex ContactsModel::index(int row, int column, const QModelIndex &parent) const {
   if (row>=m_contacts.count()) return QModelIndex();
-  if (column>=8) return QModelIndex();
+  if (column>=columnCount(QModelIndex())) return QModelIndex();
   if (parent.isValid()) return QModelIndex();
-  return createIndex(row, column );
+  return createIndex(row, column);
 }
 
 QModelIndex ContactsModel::parent(const QModelIndex &child) const {
@@ -68,7 +68,7 @@ QVariant ContactsModel::headerData(int section, Qt::Orientation orientation, int
           QTreeView *tv = dynamic_cast<QTreeView*>(QObject::parent());
           if (tv==NULL) return QVariant();
           QFontMetrics fm = tv->header()->fontMetrics();
-          return QSize(fm.maxWidth()*2+4, fm.height());
+          return QSize(fm.maxWidth()*3, fm.height());
         }
         default:
           return QVariant();
@@ -225,7 +225,7 @@ BattleContactWidget::BattleContactWidget(QWidget *parent,
   bh->setFixedHeight(15);
   listView = new QTreeView(this);
   l->addWidget(listView);
-  con_model = new ContactsModel(this);
+  con_model = new ContactsModel(listView);
 
   listView->setRootIsDecorated(false);
   QPalette pal = listView->palette();
