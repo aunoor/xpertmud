@@ -19,95 +19,96 @@ include(FindZLIB)
 # Files
 
 file (GLOB HDR
-xpertmud/TextBuffer.h
-xpertmud/TextBufferView.h
-xpertmud/TextBufferHistoryView.h
-xpertmud/mxinputline.h
-xpertmud/xpertmud.h
-xpertmud/InputAction.h
-xpertmud/scripting/Scripting.h
-xpertmud/PluginWrapper.h
-xpertmud/configdialog.h
-xpertmud/ColorChar.h
-xpertmud/Connection.h
-xpertmud/ConnectionHandler.h
-xpertmud/IacHandlerCollection.h
-xpertmud/CtrlParser.h
-xpertmud/TelnetFilter.h
-xpertmud/InputStreamHandler.h
-xpertmud/Bookmark.h
-xpertmud/BookmarkEditor.h
-xpertmud/LogToFile.h
-xpertmud/MCCP.h
-compat/kaction.h
-compat/kfontdialog.h
-compat/kapplication.h
-compat/kcolorbutton.h
-compat/kdialogbase.h
-compat/kextendedsocket.h
-compat/kfiledialog.h
-compat/klibloader.h
-compat/kmainwindow.h
-compat/kmessagebox.h
-compat/kpopupmenu.h
-compat/ktoolbar.h
-compat/dummykpartsdockmainwindow.h
-compat/kdocktabctl.h
-compat/kdockwidget.h
-compat/kdockwidget_private.h
-compat/kstandarddirs.h
-compat/arpa/telnet.h
-qextmdi/include/qextmditaskbar.h
-qextmdi/include/qextmdichildarea.h
-qextmdi/include/qextmdichildfrmcaption.h
-qextmdi/include/qextmdichildfrm.h
-qextmdi/include/qextmdichildview.h
-qextmdi/include/qextmdidefines.h
-qextmdi/include/qextmdiiterator.h
-qextmdi/include/qextmdilistiterator.h
-qextmdi/include/qextmdinulliterator.h
-qextmdi/include/qextmdimainfrm.h
-qextmdi/res/*.xpm
-)
+        xpertmud/TextBuffer.h
+        xpertmud/TextBufferView.h
+        xpertmud/TextBufferHistoryView.h
+        xpertmud/mxinputline.h
+        xpertmud/xpertmud.h
+        xpertmud/InputAction.h
+        xpertmud/scripting/Scripting.h
+        xpertmud/PluginWrapper.h
+        xpertmud/configdialog.h
+        xpertmud/ColorChar.h
+        xpertmud/Connection.h
+        xpertmud/ConnectionHandler.h
+        xpertmud/IacHandlerCollection.h
+        xpertmud/CtrlParser.h
+        xpertmud/TelnetFilter.h
+        xpertmud/InputStreamHandler.h
+        xpertmud/Bookmark.h
+        xpertmud/BookmarkEditor.h
+        xpertmud/LogToFile.h
+        xpertmud/MCCP.h
+        compat/kaction.h
+        compat/kfontdialog.h
+        compat/kapplication.h
+        compat/kcolorbutton.h
+        compat/kdialogbase.h
+        compat/kextendedsocket.h
+        compat/kfiledialog.h
+        compat/klibloader.h
+        compat/kmainwindow.h
+        compat/kmessagebox.h
+        compat/kpopupmenu.h
+        compat/ktoolbar.h
+        compat/dummykpartsdockmainwindow.h
+        compat/kdocktabctl.h
+        compat/kdockwidget.h
+        compat/kdockwidget_private.h
+        compat/kstandarddirs.h
+        compat/kconfig.h
+        compat/arpa/telnet.h
+        qextmdi/include/qextmditaskbar.h
+        qextmdi/include/qextmdichildarea.h
+        qextmdi/include/qextmdichildfrmcaption.h
+        qextmdi/include/qextmdichildfrm.h
+        qextmdi/include/qextmdichildview.h
+        qextmdi/include/qextmdidefines.h
+        qextmdi/include/qextmdiiterator.h
+        qextmdi/include/qextmdilistiterator.h
+        qextmdi/include/qextmdinulliterator.h
+        qextmdi/include/qextmdimainfrm.h
+        qextmdi/res/*.xpm
+        )
 
 file (GLOB SRCS
-compat/klibloader.cc
-compat/kapplication.cc
-compat/kglobal.cc
-compat/kdocktabctl.cpp
-compat/kmainwindow.cc
-compat/kdockwidget.cpp
-compat/kdockwidget_private.cpp
-compat/ktoolbar.cpp
-compat/kstandarddirs.cpp
-qextmdi/src/qextmdichildarea.cpp
-qextmdi/src/qextmdichildfrmcaption.cpp
-qextmdi/src/qextmdichildfrm.cpp
-qextmdi/src/qextmdichildview.cpp
-qextmdi/src/qextmdimainfrm.cpp
-qextmdi/src/qextmditaskbar.cpp
-xpertmud/TextBuffer.cc
-xpertmud/TextBufferView.cc
-xpertmud/TextBufferHistoryView.cc
-xpertmud/mxinputline.cc
-xpertmud/InputAction.cc
-xpertmud/xpertmud.cc
-xpertmud/main.cc
-xpertmud/xpertmud_scripting.cc
-xpertmud/PluginWrapper.cc
-xpertmud/Connection.cc
-xpertmud/ConnectionHandler.cc
-xpertmud/IacHandlerCollection.cc
-xpertmud/CtrlParser.cc
-xpertmud/TelnetFilter.cc
-xpertmud/InputStreamHandler.cc
-xpertmud/configdialog.cc
-xpertmud/LogToFile.cc
-xpertmud/Bookmark.cc
-xpertmud/BookmarkEditor.cc
-xpertmud/MCCP.cc
-xpertmud/scripting/Scripting.cc
-)
+        compat/klibloader.cc
+        compat/kapplication.cc
+        compat/kglobal.cc
+        compat/kdocktabctl.cpp
+        compat/kmainwindow.cc
+        compat/kdockwidget.cpp
+        compat/kdockwidget_private.cpp
+        compat/ktoolbar.cpp
+        compat/kstandarddirs.cpp
+        qextmdi/src/qextmdichildarea.cpp
+        qextmdi/src/qextmdichildfrmcaption.cpp
+        qextmdi/src/qextmdichildfrm.cpp
+        qextmdi/src/qextmdichildview.cpp
+        qextmdi/src/qextmdimainfrm.cpp
+        qextmdi/src/qextmditaskbar.cpp
+        xpertmud/TextBuffer.cc
+        xpertmud/TextBufferView.cc
+        xpertmud/TextBufferHistoryView.cc
+        xpertmud/mxinputline.cc
+        xpertmud/InputAction.cc
+        xpertmud/xpertmud.cc
+        xpertmud/main.cc
+        xpertmud/xpertmud_scripting.cc
+        xpertmud/PluginWrapper.cc
+        xpertmud/Connection.cc
+        xpertmud/ConnectionHandler.cc
+        xpertmud/IacHandlerCollection.cc
+        xpertmud/CtrlParser.cc
+        xpertmud/TelnetFilter.cc
+        xpertmud/InputStreamHandler.cc
+        xpertmud/configdialog.cc
+        xpertmud/LogToFile.cc
+        xpertmud/Bookmark.cc
+        xpertmud/BookmarkEditor.cc
+        xpertmud/MCCP.cc
+        xpertmud/scripting/Scripting.cc
+        )
 
 #file(GLOB UI_FORMS src/ui/*.ui)
 #file(GLOB MAIN_RES src/*.qrc)
