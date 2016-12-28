@@ -6,13 +6,10 @@
 #include <QMenu>
 #include <QHeaderView>
 #include <QFontMetrics>
+#include <QDebug>
 
 #include <klocale.h>
 #include <cassert>
-
-class WeaponViewItem: public QObject {
-
-};
 
 //////////////////////////////////////////////////////////////////////
 
@@ -53,7 +50,7 @@ QVariant WeaponsModel::headerData(int section, Qt::Orientation orientation, int 
         case 4: // 4 Status
         case 5: // 5 Ammo Type
           return QString("");
-        case 6: //heat?
+        case 6: //weapon heat
           return QString("H");
         case 7: //Ranges
           return QString("Ranges");
@@ -108,6 +105,13 @@ QVariant WeaponsModel::data(const QModelIndex &index, int role) const {
         else
           return wi->getName();
       case 3:
+/*
+    if(wi.hasBth()) {
+      setText(3, QString::number(wi.getBth()));
+    } else {
+      setText(3, "n/a");
+    }
+*/
         //TODO: there must be BTH?
         return QVariant();
       case 4: if(wi->isRecycling())
@@ -118,7 +122,7 @@ QVariant WeaponsModel::data(const QModelIndex &index, int role) const {
           return wi->getAmmoType();
       case 6:
         if (ws.hasHeat())
-          return QString::number(double(ws.getHeat())/10.0);
+          return QString::number(double(ws.getHeat()) / 10.0);
         else
           return QString("n/a");
       case 7:
@@ -186,16 +190,10 @@ void WeaponsModel::updateWeaponInfo(int id) {
 }
 
 void WeaponsModel::changeNrWeapons(int count) {
+  if (m_weapons.count()==count) return;
   beginResetModel();
   m_weapons.resize(count);
   endResetModel();
-}
-
-int WeaponsModel::getIndex(const WeaponInfo &info) {
-  for (int i=0; i<m_weapons.count(); i++) {
-    if (m_weapons.at(i).getId() == info.getId()) return i;
-  }
-  return -1;
 }
 
 void WeaponsModel::setHeat(int heat) {
@@ -206,94 +204,6 @@ void WeaponsModel::setHeatDissipation(int heatDissipation) {
   this->heatDissipation = heatDissipation;
 }
 
-//////////////////////////////////////////////////////////////////////
-
-#if 0
-class WeaponViewItem: public QTreeWidgetItem {
-public:
-  WeaponViewItem(QTreeWidget* parent, const WeaponInfo& wi, const WeaponStat &stat):
-      QTreeWidgetItem(parent), heatColor(0, 0, 0), textColor("lightgrey")
-  {
-    setInfo(wi,stat,0,30);
-  }
-
-  void setInfo(const WeaponInfo& wi, const WeaponStat &stat, int heat,
-	       int heatDissipation) {
-    setText(0, QString::number(wi.getId()));
-    setText(1, wi.getSection());
-    if(wi.hasTechName())
-      setText(2, wi.getTechName() + "." + wi.getName());
-    else
-      setText(2, wi.getName());
-/*
-    if(wi.hasBth()) {
-      setText(3, QString::number(wi.getBth()));
-    } else {
-      setText(3, "n/a");
-    }
-*/
-
-    if(wi.isRecycling()) {
-      textColor = QColor("grey");
-      setText(4, QString::number(wi.getRecycleTime()));
-    } else {
-      textColor = QColor("lightgrey");
-      setText(4, wi.getStatus());
-    }
-
-    setText(5, wi.getAmmoType());
-
-    if(stat.hasHeat()) {
-      setText(6, QString::number(double(stat.getHeat())/10.0));
-      int newHeat = heat + stat.getHeat();
-      if(newHeat < heatDissipation*10) 
-	heatColor = QColor(0, 0, 0);
-      else if(newHeat < heatDissipation*10 + 90)
-	heatColor = QColor(0, 80, 0);
-      else if(newHeat < heatDissipation*10 + 140)
-	heatColor = QColor(0, 100, 0);
-      else if(newHeat < heatDissipation*10 + 190)
-	heatColor = QColor(100, 100, 0);
-      else
-	heatColor = QColor(100, 0, 0);
-    } else {
-      setText(6, "n/a");
-    }
-
-    if(stat.hasMinRange() && stat.hasShortRange() &&
-       stat.hasMidRange() && stat.hasLongRange()) {
-      QString ranges;
-      QTextStream str(&ranges, QIODevice::WriteOnly);
-      str << stat.getMinRange() << " "
-	  << stat.getShortRange() << " "
-	  << stat.getMidRange() << " "
-	  << stat.getLongRange();
-      setText(7, ranges);
-    } else {
-      setText(7, "n/a");
-    }
-
-    if(stat.hasDamage()) {
-      setText(8, QString::number(stat.getDamage()));
-    } else {
-      setText(8, "n/a");
-    }
-    repaint();
-  }
-
-  void paintCell(QPainter* p, const QPalette::ColorGroup& cg, int column, int width,
-		 int align) {
-    QPalette::ColorGroup newGroup(cg);
-    newGroup.setColor(QPalette::Text, textColor);
-    newGroup.setBrush(QPalette::Base, heatColor);
-    QTreeWidgetItem::paintCell(p, newGroup, column, width, align);
-  }
-
-private:
-  QColor heatColor;
-  QColor textColor;
-};
-#endif
 //////////////////////////////////////////////////////////////////////
 
 WeaponView::WeaponView(QWidget* parent, const char* name, const QStringList& /*args*/):
@@ -329,26 +239,6 @@ WeaponView::WeaponView(QWidget* parent, const char* name, const QStringList& /*a
   listView->header()->resizeSection(6, listView->fontMetrics().maxWidth()*4); //heat
   listView->header()->resizeSection(7, listView->fontMetrics().maxWidth()*6); //ranges
   listView->header()->resizeSection(8, listView->fontMetrics().maxWidth()*3); //damage
-
-
-
-
-#if 0
-  listView->setPaletteBackgroundColor(QColor(0,0,0));
-
-  listView->setFocusPolicy(Qt::NoFocus);
-  listView->viewport()->setFocusPolicy(Qt::NoFocus);
-  
-  listView->addColumn(""); // 0  Nr
-  listView->addColumn(""); // 1  Section
-  listView->addColumn("Name"); // 2
-  listView->addColumn(""); // 3, was BTH, remove sometimes
-  listView->addColumn(""); // 4 Status
-  listView->addColumn(""); // 4 Ammo Type
-  listView->addColumn("H"); // 4 Ammo Type
-  listView->addColumn("Ranges"); // 5  
-  listView->addColumn("D"); // 4 Ammo Type
-#endif
 }
 
 WeaponView::~WeaponView() {
@@ -359,30 +249,10 @@ void WeaponView::slotFunctionCall(int /*func*/, const QVariant & /*args*/, QVari
 }
 
 void WeaponView::slotUpdateEntry(int id) {
-#if 0
-  assert(id>=0);
-  WeaponInfo wi=core->getWeaponInfo(id);
-  WeaponStat ws=core->getWeaponStat(wi.key());
-  if((int)items.size() <= id)
-    items.resize(id+1);
-  if(items[id] == NULL) {
-    items[id] = new WeaponViewItem(listView, wi, ws);
-  } else {
-    items[id]->setInfo(wi,ws, heat, heatDissipation);
-  }
-#endif
   weapons_model->updateWeaponInfo(id);
 }
 
 void WeaponView::slotNrWeaponsChange(int nr) {
-#if 0
-  assert(nr>=0);
-  for(unsigned int i=nr; i<items.size(); ++i) {
-    if(items[i] != NULL)
-      delete items[i];
-  }
-  items.resize(nr);
-#endif
   weapons_model->changeNrWeapons(nr);
 }
 

@@ -34,14 +34,11 @@ public:
     void setHeat(int heat);
     void setHeatDissipation(int heatDissipation);
 
-
-
 private:
     BattleCore * core;
     QVector<WeaponInfo> m_weapons;
     int heatDissipation;
     int heat;
-    int getIndex(const WeaponInfo &info);
 };
 
 
@@ -71,39 +68,7 @@ private:
   BattleCore* core;
   QTreeView* listView;
   QMenu* popup;
-  std::vector<WeaponViewItem *> items;
   WeaponsModel *weapons_model;
-
-  // for heat calculations:
-  //int heatDissipation;
-  //int heat;
-
 };
-
-// TODO:
-//class AmmoView;
-//class ArmsNLegsView;
-
-/**
- * This class combines the different view classes into
- * one nice toplevel widget.
-class BattleWeaponWidget: public QWidget {
-  Q_OBJECT
-public:
-  BattleWeaponWidget(QWidget *parent, const char* name, const QStringList& args);
-  ~BattleWeaponWidget();
-
-  // <Plugin Interface> ///////////////////////////////////////////////////////
-signals:
-  void callback(int func, const QVariant & args, QVariant & result);
-
-public slots:
-  void slotFunctionCall(int func, const QVariant & args, QVariant & result);
-  // </Plugin Interface> //////////////////////////////////////////////////////
-
-private:
-  WeaponView* weaponView;
-};
-*/
 
 #endif
