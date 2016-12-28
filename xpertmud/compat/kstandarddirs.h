@@ -5,6 +5,8 @@
 #pragma warning( disable : 4100 )
 #endif
 
+#include "config.h"
+
 #include "kurl.h"
 #include <QStringList>
 #include <QDir>
@@ -12,6 +14,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <iostream>
+
 using std::cout;
 using std::endl;
 
@@ -19,7 +22,7 @@ class KStandardDirs {
  public:
   QString findResource(const QString& type, const QString& name) {
       if(type == "appdata") {
-        return type + '/' + name;
+        return RESOURCES_PATH_PREFIX + type + '/' + name;
       }
       return name;
   }

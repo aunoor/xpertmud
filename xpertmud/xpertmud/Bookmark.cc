@@ -24,17 +24,14 @@
 
 #include <cassert>
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#else
-# define VERSION "win32-unknown"
-#endif
+
+#include "config.h"
 
 
 Bookmark::Bookmark():
 isEdited(false),data("xpertmudBookmark"){
   QDomElement root = data.createElement("xpertmudBookmark");
-  root.setAttribute("version",VERSION);
+  root.setAttribute("version", APP_VERSION);
   data.appendChild( root );
 }
 
@@ -93,7 +90,7 @@ bool Bookmark::load(const KURL & url) {
     data=doc;
     if (data.documentElement().isNull()) {
       QDomElement root = data.createElement("xpertmudBookmark");
-      root.setAttribute("version",VERSION);
+      root.setAttribute("version", APP_VERSION);
       data.appendChild( root );
     }
     emit titleChanged(getTitle());

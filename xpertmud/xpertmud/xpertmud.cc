@@ -242,6 +242,7 @@ Xpertmud::Xpertmud(QWidget *parent, const char *name) :
 	  this,SLOT(setWindowTitle(const QString &)));
 
   setWindowTitle(bookmark.getTitle());
+  setWindowIcon(KGlobal::iconLoader()->loadIcon("appIcon", KIcon::SizeMedium));
 }
 
 Xpertmud::~Xpertmud()

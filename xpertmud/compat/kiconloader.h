@@ -35,8 +35,13 @@ class KIconLoader {
     QPixmap ret;
 
     QString fileName;
-    if(name == "appIcon" && size == KIcon::Small) {
-      fileName = "hi16-app-xpertmud";
+    if(name == "appIcon") {
+      if (size == KIcon::Small) {
+        fileName = "hi16-app-xpertmud";
+      }
+      if (size == KIcon::SizeMedium) {
+        fileName = "hi32-app-xpertmud";
+      }
     }
 
     QStringList list = 

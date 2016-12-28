@@ -19,7 +19,7 @@ public:
 #else
       format = QSettings::NativeFormat;
 #endif
-      settings = new QSettings(format, QSettings::UserScope, "Xpertmud", "Xpertmud");
+      settings = new QSettings(format, QSettings::UserScope, "Xpertmud", "xpertmud");
     }
 
     virtual ~KConfig() {

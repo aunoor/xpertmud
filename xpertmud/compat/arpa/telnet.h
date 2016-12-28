@@ -124,7 +124,7 @@ extern char *telcmds[];
 
 #define	NTELOPTS	(1+TELOPT_NEW_ENVIRON)
 #ifdef TELOPTS
-char *telopts[NTELOPTS+1] = {
+const char *telopts[NTELOPTS+1] = {
 	"BINARY", "ECHO", "RCP", "SUPPRESS GO AHEAD", "NAME",
 	"STATUS", "TIMING MARK", "RCTE", "NAOL", "NAOP",
 	"NAOCRD", "NAOHTS", "NAOHTD", "NAOFFD", "NAOVTS",

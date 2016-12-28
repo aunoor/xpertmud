@@ -43,7 +43,7 @@ class KLibFactory: public QObject {
 class KLibrary {
  public:
   KLibrary(KLibFactory *f): f(f) {
-    name = f->objectName();
+    if (f!=NULL) name = f->objectName();
   }
   KLibFactory *factory() { return f; }
   QString libName() {return name;}
@@ -79,7 +79,7 @@ class KLibLoader {
 #ifdef WIN32
     QString name = libname + ".dll";
 #else
-# ifdef MACOS_X
+# ifdef Q_OS_MACOS
     QString name = libname + ".dylib";
 # else 
     QString name = libname + ".so";
@@ -107,7 +107,10 @@ class KLibLoader {
     return fac;
   }
 
-  QString lastErrorMessage() { return ""; }
+  QString lastErrorMessage() {
+    //TODO: add support for error messages
+    return "";
+  }
  private:
   KLibLoader() {}
   static KLibLoader* instance;

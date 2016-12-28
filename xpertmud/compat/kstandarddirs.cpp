@@ -16,7 +16,7 @@ QStringList KStandardDirs::findAllResources(const QString& type,
         findModules("dll/interpreter", "lib"+cfilter, ret);
         findModules("dll/plugins", "lib"+cfilter, ret);
     } else if(type == "icon") {
-        QDir d("icons");
+        QDir d(RESOURCES_PATH_PREFIX + "icons");
         d.setFilter( QDir::Files | QDir::Readable );
 
         QString filter = cfilter;
@@ -39,7 +39,9 @@ QStringList KStandardDirs::findAllResources(const QString& type,
 
 void KStandardDirs::findModules(const QString& dir, const QString &cfilter,
                  QStringList& ret) {
-    QDir d(dir);
+
+    QDir d(DLL_PATH_PREFIX + dir);
+
     d.setFilter( QDir::Files | QDir::Readable );
 
     QString filter = cfilter;
@@ -48,7 +50,7 @@ void KStandardDirs::findModules(const QString& dir, const QString &cfilter,
 #ifdef WIN32
         filter.replace(QRegExp("\\.la"), ".dll");
 #else
-#ifdef MACOS_X
+#ifdef Q_OS_MACOS
         filter.replace(QRegExp("\\.la"), ".dylib");
 #else
         filter.replace(QRegExp("\\.la"), ".so");
@@ -71,7 +73,7 @@ void KStandardDirs::findModules(const QString& dir, const QString &cfilter,
 #ifdef WIN32
             name.replace(QRegExp("\\.dll"), ".la");
 #else
-#ifdef MACOS_X
+#ifdef Q_OS_MACOS
             name.replace(QRegExp("\\.dylib"), ".la");
 #else
         name.replace(QRegExp("\\.so"), ".la");

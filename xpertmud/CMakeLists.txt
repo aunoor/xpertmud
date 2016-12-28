@@ -1,4 +1,4 @@
-cmake_minimum_required ( VERSION 2.8.12 )
+cmake_minimum_required ( VERSION 3.0.2 )
 
 if(POLICY CMP0020)
     cmake_policy(SET CMP0020 NEW)
@@ -12,7 +12,7 @@ if(POLICY CMP0042)
     cmake_policy(SET CMP0042 NEW)
 endif()
 
-project(xpertmud-ng)
+project(xpertmud)
 
 include(FindZLIB)
 
@@ -39,6 +39,7 @@ file (GLOB HDR
         xpertmud/BookmarkEditor.h
         xpertmud/LogToFile.h
         xpertmud/MCCP.h
+        xpertmud/config.h
         compat/kaction.h
         compat/kfontdialog.h
         compat/kapplication.h
@@ -121,7 +122,14 @@ set_property(GLOBAL PROPERTY MCCP_SUPPORT OFF)
 set_property(GLOBAL PROPERTY PYTHON_SUPPORT ON)
 set_property(GLOBAL PROPERTY PERL_SUPPORT ON)
 
-set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.xpertmud.Xpertmud")
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/config.h CURRENT_CONFIG)
+string(REGEX MATCH "\#define APP_VERSION[ ]+[\"]?[a-z0-9.]+[\"]?" APP_VERSION_DEF ${CURRENT_CONFIG})
+string(STRIP ${APP_VERSION_DEF} APP_VERSION_DEF)
+string(REPLACE "\#define APP_VERSION" "" APP_VERSION_DEF ${APP_VERSION_DEF})
+string(REPLACE "\"" "" APP_VERSION_DEF ${APP_VERSION_DEF})
+string(STRIP ${APP_VERSION_DEF} APP_VERSION_DEF)
+string(REGEX MATCH "[0-9.]+"  APP_VERSION_SHORT ${APP_VERSION_DEF})
+message("Version of application is ${APP_VERSION_DEF}, short is ${APP_VERSION_SHORT}")
 
 if (WIN32 OR APPLE)
     set(QTDIR "" CACHE PATH "Qt root dir")
@@ -171,10 +179,6 @@ add_definitions(-DNO_KDE2)
 add_definitions(-DNO_INCLUDE_MOCFILES)
 add_definitions(-DMAKEDLL_QEXTMDI)
 
-if (APPLE)
-    add_definitions(-DMACOS_X)
-endif(APPLE)
-
 if (MCCP_SUPPORT)
     add_definitions(-DMCCP_SUPPORT)
 endif(MCCP_SUPPORT)
@@ -187,6 +191,7 @@ qt5_add_resources(MAIN_UI_RC ${MAIN_RES})
 
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/xpertmud)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/compat)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qextmdi/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qextmdi/res)
@@ -236,6 +241,12 @@ if (APPLE)
 #  install(DIRECTORY ${MARBLE_LIBRARIES} DESTINATION ${CMAKE_INSTALL_PREFIX}${PROJECT_NAME}.app/Contents/MacOs
 #          FILES_MATCHING PATTERN "lib*")
 #  install(DIRECTORY ${MARBLE_DIR}/share/marble/data DESTINATION ${CMAKE_INSTALL_PREFIX}${PROJECT_NAME}.app/Contents/MacOs/resources/)
+set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.xpertmud.Xpertmud")
+set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${APP_VERSION_SHORT})
+set(MACOSX_BUNDLE_LONG_VERSION_STRING ${APP_VERSION_DEF})
+set(MACOSX_BUNDLE_ICON_FILE "hi32-app-xpertmud")
+
+
 else (APPLE)
   if (WIN32)
 #      install(DIRECTORY ${MARBLE_LIBRARIES}/ DESTINATION ${CMAKE_INSTALL_PREFIX}/
