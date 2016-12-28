@@ -11,13 +11,6 @@ class BattleCore;
 class QTreeView;
 class MechInfo;
 class QMenu;
-class ContactItem;
-
-class ContactsModel;
-
-class QTreeViewItem: public QObject {
-
-};
 
 class ContactsModel: public QAbstractItemModel {
 
@@ -57,12 +50,10 @@ public slots:
   // </Plugin Interface> //////////////////////////////////////////////////////
 
 public slots:
-  //void popmeup(QTreeViewItem *, const QPoint &, int);
   void popmeup(const QPoint &point);
 
 protected slots:
   void slotUpdateMechInfo(const MechInfo &,const MechInfo &);
-//  void updateList();
   void slotPopup();
 
 private:
@@ -70,7 +61,6 @@ private:
   QTreeView* listView;
   QMenu * popup;
   QString currentID;
-  std::map<QString, ContactItem*> items;
   ContactsModel *con_model;
 };
 
