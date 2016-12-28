@@ -253,14 +253,18 @@ public:
           mc = mechCache.insert(mechCacheT::value_type(mechInfo.getId(), MechCacheEntry())).first;
         }
         // and paint
+
+        QBitmap tmpb(mWidth, mHeight);
+        tmpb.fill(Qt::color0);
+
         mc->second.pixmap = new QPixmap(mWidth, mHeight);
-        mc->second.pixmap->setMask(QBitmap(mWidth, mHeight));
+        mc->second.pixmap->setMask(tmpb);
 
         mc->second.width = mWidth;
         mc->second.height = mHeight;
         mc->second.heading = heading;
         QPixmap scaled(mWidth, mHeight);
-        scaled.setMask(QBitmap(mWidth, mHeight));
+        scaled.setMask(tmpb);
         if(rtype == "B" || rtype == "V" || rtype == "U") {
           scaled.convertFromImage(iMechs[rtype].scaled(mWidth, mHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
         } else {
@@ -470,7 +474,7 @@ public:
                  Qt::CopyROP,false);
 */
           QPainter pBlt(device);
-          pBlt.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+          //pBlt.setCompositionMode(QPainter::CompositionMode_SourceAtop);
           pBlt.drawPixmap(rect.x(), rect.y(), *tc->second.pixmap, inX, inY, rect.width(), rect.height());
           pBlt.end();
 

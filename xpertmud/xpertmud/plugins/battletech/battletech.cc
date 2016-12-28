@@ -26,6 +26,7 @@ BattleMapView::BattleMapView(QWidget * parent, const char * name):
   QWidget(parent),
   x(0), y(0),
   style(new EasyStyle()),
+  //style(new HeavyStyle()),
   core(BattleCore::getInstance()),
   zoom(50.0), deformation(1.0)
 {
@@ -204,74 +205,70 @@ void BattleMapView::updateInternal(const QRegion& area) {
   updateMechs(buffer, area);
 }
 
-void BattleMapView::updateMap(QPaintDevice* device, const QRegion& area) {
+void BattleMapView::updateMap(QPaintDevice *device, const QRegion &area) {
   // calculate where to check if we have to redraw...
   QRect bounding(area.boundingRect());
-  HEXPos upperLeft  = layout.pixelToHex(x+bounding.topLeft().x(), 
-					y+bounding.topLeft().y());
+  HEXPos upperLeft = layout.pixelToHex(x + bounding.topLeft().x(),
+                                       y + bounding.topLeft().y());
 
-  HEXPos lowerRight = layout.pixelToHex(x+bounding.bottomRight().x(),
-		 			y+bounding.bottomRight().y());
+  HEXPos lowerRight = layout.pixelToHex(x + bounding.bottomRight().x(),
+                                        y + bounding.bottomRight().y());
 
-  MechInfo self=core->getMechInfo(core->getOwnId()); 
+  MechInfo self = core->getMechInfo(core->getOwnId());
   // TODO: is there something like core->getOwnMechinfo? 
   // nope, not yet... do we need it?
 
   // we're only drawing what's really needed, so let's
   // be generous here ;-)
-  for(int curY=upperLeft.getY()-1; curY<lowerRight.getY()+2; ++curY) {
-    for(int curX=upperLeft.getX()-1; curX<lowerRight.getX()+1; ++curX) {
+  for (int curY = upperLeft.getY() - 1; curY < lowerRight.getY() + 2; ++curY) {
+    for (int curX = upperLeft.getX() - 1; curX < lowerRight.getX() + 1; ++curX) {
 
       QPoint pupperLeft = layout.hexToPixel(HEXPos(curX, curY));
-      QRect paintArea = QRect(pupperLeft.x()-x, pupperLeft.y()-y,
-			      layout.getWidth(), layout.getHeight());
+      QRect paintArea = QRect(pupperLeft.x() - x, pupperLeft.y() - y,
+                              layout.getWidth(), layout.getHeight());
 
       QRegion clipArea = area & paintArea;
-      if(!clipArea.isEmpty()) {
-	MapTile t = core->getMapTile(HEXPos(curX, curY));
-	MapTile tNW = core->getMapTile(HEXPos(curX, curY).NW());
-	MapTile tSW = core->getMapTile(HEXPos(curX, curY).SW());
-	MapTile tN =  core->getMapTile(HEXPos(curX, curY).N());
-	/* todo let the BattleStyle decide when to draw
-	   borders and how thick the cliffs are according to map-tile size */
-	style->paintTile(device, clipArea, pupperLeft.x()-x, pupperLeft.y()-y, // TODO: pass paintArea instead of those 4 values
-			 layout.getWidth(), layout.getHeight(),
-			 t, ((zoom <= 7.0) ? false : true),
-			 ((zoom <= 26.0) ? 0 : 2),
-			 self.isCliff(t,tN), self.isCliff(t,tNW), self.isCliff(t,tSW));
+      if (!clipArea.isEmpty()) {
+        MapTile t = core->getMapTile(HEXPos(curX, curY));
+        MapTile tNW = core->getMapTile(HEXPos(curX, curY).NW());
+        MapTile tSW = core->getMapTile(HEXPos(curX, curY).SW());
+        MapTile tN = core->getMapTile(HEXPos(curX, curY).N());
+        /* todo let the BattleStyle decide when to draw
+           borders and how thick the cliffs are according to map-tile size */
+        style->paintTile(device, clipArea, pupperLeft.x() - x,
+                         pupperLeft.y() - y, // TODO: pass paintArea instead of those 4 values
+                         layout.getWidth(), layout.getHeight(),
+                         t, ((zoom <= 7.0) ? false : true),
+                         ((zoom <= 26.0) ? 0 : 2),
+                         self.isCliff(t, tN), self.isCliff(t, tNW), self.isCliff(t, tSW));
       }
     }
   }
 }
 
-void BattleMapView::updateMechs(QPaintDevice* device, const QRegion& area) {
-  QSize mechMess = 
-    style->mechMess(device, layout.getWidth(), layout.getHeight());
+void BattleMapView::updateMechs(QPaintDevice *device, const QRegion &area) {
+  QSize mechMess = style->mechMess(device, layout.getWidth(), layout.getHeight());
 
-  for(BattleCore::mechIteratorT it = core->getMechBegin();
-      it != core->getMechEnd(); ++it) {
-
+  for (BattleCore::mechIteratorT it = core->getMechBegin(); it != core->getMechEnd(); ++it) {
     // show only somehow newer mechs
     if (it->second.visible()) {
       QRect paintArea;
       bool inside;
-      mechPosition(it->second.getPos(), it->second.getId(),
-		   paintArea, inside);
+      mechPosition(it->second.getPos(), it->second.getId(), paintArea, inside);
 
       QRegion clipArea = area & paintArea;
-      if(!clipArea.isEmpty()) {
-	if(inside) {
-	  style->paintMech(device, clipArea, 
-			   paintArea.x()+mechMess.width()/2, 
-			   paintArea.y()+mechMess.height()/2, 
-			   layout.getWidth(), layout.getHeight(),
-			   layout.getDeformizedDeg(it->second.getHeading()),
-			   it->second,
-			   15.0 + 15.0*(zoom-MIN_ZOOM)/(MAX_ZOOM-MIN_ZOOM));
-	} else {
-	  style->paintMechName
-	    (device, clipArea, paintArea.x(), paintArea.y(), it->second);
-	}
+      if (!clipArea.isEmpty()) {
+        if (inside) {
+          style->paintMech(device, clipArea,
+                           paintArea.x() + mechMess.width() / 2,
+                           paintArea.y() + mechMess.height() / 2,
+                           layout.getWidth(), layout.getHeight(),
+                           layout.getDeformizedDeg(it->second.getHeading()),
+                           it->second,
+                           15.0 + 15.0 * (zoom - MIN_ZOOM) / (MAX_ZOOM - MIN_ZOOM));
+        } else {
+          style->paintMechName(device, clipArea, paintArea.x(), paintArea.y(), it->second);
+        }
       }
     }
   }
@@ -498,7 +495,7 @@ void BattleMapView::scrollMap(int dx, int dy) {
     	   buffer, dx, dy, width(), height(), Qt::CopyROP, true);
 */
     QPainter pBlt(doubleBuffer);
-    pBlt.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+    //pBlt.setCompositionMode(QPainter::CompositionMode_SourceAtop);
     pBlt.drawPixmap(0, 0, *buffer, dx, dy, width(), height());
     pBlt.end();
 
@@ -776,54 +773,50 @@ bool BattleMapView::lineIntersection(const QPoint& start1, const QPoint& end1,
 }
 
 
-void BattleMapView::mechPosition(const SubHEXPos& hexPos, 
-				 const QString& ref,
-				 QRect& paintArea, bool& inside) {
-  QSize mechMess = 
-    style->mechMess(buffer, layout.getWidth(), layout.getHeight());
-  QSize mechNameMess =
-    style->mechNameMess(buffer, ref);
+void BattleMapView::mechPosition(const SubHEXPos &hexPos,
+                                 const QString &ref,
+                                 QRect &paintArea, bool &inside) {
+  QSize mechMess = style->mechMess(buffer, layout.getWidth(), layout.getHeight());
+  QSize mechNameMess = style->mechNameMess(buffer, ref);
 
   QPoint pos = layout.subPosToPixel(hexPos);
-  pos -= QPoint(x,y);
-  paintArea = QRect(QPoint(pos.x()-mechMess.width()/2, 
-			   pos.y()-mechMess.height()/2),
-		    mechMess);
+  pos -= QPoint(x, y);
+  paintArea = QRect(QPoint(pos.x() - mechMess.width() / 2,
+                           pos.y() - mechMess.height() / 2),
+                    mechMess);
   QRegion clipArea = paintArea & QRect(QPoint(0, 0), size());
-  if(!clipArea.isEmpty()) {
+  if (!clipArea.isEmpty()) {
     inside = true;
     return;
   }
   inside = false;
   paintArea = QRect();
   double l1, l2;
-  if(lineIntersection(QPoint(width()/2, height()/2), 
-		      QPoint(pos.x(), pos.y()),
-		      QPoint(0, 0), QPoint(width(), 0), l1, l2)) {
+  if (lineIntersection(QPoint(width() / 2, height() / 2),
+                       QPoint(pos.x(), pos.y()),
+                       QPoint(0, 0), QPoint(width(), 0), l1, l2)) {
     // upper border
-    paintArea = QRect(QPoint((int)(l2*width()), 0), mechNameMess);
-  } else if(lineIntersection(QPoint(width()/2, height()/2), 
-			     QPoint(pos.x(), pos.y()),
-			     QPoint(0, 0), QPoint(0, height()), 
-			     l1, l2)) {
+    paintArea = QRect(QPoint((int) (l2 * width()), 0), mechNameMess);
+  } else if (lineIntersection(QPoint(width() / 2, height() / 2),
+                              QPoint(pos.x(), pos.y()),
+                              QPoint(0, 0), QPoint(0, height()),
+                              l1, l2)) {
     // left border
-    paintArea = QRect(QPoint(0, (int)(l2*height())), mechNameMess);
-  } else if(lineIntersection(QPoint(width()/2, height()/2), 
-			     QPoint(pos.x(), pos.y()),
-			     QPoint(width(), 0), 
-			     QPoint(width(), height()), 
-			     l1, l2)) {
+    paintArea = QRect(QPoint(0, (int) (l2 * height())), mechNameMess);
+  } else if (lineIntersection(QPoint(width() / 2, height() / 2),
+                              QPoint(pos.x(), pos.y()),
+                              QPoint(width(), 0),
+                              QPoint(width(), height()),
+                              l1, l2)) {
     // right border
-    paintArea = QRect(QPoint(width()-mechNameMess.width()-1, 
-			     (int)(l2*height())), mechNameMess);
-  } else if(lineIntersection(QPoint(width()/2, height()/2), 
-			     QPoint(pos.x(), pos.y()),
-			     QPoint(0, height()), 
-			     QPoint(width(), height()), 
-			     l1, l2)) {
+    paintArea = QRect(QPoint(width() - mechNameMess.width() - 1, (int)(l2 * height())), mechNameMess);
+  } else if (lineIntersection(QPoint(width() / 2, height() / 2),
+                              QPoint(pos.x(), pos.y()),
+                              QPoint(0, height()),
+                              QPoint(width(), height()),
+                              l1, l2)) {
     // lower border
-    paintArea = QRect(QPoint((int)(l2*width()),
-			     height()-mechNameMess.height()-1), mechNameMess);
+    paintArea = QRect(QPoint((int)(l2 * width()), height() - mechNameMess.height() /*- 1*/), mechNameMess);
   }
 }
 
@@ -840,6 +833,7 @@ void BattleStyle::updateTileMask(int width,int height) {
 */
     //tileMask=QBitmap(width,height, true);
     tileMask=QBitmap(width, height);
+    tileMask.fill(Qt::color0);
 
     QPainter pixPaint;
     pixPaint.begin(&tileMask);

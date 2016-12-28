@@ -224,7 +224,7 @@ void BattleMapWidget::tactCurrentHex() {
   SubPos p = NormHexLayout::difference
     (ownP, currentHex);
   QString s=QString("hudinfo t 20 %1 %2\n").arg((int)p.getAngleDeg()).arg((int)p.getDistance());
-  cout << "TODO: send(" << s.toLatin1().data() << ")" << endl;
+  //cout << "TODO: send(" << s.toLatin1().data() << ")" << endl;
   core->slotSend(s);
 }
 
@@ -376,13 +376,13 @@ void BattleMapWidget::createLockHexMenu() {
   ta=lockHexPopup->addAction(i18n("&Lock IDF"), this, SLOT(lockCurrentHex()));
   ta->setProperty("id",0);
   ta=lockHexPopup->addAction(i18n("Lock &Building"), this, SLOT(lockCurrentHex()));
-  ta->setProperty("id",2);
+  ta->setProperty("id",1);
   ta=lockHexPopup->addAction(i18n("Lock &Clear"), this, SLOT(lockCurrentHex()));
-  ta->setProperty("id",3);
+  ta->setProperty("id",2);
   ta=lockHexPopup->addAction(i18n("Lock &Ignite"), this, SLOT(lockCurrentHex()));
-  ta->setProperty("id",4);
+  ta->setProperty("id",3);
   ta=lockHexPopup->addAction(i18n("Lock &Hex"), this, SLOT(lockCurrentHex()));
-  ta->setProperty("id",5);
+  ta->setProperty("id",4);
 }
 
 void BattleMapWidget::createSettingsMenu() {
