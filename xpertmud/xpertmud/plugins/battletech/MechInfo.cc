@@ -3,7 +3,7 @@
 #include <QStringList>
 
 MechInfo::MechInfo():
-  valid(false), los(false), name("something"), pHasPos(false),
+  id_hash(0), valid(false), los(false), name("something"), pHasPos(false),
   pHasTurret(false), pHasHeading(false), pHasArc(false),
   pHasSensors(false), pHasType(false), pHasSpeed(false),
   pHasVSpeed(false), pHasJumpHeading(false), pHasWeight(false),

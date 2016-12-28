@@ -303,61 +303,61 @@ void BattleCore::updateMechsLOS(const map<QString, MechInfo>& currentMechs) {
   flushDisplay();
 }
 
-void BattleCore::setMechInfo(const MechInfo& mechInfo) {
+void BattleCore::setMechInfo(const MechInfo &mechInfo) {
   MechInfo oldMechInfo = getMechInfo(mechInfo.getId());
   mechInfos[mechInfo.getId().toUpper()] = mechInfo;
 
-  if(mechInfo.getId() == getOwnId()) {
-    if(mechInfo.getPos().getZ() != oldMechInfo.getPos().getZ())
-      switch(mechInfo.getType()) {
-      case 'N':
-      case 'Y':
-      case 'U':
-      case 'V':
-      case 'F':
-      case 'A':
-      case 'D':
-	emit repaintCliffings();
-	break;
-      default:
-	if ((mechInfo.hasStatus() && mechInfo.getStatus().contains("J"))){
-	  emit repaintCliffings();
-	}
+  if (mechInfo.getId() == getOwnId()) {
+    if (mechInfo.getPos().getZ() != oldMechInfo.getPos().getZ())
+      switch (mechInfo.getType()) {
+        case 'N':
+        case 'Y':
+        case 'U':
+        case 'V':
+        case 'F':
+        case 'A':
+        case 'D':
+          emit repaintCliffings();
+          break;
+        default:
+          if ((mechInfo.hasStatus() && mechInfo.getStatus().contains("J"))) {
+            emit repaintCliffings();
+          }
       }
 
     if (oldMechInfo.hasStatus() && oldMechInfo.getStatus().contains("J") &&
-	!mechInfo.getStatus().contains("J")) {
+        !mechInfo.getStatus().contains("J")) {
       // we finished the jump
       emit repaintCliffings();
     }
-    if(mechInfo.hasType() != oldMechInfo.hasType() ||
-       mechInfo.getType() != oldMechInfo.getType())
-      emit repaintCliffings();
-    if(mechInfo.hasHeatDissipation() && 
-       (!oldMechInfo.hasHeatDissipation() || (oldMechInfo.getHeatDissipation() != mechInfo.getHeatDissipation())))
-      emit heatDissipationChanged(mechInfo.getHeatDissipation());
-    if(mechInfo.hasHeat() && (!oldMechInfo.hasHeat() || (oldMechInfo.getHeat() != mechInfo.getHeat())))
-      emit heatChanged(mechInfo.getHeat());
-    if(mechInfo.hasSpeed() && (!oldMechInfo.hasSpeed() || (oldMechInfo.getSpeed() != mechInfo.getSpeed())))
-      emit speedChanged(mechInfo.getSpeed());
-    if(mechInfo.hasDesiredSpeed() && 
-       (!oldMechInfo.hasDesiredSpeed() || (oldMechInfo.getDesiredSpeed() != mechInfo.getDesiredSpeed())))
-      emit desiredSpeedChanged(mechInfo.getDesiredSpeed());
-    if(mechInfo.hasRunningSpeed() && 
-       mechInfo.hasWalkingSpeed() &&
-       mechInfo.hasBackingSpeed() && 
-       (
-	!oldMechInfo.hasRunningSpeed() ||
-	!oldMechInfo.hasWalkingSpeed() ||
-	!oldMechInfo.hasBackingSpeed() ||
-	(oldMechInfo.getRunningSpeed() != mechInfo.getRunningSpeed()) ||
-	(oldMechInfo.getWalkingSpeed() != mechInfo.getWalkingSpeed()) ||
-	(oldMechInfo.getBackingSpeed() != mechInfo.getBackingSpeed())
-	)
-       )
-      emit maxSpeedChanged(mechInfo.getRunningSpeed(),
-			   mechInfo.getWalkingSpeed(),
-			   mechInfo.getBackingSpeed());
+    if (mechInfo.hasType() != oldMechInfo.hasType() ||
+        mechInfo.getType() != oldMechInfo.getType())
+            emit repaintCliffings();
+    if (mechInfo.hasHeatDissipation() &&
+        (!oldMechInfo.hasHeatDissipation() || (oldMechInfo.getHeatDissipation() != mechInfo.getHeatDissipation())))
+            emit heatDissipationChanged(mechInfo.getHeatDissipation());
+    if (mechInfo.hasHeat() && (!oldMechInfo.hasHeat() || (oldMechInfo.getHeat() != mechInfo.getHeat())))
+            emit heatChanged(mechInfo.getHeat());
+    if (mechInfo.hasSpeed() && (!oldMechInfo.hasSpeed() || (oldMechInfo.getSpeed() != mechInfo.getSpeed())))
+            emit speedChanged(mechInfo.getSpeed());
+    if (mechInfo.hasDesiredSpeed() &&
+        (!oldMechInfo.hasDesiredSpeed() || (oldMechInfo.getDesiredSpeed() != mechInfo.getDesiredSpeed())))
+            emit desiredSpeedChanged(mechInfo.getDesiredSpeed());
+    if (mechInfo.hasRunningSpeed() &&
+        mechInfo.hasWalkingSpeed() &&
+        mechInfo.hasBackingSpeed() &&
+        (
+                !oldMechInfo.hasRunningSpeed() ||
+                !oldMechInfo.hasWalkingSpeed() ||
+                !oldMechInfo.hasBackingSpeed() ||
+                (oldMechInfo.getRunningSpeed() != mechInfo.getRunningSpeed()) ||
+                (oldMechInfo.getWalkingSpeed() != mechInfo.getWalkingSpeed()) ||
+                (oldMechInfo.getBackingSpeed() != mechInfo.getBackingSpeed())
+        )
+            )
+            emit maxSpeedChanged(mechInfo.getRunningSpeed(),
+                                 mechInfo.getWalkingSpeed(),
+                                 mechInfo.getBackingSpeed());
   }
   /* Temporarily disabled 
      if ((!oldMechInfo.hasPos() || (oldMechInfo.getPos() != mechInfo.getPos())) ||

@@ -4,6 +4,7 @@
 
 #include <QWidget>
 #include <QVariant>
+#include <QAbstractItemModel>
 #include <map>
 
 class BattleCore;
@@ -12,8 +13,33 @@ class MechInfo;
 class QMenu;
 class ContactItem;
 
+class ContactsModel;
+
 class QTreeViewItem: public QObject {
 
+};
+
+class ContactsModel: public QAbstractItemModel {
+
+Q_OBJECT
+
+public:
+    ContactsModel(QObject *parent);
+
+    int rowCount(const QModelIndex &parent) const override;
+    int columnCount(const QModelIndex &parent) const override;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const override;
+    QModelIndex parent(const QModelIndex &child) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+    void updateMechInfo(const MechInfo &oldInfo, const MechInfo &mechInfo);
+
+private:
+    BattleCore * core;
+    QVector<MechInfo> m_contacts;
+    int getIndex(const MechInfo &info);
 };
 
 class BattleContactWidget: public QWidget {
@@ -31,7 +57,8 @@ public slots:
   // </Plugin Interface> //////////////////////////////////////////////////////
 
 public slots:
-  void popmeup(QTreeViewItem *, const QPoint &, int);
+  //void popmeup(QTreeViewItem *, const QPoint &, int);
+  void popmeup(const QPoint &point);
 
 protected slots:
   void slotUpdateMechInfo(const MechInfo &,const MechInfo &);
@@ -44,6 +71,7 @@ private:
   QMenu * popup;
   QString currentID;
   std::map<QString, ContactItem*> items;
+  ContactsModel *con_model;
 };
 
 #endif

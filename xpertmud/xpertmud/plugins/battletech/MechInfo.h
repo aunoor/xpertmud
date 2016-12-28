@@ -61,7 +61,10 @@ public:
   void setId(const QString& id) { 
     this->id = id;
     valid = true;
+    id_hash = qHash(id.toUpper());
   }
+  uint getIdHash() const {return id_hash;}
+
   bool isValid() const { return valid; }
 
   int age() const {
@@ -246,7 +249,8 @@ public:
 
 private:
   // every valid MechInfo has an id
-  QString id; 
+  QString id;
+  uint id_hash; //hash of id
   bool valid; 
 
   // LOS stuff, used to identify outdated contacts
