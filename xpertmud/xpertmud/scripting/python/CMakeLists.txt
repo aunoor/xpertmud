@@ -1,4 +1,4 @@
-cmake_minimum_required ( VERSION 2.8.12 )
+cmake_minimum_required ( VERSION 3.0.2 )
 
 if(POLICY CMP0042)
     cmake_policy(SET CMP0042 NEW)
@@ -49,7 +49,11 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/AutoXMPython.cc
 
 
 add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDR} ${CMAKE_BINARY_DIR}/sysinit_pyf.h ${CMAKE_BINARY_DIR}/AutoXMPython.cc)
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets util pthread ${PYTHON_LIBRARY})
+if (APPLE)
+    target_link_libraries(${PROJECT_NAME} Qt5::Widgets util pthread ${PYTHON_LIBRARY})
+else (APPLE)
+    target_link_libraries(${PROJECT_NAME} Qt5::Widgets ${PYTHON_LIBRARY})
+endif (APPLE)
 
 
 install(CODE "MESSAGE(\"Python plugin\")")

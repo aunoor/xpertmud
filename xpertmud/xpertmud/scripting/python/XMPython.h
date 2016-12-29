@@ -1,6 +1,8 @@
 // -*- c++ -*-
 #ifndef XM_PYTHON_H
 #define XM_PYTHON_H
+
+#include <cmath>
 #include <Python.h>
 #include "../Scripting.h"
 

@@ -14,9 +14,6 @@ endif()
 
 project(xpertmud)
 
-if (MCCP_SUPPORT)
-    include(FindZLIB)
-endif (MCCP_SUPPORT)
 # Files
 
 file (GLOB HDR
@@ -121,8 +118,20 @@ source_group("Autogen files" FILES ${UI_GEN})
 
 set(MAIN_PROJ_NAME ${PROJECT_NAME})
 set_property(GLOBAL PROPERTY MCCP_SUPPORT OFF)
-set_property(GLOBAL PROPERTY PYTHON_SUPPORT ON)
-set_property(GLOBAL PROPERTY PERL_SUPPORT ON)
+#set_property(GLOBAL PROPERTY PYTHON_SUPPORT ON)
+#set_property(GLOBAL PROPERTY PERL_SUPPORT ON)
+set(MCCP_SUPPORT OFF CACHE BOOL "MCCP protocol support")
+set(PYTHON_SUPPORT ON CACHE  BOOL "Python scrypting support")
+set(PERL_SUPPORT ON CACHE  BOOL "Perl scrypting support")
+
+if (MCCP_SUPPORT)
+    include(FindZLIB)
+endif (MCCP_SUPPORT)
+
+if (MCCP_SUPPORT AND (NOT ZLIB_FOUND))
+    set(MCCP_SUPPORT OFF)
+    message(WARNING "Disable MCCP support - zlib not found")
+endif (MCCP_SUPPORT AND (NOT ZLIB_FOUND))
 
 file(READ ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/config.h CURRENT_CONFIG)
 string(REGEX MATCH "\#define APP_VERSION[ ]+[\"]?[a-z0-9.]+[\"]?" APP_VERSION_DEF ${CURRENT_CONFIG})
@@ -176,7 +185,7 @@ if(MSVC)
 	add_definitions(/FR)
 	add_definitions(-D_USE_MATH_DEFINES)
 	add_definitions( /wd4786 /wd4503 /wd4251 /wd4275 /wd4290 /wd4661 /wd4996 /wd4127 /wd4100)
-elseif(CMAKE_COMPILER_IS_GNUCXX)
+elseif(CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_C_COMPILER_ID MATCHES "Clang") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
 	#add_definitions (-Wall -fPIC)
     add_definitions (-Wall)
 endif(MSVC)
@@ -322,5 +331,6 @@ else (APPLE)
   endif (WIN32)
 endif (APPLE)
 
-add_subdirectory(xpertmud/plugins)
 add_subdirectory(xpertmud/scripting)
+add_subdirectory(xpertmud/plugins)
+

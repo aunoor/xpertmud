@@ -2,18 +2,24 @@
 #ifndef HEX_POSITIONS_H
 #define HEX_POSITIONS_H
 
+#ifdef Q_OS_WIN
+#define _USE_MATH_DEFINES
+#ifdef Q_CC_GNU
+#include <math.h>
+#endif
+#endif//Q_OS_WIN
+
 #include <cmath>
-#ifdef WIN32
-#pragma warning ( disable:4786 )
+
 #ifndef M_PI
-// there really seems to be no PI constant in the
-// win32 math libraries...
-#define M_PI 3.1415926535
+//ok, we do what we can, but...
+#define M_PI		3.14159265358979323846
 #endif
-#endif
+
 #include <algorithm>
-#include <QPoint>
 #include <iostream>
+#include <QPoint>
+
 using std::cout;
 using std::endl;
 

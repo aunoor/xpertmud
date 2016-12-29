@@ -2,6 +2,10 @@
 #ifndef BATTLECORE_H
 #define BATTLECORE_H
 
+#include "Positions.h"
+#include "MechInfo.h"
+#include "WeaponInfo.h"
+
 #include <algorithm>
 using std::max;
 using std::min;
@@ -19,10 +23,6 @@ using std::map;
 #include <QVector>
 
 #include <kurl.h>
-
-#include "Positions.h"
-#include "MechInfo.h"
-#include "WeaponInfo.h"
 
 #ifndef ABSTRACT
 #  define ABSTRACT 0
