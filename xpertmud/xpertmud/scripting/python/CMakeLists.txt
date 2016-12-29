@@ -51,6 +51,9 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/AutoXMPython.cc
 add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDR} ${CMAKE_BINARY_DIR}/sysinit_pyf.h ${CMAKE_BINARY_DIR}/AutoXMPython.cc)
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets util pthread ${PYTHON_LIBRARY})
 
+
+install(CODE "MESSAGE(\"Python plugin\")")
+
 if (APPLE)
     install(TARGETS ${PROJECT_NAME} DESTINATION ${APP_INSTALL_PATH}/Contents/MacOS/dll/interpreter/)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/bt3030.py

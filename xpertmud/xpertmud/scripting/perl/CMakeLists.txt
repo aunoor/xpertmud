@@ -67,6 +67,8 @@ add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDR} ${CMAKE_BINARY_DIR}/sysinit_pl
             ${CMAKE_BINARY_DIR}/AutoGuiScriptingWrapper.cc ${CMAKE_BINARY_DIR}/AutoPerlInterpret.cc)
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets ${PERL_LIBRARY})
 
+install(CODE "MESSAGE(\"Perl plugin\")")
+
 if (APPLE)
 
     install(TARGETS ${PROJECT_NAME} DESTINATION ${APP_INSTALL_PATH}/Contents/MacOS/dll/interpreter/)

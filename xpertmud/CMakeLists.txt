@@ -235,6 +235,8 @@ if (MCCP_SUPPORT)
     target_link_libraries(${PROJECT_NAME} ${ZLIB_LIBRARIES})
 endif(MCCP_SUPPORT)
 
+install(CODE "MESSAGE(\"Main app\")")
+
 if (APPLE)
 
     set(APP_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app")
@@ -289,6 +291,7 @@ if (APPLE)
                   ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi16-app-xpertmud.png
             DESTINATION ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/MacOS/icons/)
 
+    install(CODE "MESSAGE(\"Qt framework\")")
     QT_MODULE_DEPLOY(Qt5::Core)
     QT_MODULE_DEPLOY(Qt5::Gui)
     QT_MODULE_DEPLOY(Qt5::Widgets)

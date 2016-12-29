@@ -55,3 +55,52 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../)
 add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDR})
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
 
+install(CODE "MESSAGE(\"Battletech plugin\")")
+
+if (APPLE)
+    install(TARGETS ${PROJECT_NAME} DESTINATION ${APP_INSTALL_PATH}/Contents/MacOS/dll/plugins/)
+
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+            DESTINATION ${APP_INSTALL_PATH}/Contents/MacOS/appdata/python/
+            FILES_MATCHING PATTERN "*.py" PATTERN "artwork" EXCLUDE PATTERN "xperthud" EXCLUDE)
+
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+            DESTINATION ${APP_INSTALL_PATH}/Contents/MacOS/appdata/perl/
+            FILES_MATCHING PATTERN "*.pm" PATTERN "*.pl" PATTERN "artwork" EXCLUDE PATTERN "xperthud" EXCLUDE)
+
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/artwork
+            DESTINATION ${APP_INSTALL_PATH}/Contents/MacOS/appdata/
+            FILES_MATCHING PATTERN "*.png" PATTERN "*.def")
+else (APPLE)
+    if (WIN32)
+        install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/dll/plugins/)
+
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/appdata/python/
+                FILES_MATCHING PATTERN "*.py" PATTERN "artwork" EXCLUDE PATTERN "xperthud" EXCLUDE)
+
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/appdata/perl/
+                FILES_MATCHING PATTERN "*.pm" PATTERN "*.pl" PATTERN "artwork" EXCLUDE PATTERN "xperthud" EXCLUDE)
+
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/artwork
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/appdata/
+                FILES_MATCHING PATTERN "*.png" PATTERN "*.def")
+    else (WIN32)
+        #TODO: make Linux install
+        install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${MAIN_PROJ_NAME}/dll/plugins/)
+
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/share/${MAIN_PROJ_NAME}/appdata/python/
+                FILES_MATCHING PATTERN "*.py" PATTERN "artwork" EXCLUDE PATTERN "xperthud" EXCLUDE)
+
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/share/${MAIN_PROJ_NAME}/appdata/perl/
+                FILES_MATCHING PATTERN "*.pm" PATTERN "*.pl" PATTERN "artwork" EXCLUDE PATTERN "xperthud" EXCLUDE)
+
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/artwork
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/share/${MAIN_PROJ_NAME}/appdata/
+                FILES_MATCHING PATTERN "*.png" PATTERN "*.def")
+
+    endif (WIN32)
+endif (APPLE)
