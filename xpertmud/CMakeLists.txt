@@ -158,6 +158,12 @@ find_package(Qt5Concurrent REQUIRED)
 find_package(Qt5Multimedia REQUIRED)
 find_package(Qt5PrintSupport REQUIRED)
 
+if (Qt5Widgets_FOUND)
+    if (Qt5Widgets_VERSION VERSION_LESS 5.6.0)
+        message(FATAL_ERROR "Minimum supported Qt5 version is 5.6.0!")
+    endif()
+endif(Qt5Widgets_FOUND)
+
 include_directories( ${Qt5Network_INCLUDE_DIRS} )
 include_directories( ${Qt5Concurrent_INCLUDE_DIRS} )
 include_directories( ${Qt5Multimedia_INCLUDE_DIRS} )
