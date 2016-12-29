@@ -237,6 +237,9 @@ endif(MCCP_SUPPORT)
 
 if (APPLE)
 
+    set(APP_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app")
+
+
     function(QT_MODULE_DEPLOY QMODULE_NAME)
         string(REPLACE ":" "" QMODULE_NAME ${QMODULE_NAME})
         set(QMODULE_NAME "_${QMODULE_NAME}_OWN_INCLUDE_DIRS")
@@ -284,7 +287,7 @@ if (APPLE)
             DESTINATION ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/Resources/)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi32-app-xpertmud.png
                   ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi16-app-xpertmud.png
-            DESTINATION ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/MacOs/icons/)
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/MacOS/icons/)
 
     QT_MODULE_DEPLOY(Qt5::Core)
     QT_MODULE_DEPLOY(Qt5::Gui)
@@ -306,7 +309,7 @@ else (APPLE)
       install(TARGETS ${PROJECT_NAME} DESTINATION bin)
       install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi32-app-xpertmud.png
               ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi16-app-xpertmud.png
-              DESTINATION share/xpertmud/icons/)
+              DESTINATION ${CMAKE_INSTALL_PREFIX}/share/${MAIN_PROJ_NAME}/icons/)
   endif (WIN32)
 endif (APPLE)
 

@@ -66,3 +66,36 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/AutoGuiScriptingWrapper.cc
 add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDR} ${CMAKE_BINARY_DIR}/sysinit_plf.h ${CMAKE_BINARY_DIR}/AutoGuiScriptingWrapper.h
             ${CMAKE_BINARY_DIR}/AutoGuiScriptingWrapper.cc ${CMAKE_BINARY_DIR}/AutoPerlInterpret.cc)
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets ${PERL_LIBRARY})
+
+if (APPLE)
+
+    install(TARGETS ${PROJECT_NAME} DESTINATION ${APP_INSTALL_PATH}/Contents/MacOS/dll/interpreter/)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/completion.pl
+            ${CMAKE_CURRENT_SOURCE_DIR}/snake.pl
+            ${CMAKE_CURRENT_SOURCE_DIR}/speedwalk.pl
+            ${CMAKE_CURRENT_SOURCE_DIR}/pipes.pl
+            ${CMAKE_CURRENT_SOURCE_DIR}/easywalk.pl
+            ${CMAKE_CURRENT_SOURCE_DIR}/easywalk.demo.pl
+            DESTINATION ${APP_INSTALL_PATH}/Contents/MacOS/appdata/perl/)
+else (APPLE)
+    if (WIN32)
+        install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/dll/interpreter/)
+        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/completion.pl
+                ${CMAKE_CURRENT_SOURCE_DIR}/snake.pl
+                ${CMAKE_CURRENT_SOURCE_DIR}/speedwalk.pl
+                ${CMAKE_CURRENT_SOURCE_DIR}/pipes.pl
+                ${CMAKE_CURRENT_SOURCE_DIR}/easywalk.pl
+                ${CMAKE_CURRENT_SOURCE_DIR}/easywalk.demo.pl
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/appdata/perl/)
+    else (WIN32)
+        #TODO: make Linux install
+        install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${MAIN_PROJ_NAME}/dll/interpreter/)
+        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/completion.pl
+                ${CMAKE_CURRENT_SOURCE_DIR}/snake.pl
+                ${CMAKE_CURRENT_SOURCE_DIR}/speedwalk.pl
+                ${CMAKE_CURRENT_SOURCE_DIR}/pipes.pl
+                ${CMAKE_CURRENT_SOURCE_DIR}/easywalk.pl
+                ${CMAKE_CURRENT_SOURCE_DIR}/easywalk.demo.pl
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/share/${MAIN_PROJ_NAME}/appdata/perl/)
+    endif (WIN32)
+endif (APPLE)
