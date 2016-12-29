@@ -21,9 +21,11 @@ extern "C" {
 #include "sysinit_plf.h"
 #endif
 
-#ifdef WIN32
+#ifdef Q_OS_WIN
+#ifdef Q_CC_MSVC
 #undef bool
 #define snprintf _snprintf
+#endif
 #endif
 
 // Stupid perl version incompatibilities...
@@ -108,16 +110,8 @@ PerlInterpret::PerlInterpret(GuiScriptingWrapper *callBack):
 {
   currentCallBack = callBack;
 
-//simulate environment for perl
-  int argc = 1;
-
-  const char *argv[]={"xperlmud"};
-  const char *env[]={""};
-
-  PL_perl_destruct_level = 1;
-
   if (!sys_inited) {
-    PERL_SYS_INIT3(&argc, (char ***) &argv, (char ***) &env);
+      PERL_SYS_INIT3((int *)NULL,(char ***)NULL,(char ***)NULL);
     sys_inited = true;
   }
 
@@ -188,6 +182,10 @@ PerlInterpret::~PerlInterpret() {
 
   std::cout << "Destroy PerlInterpret" << std::endl;
 
+#ifndef Q_OS_WIN
+  //ActivePerl 5.24 just crash on this line
+  PL_perl_destruct_level = 1;
+#endif
   perl_destruct(perlInt);
   perl_free(perlInt);
 

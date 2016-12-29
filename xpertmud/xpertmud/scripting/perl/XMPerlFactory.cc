@@ -28,7 +28,7 @@ QObject* XMPerlFactory::createObject(QObject* parent,
 
   //cout << "Creating XMPerl" <<endl;
   return new XMPerl(parent, name);
-} 
+}
 
 K_EXPORT_COMPONENT_FACTORY(libxmperlinterpreter,XMPerlFactory)
 

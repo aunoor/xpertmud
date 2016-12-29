@@ -128,7 +128,7 @@ QVariant XMPerl::pluginCall(int id, int function, const QVariant & args) {
       //QCString utf8=args.toString().utf8();
       QByteArray utf8=args.toString().toUtf8();
 
-#ifdef WIN32
+#ifdef Q_OS_WIN
     char * ret=(char*)interp->pluginCall(id,function,utf8.data(),utf8.length());
 #else
     const char * ret=interp->pluginCall(id,function,utf8.data(),utf8.length());

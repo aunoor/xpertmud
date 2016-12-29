@@ -100,9 +100,11 @@ class KLibLoader {
     if(symAddr == NULL) { cout << "Can't load library or resolve func" << endl; return 0; }
     
     KLibFactory* fac = ((KLibFactory* (*)())symAddr)();
-    fac->setObjectName(list.first());
-    
-    cout << "got a factory..." << endl;
+    if (fac!=NULL) {
+        fac->setObjectName(list.first());
+        qDebug() << "got a factory...";
+    }
+
     return fac;
   }
 

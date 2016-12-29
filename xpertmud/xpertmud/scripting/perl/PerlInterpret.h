@@ -2,9 +2,11 @@
 #ifndef PERLINTERPRET_H
 #define PERLINTERPRET_H
 
-#ifdef WIN32
-#define _M_M68K
-#endif
+#include <QtGlobal>
+
+//#ifdef Q_OS_WIN
+//#define _M_M68K
+//#endif
 
 typedef struct interpreter PerlInterpreter;
 
