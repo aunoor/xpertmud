@@ -4,7 +4,7 @@ cREDIT: scotty@frontiers
 TEMPLATE: B
 NOTE: Biped Default Template
 CREDIT: Brennan Derrick @ Frontiers
-IMAGE: status/Biped.png
+IMAGE: artwork/status/Biped.png
 SECTION: 68 27 H
 SECTION: 82 27 H-I
 SECTION: 40 39 LA
@@ -27,7 +27,7 @@ SECTION: 90 114 RL-I
 
 TEMPLATE: Q
 NOTE: Quad Default Template
-IMAGE: status/Quad.png
+IMAGE: artwork/status/Quad.png
 SECTION: 73 27 H
 SECTION: 73 37 H-I
 SECTION: 33 30 LT
@@ -52,7 +52,7 @@ SECTION: 128 100 FRL-I
 
 TEMPLATE: V
 NOTE: VTOL Default Template
-IMAGE: status/Vtol.png
+IMAGE: artwork/status/Vtol.png
 SECTION: 70 27 FS
 SECTION: 82 27 FS-I
 SECTION: 46 40 LS
@@ -66,7 +66,7 @@ SECTION: 76 75 R-I
 
 TEMPLATE: T
 NOTE: Tracked Default Template
-IMAGE: status/Tank.png
+IMAGE: artwork/status/Tank.png
 SECTION: 68 27 FS
 SECTION: 84 27 FS-I
 SECTION: 50 60 LS
@@ -80,7 +80,7 @@ SECTION: 84 125 AS-I
 
 TEMPLATE: T-NT
 NOTE: Tracked No-Turret Template
-IMAGE: status/Tank-NT.png
+IMAGE: artwork/status/Tank-NT.png
 SECTION: 68 27 FS
 SECTION: 84 27 FS-I
 SECTION: 50 60 LS
@@ -92,7 +92,7 @@ SECTION: 84 125 AS-I
 
 TEMPLATE: H
 NOTE: Hover Default Template
-IMAGE: status/Tank.png
+IMAGE: artwork/status/Tank.png
 SECTION: 68 27 FS
 SECTION: 84 27 FS-I
 SECTION: 50 60 LS
@@ -107,7 +107,7 @@ SECTION: 84 125 AS-I
 
 TEMPLATE: H-NT
 NOTE: Hover No-Turret Template
-IMAGE: status/Tank-NT.png
+IMAGE: artwork/status/Tank-NT.png
 SECTION: 68 27 FS
 SECTION: 84 27 FS-I
 SECTION: 50 60 LS
@@ -119,7 +119,7 @@ SECTION: 84 125 AS-I
 
 TEMPLATE: W
 NOTE: Wheel Default Template
-IMAGE: status/Tank.png
+IMAGE: artwork/status/Tank.png
 SECTION: 68 27 FS
 SECTION: 84 27 FS-I
 SECTION: 50 60 LS
@@ -134,7 +134,7 @@ SECTION: 84 125 AS-I
 
 TEMPLATE: W-NT
 NOTE: Wheel No-Turret Template
-IMAGE: status/Tank-NT.png
+IMAGE: artwork/status/Tank-NT.png
 SECTION: 68 27 FS
 SECTION: 84 27 FS-I
 SECTION: 50 60 LS
@@ -147,7 +147,7 @@ SECTION: 84 125 AS-I
 
 TEMPLATE: N
 NOTE: Naval Default Template
-IMAGE: status/Naval.png
+IMAGE: artwork/status/Naval.png
 SECTION: 73 36 FS
 SECTION: 73 48 FS-I
 SECTION: 42 70 LS
@@ -163,7 +163,7 @@ SECTION: 84 125 AS-I
 
 TEMPLATE: Y
 NOTE: Hydrofoil Default Template
-IMAGE: status/Hydro.png
+IMAGE: artwork/status/Hydro.png
 SECTION: 72 48 FS
 SECTION: 72 58 FS-I
 SECTION: 33 73 LS
@@ -178,7 +178,7 @@ SECTION: 82 128 AS-I
 TEMPLATE: U
 NOTE: Submarine Default Template
 CREDIT: scotty@frontiers
-IMAGE: status/Sub.png
+IMAGE: artwork/status/Sub.png
 SECTION: 75 25 FS
 SECTION: 75 40 FS-I
 SECTION: 42 60 LS
@@ -191,7 +191,7 @@ SECTION: 84 94 AS-I
 
 TEMPLATE: A
 NOTE: Aerodyne DS Default Template
-IMAGE: status/AerodyneDS.png
+IMAGE: artwork/status/AerodyneDS.png
 SECTION: 73 30 N
 SECTION: 73 40 N-I
 SECTION: 41 87 LW
@@ -203,7 +203,7 @@ SECTION: 82 102 A-I
 
 TEMPLATE: D
 NOTE: spheroid DS Default Template
-IMAGE: status/SpheroidDS.png
+IMAGE: artwork/status/SpheroidDS.png
 SECTION: 15 45 FLS
 SECTION: 65 45 FRS
 SECTION: 15 105 RLS
@@ -213,7 +213,7 @@ SECTION: 115 95 A
 
 TEMPLATE: F
 NOTE: Aerofighter Default Template
-IMAGE: status/Aerofighter.png
+IMAGE: artwork/status/Aerofighter.png
 SECTION: 71 32 N
 SECTION: 71 42 N-I
 SECTION: 110 58 C
@@ -230,7 +230,7 @@ SECTION: 124 130 E-I
 
 TEMPLATE: S
 NOTE: Battlesuit Default Template
-IMAGE: status/Suit_4.png
+IMAGE: artwork/status/Suit_4.png
 SECTION: 40 40 S1
 SECTION: 40 50 S1-I
 SECTION: 105 40 S2
@@ -242,7 +242,7 @@ SECTION: 104 114 S4-I
 
 TEMPLATE: i
 NOTE: Installation Default Template
-IMAGE: status/Installation.png
+IMAGE: artwork/status/Installation.png
 SECTION: 65 45 FS
 SECTION: 85 45 FS-I
 SECTION: 45 67 LS

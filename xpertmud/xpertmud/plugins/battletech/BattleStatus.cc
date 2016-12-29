@@ -40,7 +40,7 @@ BattleStatusWidget::BattleStatusWidget(QWidget *parent,
   setPalette(pal);
 
    QString path;
-   path = KGlobal::dirs()->findResource("appdata", "status/status.def");
+   path = KGlobal::dirs()->findResource("appdata", "artwork/status/status.def");
 
    qDebug("Reading status defs from [%s]",(const char *)(path.toLocal8Bit()));
    
