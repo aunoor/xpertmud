@@ -17,14 +17,14 @@
     #define DLL_PATH_PREFIX qApp->applicationDirPath()+QDir::separator()
   #else
     //Linux, *BSD and other unix-like OS
-    #define RESOURCES_PATH_PREFIX "/usr/local/share/xpertmud"
-    #define DLL_PATH_PREFIX "/usr/local/lib"
+    #define RESOURCES_PATH_PREFIX "/usr/local/share/xpertmud/"
+    #define DLL_PATH_PREFIX "/usr/local/lib/xpertmud"
   #endif
 #endif
 
 #ifdef Q_OS_WIN
-  #define RESOURCES_PATH_PREFIX ""
-  #define DLL_PATH_PREFIX ""
+  #define RESOURCES_PATH_PREFIX QString("")
+  #define DLL_PATH_PREFIX QString("")
 #endif
 
 
