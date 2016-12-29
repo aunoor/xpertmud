@@ -70,7 +70,7 @@ void KStandardDirs::findModules(const QString& dir, const QString &cfilter,
         fi = it.next();
         QString name = fi.filePath();
         if(isDotLa)
-#ifdef WIN32
+#ifdef Q_OS_WIN
             name.replace(QRegExp("\\.dll"), ".la");
 #else
 #ifdef Q_OS_MACOS

@@ -13,7 +13,7 @@ using std::endl;
 
 
 
-#ifdef WIN32
+#ifdef Q_OS_WIN
 #define K_EXPORT_COMPONENT_FACTORY(X, Y) \
 extern "C" { __declspec(dllexport) void *init_##X() { return new Y; } }
 #else
@@ -76,7 +76,7 @@ class KLibLoader {
 
   KLibFactory* factory(const QString& libname) {
     cout << "trying to load lib " << libname.toLocal8Bit().data() << endl;
-#ifdef WIN32
+#ifdef Q_OS_WIN
     QString name = libname + ".dll";
 #else
 # ifdef Q_OS_MACOS
@@ -85,8 +85,7 @@ class KLibLoader {
     QString name = libname + ".so";
 # endif
 #endif
-    QStringList list = 
-      KGlobal::dirs()->findAllResources("module", name, false, true);
+    QStringList list = KGlobal::dirs()->findAllResources("module", name, false, true);
     if(list.count() == 0) { 
       cout << "Couldn't find library " << name.toLocal8Bit().data() << endl;
       return 0; 
