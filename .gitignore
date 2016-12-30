@@ -1,4 +1,4 @@
-.git
+.hg
 .idea
 .DS_Store
 cmake-build-debug
