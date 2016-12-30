@@ -225,7 +225,9 @@ else()
 endif(MSVC)
 
 if(WIN32)
-	set(GUI_TYPE WIN32)
+    if (CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]")
+	    set(GUI_TYPE WIN32)
+    endif (CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]")
 elseif(APPLE)
 	set(GUI_TYPE MACOSX_BUNDLE)
 
@@ -255,7 +257,6 @@ install(CODE "MESSAGE(\"Main app\")")
 if (APPLE)
 
     set(APP_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app")
-
 
     function(QT_MODULE_DEPLOY QMODULE_NAME)
         string(REPLACE ":" "" QMODULE_NAME ${QMODULE_NAME})
@@ -307,6 +308,7 @@ if (APPLE)
             DESTINATION ${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.app/Contents/MacOS/icons/)
 
     install(CODE "MESSAGE(\"Qt framework\")")
+    #yes, we can do it as for WIN, but why not play a little?
     QT_MODULE_DEPLOY(Qt5::Core)
     QT_MODULE_DEPLOY(Qt5::Gui)
     QT_MODULE_DEPLOY(Qt5::Widgets)
@@ -322,6 +324,39 @@ else (APPLE)
       install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi32-app-xpertmud.png
               ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi16-app-xpertmud.png
               DESTINATION ${CMAKE_INSTALL_PREFIX}/icons/)
+
+      if (CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]")
+            install(FILES ${QTDIR}/bin/Qt5Widgetsd.dll
+                    ${QTDIR}/bin/Qt5Cored.dll
+                    ${QTDIR}/bin/Qt5Guid.dll
+                    ${QTDIR}/bin/Qt5Multimediad.dll
+                    ${QTDIR}/bin/Qt5Networkd.dll
+                    ${QTDIR}/bin/Qt5Xmld.dll
+                    DESTINATION ${CMAKE_INSTALL_PREFIX}/)
+            install(FILES ${QTDIR}/plugins/platforms/qwindowsd.dll
+                    DESTINATION ${CMAKE_INSTALL_PREFIX}/plugins/platforms/)
+      else(CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]")
+            install(FILES ${QTDIR}/bin/Qt5Widgets.dll
+                    ${QTDIR}/bin/Qt5Core.dll
+                    ${QTDIR}/bin/Qt5Gui.dll
+                    ${QTDIR}/bin/Qt5Multimedia.dll
+                    ${QTDIR}/bin/Qt5Network.dll
+                    ${QTDIR}/bin/Qt5Xml.dll
+                    DESTINATION ${CMAKE_INSTALL_PREFIX}/)
+            install(FILES ${QTDIR}/plugins/platforms/qwindows.dll
+                    DESTINATION ${CMAKE_INSTALL_PREFIX}/plugins/platforms/)
+      endif (CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]")
+
+      install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/qt.conf.macos
+              DESTINATION ${CMAKE_INSTALL_PREFIX}/ RENAME qt.conf)
+
+      if(CMAKE_COMPILER_IS_GNUCXX)
+        install(FILES ${QTDIR}/bin/libgcc_s_dw2-1.dll
+                ${QTDIR}/bin/libstdc++-6.dll
+                ${QTDIR}/bin/libwinpthread-1.dll
+                DESTINATION ${CMAKE_INSTALL_PREFIX}/)
+      endif(CMAKE_COMPILER_IS_GNUCXX)
+
   else (WIN32)
 #TODO: make Linux install
       install(TARGETS ${PROJECT_NAME} DESTINATION bin)
