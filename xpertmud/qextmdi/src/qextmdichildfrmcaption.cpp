@@ -184,7 +184,7 @@ int QextMdiChildFrmCaption::heightHint()
       if(hght<20)hght=20;
    }
    else if (QextMdiMainFrm::frameDecorOfAttachedViews() == QextMdi::KDE2Look) {
-      if(hght<16)hght=16;
+      if(hght<16+4)hght=16+4;
    }
    else {   // kde2laptop look
       hght -= 4;

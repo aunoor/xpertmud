@@ -62,11 +62,11 @@
 
 //using namespace KParts;
 
-#if defined(_OS_WIN32_) || defined(Q_OS_WIN32)
-QextMdi::FrameDecor QextMdiMainFrm::m_frameDecoration = QextMdi::Win95Look;
-#else
+//#if defined(_OS_WIN32_) || defined(Q_OS_WIN32)
+//QextMdi::FrameDecor QextMdiMainFrm::m_frameDecoration = QextMdi::Win95Look;
+//#else
 QextMdi::FrameDecor QextMdiMainFrm::m_frameDecoration = QextMdi::KDE2Look;
-#endif
+//#endif
 
 QextMdi::MdiMode QextMdiMainFrm::m_mdiMode = QextMdi::ChildframeMode;
 
