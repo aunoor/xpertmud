@@ -1,3 +1,0 @@
-SUBDIRS=. example battletech html
-
-
