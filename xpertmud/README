@@ -1,6 +1,12 @@
+Xpertmud, the xtensible PERL-Scriptable MUD Client.
 
-this is xpertmud, the xtensible PERL-Scriptable MUD Client.
+This is new incarnation of old, abandoned version from SourceForge.
 
+Now Xpertmud ported to Qt5 and CMake build system. It can run on Windows, MacOS and Linux.
 
-Install like any other KDE2 Program
+Because there are no significal changes from original now, current version set only to 3.2.0,
+and still alfa.
+
+Main advantages of Xpertmud also saved: support Python and Perl scripting (Ruby in plans),
+and, of course, Battletech HUD plugin is fully functional.
 
