@@ -1466,7 +1466,13 @@ void QextMdiMainFrm::setEnableMaximizedChildFrmMode(bool bEnable)
          ta->setIcon(QPixmap(kde2laptop_closebutton_menu));
       } else {
          pCurrentChild->systemMenu()->setIcon(*pCurrentChild->icon());
-         m_pMainMenuBar->addMenu(pCurrentChild->systemMenu());
+
+         QAction *tFirstAction = NULL;
+         if (m_pMainMenuBar->actions().count()) {
+            tFirstAction = m_pMainMenuBar->actions().first();
+         }
+         QAction *ta = m_pMainMenuBar->insertMenu(tFirstAction, pCurrentChild->systemMenu());
+         ta->setObjectName("MainFrmMenuIconAction");
          QObject::connect( m_pClose, SIGNAL(clicked()), pCurrentChild, SLOT(closePressed()) );
          m_pClose->show();
       }
@@ -1496,9 +1502,12 @@ void QextMdiMainFrm::switchOffMaximizeModeForMenu(QextMdiChildFrm* oldChild)
    if( m_pMainMenuBar == 0L)
       return;
       
-   //m_pMainMenuBar->removeItem( m_pMainMenuBar->idAt(0));
-   if (!m_pMainMenuBar->actions().isEmpty())
-        m_pMainMenuBar->removeAction(m_pMainMenuBar->actions().at(0));
+   foreach (QAction *ta, m_pMainMenuBar->actions()) {
+         if (ta->objectName()=="MainFrmMenuIconAction") {
+            m_pMainMenuBar->removeAction(ta);
+            break;
+         }
+   }
 
    if( oldChild) {
       QObject::disconnect( m_pUndock, SIGNAL(clicked()), oldChild, SLOT(undockPressed()) );
