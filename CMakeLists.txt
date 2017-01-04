@@ -354,6 +354,9 @@ else (APPLE)
       install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/qt.conf.macos
               DESTINATION ${CMAKE_INSTALL_PREFIX}/ RENAME qt.conf)
 
+      install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/vendor/zlib-1.2.3/bin/zlib1.dll
+              DESTINATION ${CMAKE_INSTALL_PREFIX}/)
+
       if(CMAKE_COMPILER_IS_GNUCXX)
         install(FILES ${QTDIR}/bin/libgcc_s_dw2-1.dll
                 ${QTDIR}/bin/libstdc++-6.dll
