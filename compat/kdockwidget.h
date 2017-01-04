@@ -1033,7 +1033,8 @@ private:
   /**
    * An internal list containing data for the menuitems for the visibility popup menu.
    */
-  QList<MenuDockData*> *menuData;
+  //QList<MenuDockData*> *menuData;
+    QMap<QAction*, MenuDockData*> menuData;
 
   class KDockManagerPrivate;
   KDockManagerPrivate *d;

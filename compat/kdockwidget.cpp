@@ -999,7 +999,7 @@ KDockManager::KDockManager( QWidget* mainWindow , const QString name )
 
   undockProcess = false;
 
-  menuData = new QList<MenuDockData*>;
+  //menuData = new QList<MenuDockData*>;
 
   menu = new QMenu();
 
@@ -1011,8 +1011,8 @@ KDockManager::KDockManager( QWidget* mainWindow , const QString name )
 
 KDockManager::~KDockManager()
 {
-  qDeleteAll(*menuData);
-  delete menuData;
+  qDeleteAll(menuData);
+  //delete menuData;
   delete menu;
 
   qDeleteAll(*childDock);
@@ -1719,32 +1719,33 @@ bool KDockManager::splitterHighResolution() const
 void KDockManager::slotMenuPopup()
 {
   menu->clear();
-  menuData->clear();
+  qDeleteAll(menuData);
+  menuData.clear();
 
   foreach(QObject *o, *childDock) {
     KDockWidget * obj = dynamic_cast<KDockWidget *>(o);
     if (obj==NULL) continue;
     if ( obj->mayBeHide() )
     {
-      menu->addMenu( !obj->windowIcon().isNull() ? obj->windowIcon() : QPixmap(), QString("Hide ") + obj->windowTitle());
-      menuData->append( new MenuDockData( obj, true ) );
+      QMenu * tm = menu->addMenu( !obj->windowIcon().isNull() ? obj->windowIcon() : QPixmap(), QString("Hide ") + obj->windowTitle());
+      QAction *ta = tm->menuAction();
+      menuData.insert(ta, new MenuDockData( obj, true ) );
     }
 
     if ( obj->mayBeShow() )
     {
-      menu->addMenu( !obj->windowIcon().isNull() ? obj->windowIcon() : QPixmap(), QString("Show ") + obj->windowTitle() );
-      menuData->append( new MenuDockData( obj, false ) );
+      QMenu * tm = menu->addMenu( !obj->windowIcon().isNull() ? obj->windowIcon() : QPixmap(), QString("Show ") + obj->windowTitle() );
+      QAction *ta = tm->menuAction();
+      menuData.insert(ta, new MenuDockData( obj, false ) );
     }
   }
 }
 
 void KDockManager::slotMenuActivated( QAction * action )
 {
-#warning TODO: need implementation!
-#if 0
-  MenuDockData* data = menuData->at( id );
+  MenuDockData* data = menuData.value(action, NULL);
+  if (data == NULL) return;
   data->dock->changeHideShowState();
-#endif
 }
 
 KDockWidget* KDockManager::findWidgetParentDock( QWidget* w )
