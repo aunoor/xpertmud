@@ -102,9 +102,9 @@ namespace QextMdi
     /* for building qextmdi */
 #   ifdef _DLL_IMP_EXP_MSG_
 #     ifdef _DEBUG
-#      pragma message ("  exporting C++ class to debug lib...")
+//#      pragma message ("  exporting C++ class to debug lib...")
 #      else
-#      pragma message ("  exporting C++ class to release lib...")
+//#      pragma message ("  exporting C++ class to release lib...")
 #      endif
 #    endif
 #    define DLL_IMP_EXP_QEXTMDICLASS  __declspec(dllexport)
@@ -112,9 +112,9 @@ namespace QextMdi
     /* for including headers of qextmdi */
 #    ifdef _DLL_IMP_EXP_MSG_
 #      ifdef _DEBUG
-#      pragma message ("  importing C++ class from qextmdi debug lib...")
+//#      pragma message ("  importing C++ class from qextmdi debug lib...")
 #      else
-#      pragma message ("  importing C++ class from qextmdi release lib...")
+//#      pragma message ("  importing C++ class from qextmdi release lib...")
 #      endif
 #    endif
 #    define DLL_IMP_EXP_QEXTMDICLASS  __declspec(dllimport)
