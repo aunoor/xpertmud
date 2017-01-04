@@ -125,6 +125,10 @@ set(PYTHON_SUPPORT ON CACHE  BOOL "Python scrypting support")
 set(PERL_SUPPORT ON CACHE  BOOL "Perl scrypting support")
 
 if (MCCP_SUPPORT)
+    if(WIN32)
+        set(ZLIB_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/vendor/zlib-1.2.3)
+    endif(WIN32)
+
     include(FindZLIB)
 endif (MCCP_SUPPORT)
 
