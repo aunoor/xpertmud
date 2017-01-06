@@ -28,22 +28,20 @@ extern "C" {
 #endif
 #endif
 
-// Stupid perl version incompatibilities...
-#ifdef dXSTARG
-#define FIXWARN
-#else
-#define dXSTARG
+// Get rid of those stupid warnings
+#ifdef dXSARGS
+//#define FIXPERLWARN  if(false) { cv+=0; Perl___notused+=0; }
 #endif
 
-// TODO: add configure test! 5.6.1 compatibility mode as default
-#undef FIXWARN
+#ifdef dXSTARG
+#define FIXPERLWARN2  if (targ) ;
+#endif
 
-// Get rid of those stupid warnings
-#ifdef FIXWARN
-#define FIXPERLWARN  if(false) { cv+=0; Perl___notused+=0; }
-#define FIXPERLWARN2  if (false) { targ+=0; }
-#else
+#ifndef FIXPERLWARN
 #define FIXPERLWARN
+#endif
+
+#ifndef FIXPERLWARN2
 #define FIXPERLWARN2
 #endif
 

@@ -82,7 +82,7 @@ if (APPLE)
             DESTINATION ${APP_INSTALL_PATH}/Contents/MacOS/appdata/perl/)
 else (APPLE)
     if (WIN32)
-        install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/dll/interpreter/)
+        install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/dll/interpreter/)
         install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/completion.pl
                 ${CMAKE_CURRENT_SOURCE_DIR}/snake.pl
                 ${CMAKE_CURRENT_SOURCE_DIR}/speedwalk.pl
