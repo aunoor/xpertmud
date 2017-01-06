@@ -66,7 +66,7 @@ if (APPLE)
             DESTINATION ${APP_INSTALL_PATH}/Contents/MacOS/appdata/python/)
 else (APPLE)
     if (WIN32)
-        install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/dll/interpreter/)
+        install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/dll/interpreter/)
         install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/bt3030.py
                 ${CMAKE_CURRENT_SOURCE_DIR}/tapp.py
                 ${CMAKE_CURRENT_SOURCE_DIR}/ansicolors.py
