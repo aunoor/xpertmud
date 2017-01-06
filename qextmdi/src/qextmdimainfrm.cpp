@@ -1593,6 +1593,7 @@ void QextMdiMainFrm::hideViewTaskBar()
 //=============== fillWindowMenu ===============//
 void QextMdiMainFrm::fillWindowMenu()
 {
+   QAction *lastSeparator = NULL;
    bool bTabPageMode = false;
    if (m_mdiMode == QextMdi::TabPageMode)
       bTabPageMode = true;
@@ -1621,26 +1622,23 @@ void QextMdiMainFrm::fillWindowMenu()
    QAction *mdiMode = m_pWindowMenu->addMenu(m_pMdiModeMenu);
    mdiMode->setText(tr("&MDI Mode..."));
    m_pMdiModeMenu->clear();
-   QAction *tplm=m_pMdiModeMenu->addAction(tr("&Toplevel mode"), this, SLOT(switchToToplevelMode())); //0
-   QAction *cfm=m_pMdiModeMenu->addAction(tr("C&hildframe mode"), this, SLOT(switchToChildframeMode())); //1
-   QAction *tpm=m_pMdiModeMenu->addAction(tr("Ta&b Page mode"), this, SLOT(switchToTabPageMode())); //2
+   QAction *tplm=m_pMdiModeMenu->addAction(tr("&Toplevel mode"), this, SLOT(switchToToplevelMode()));
+   QAction *cfm=m_pMdiModeMenu->addAction(tr("C&hildframe mode"), this, SLOT(switchToChildframeMode()));
+   QAction *tpm=m_pMdiModeMenu->addAction(tr("Ta&b Page mode"), this, SLOT(switchToTabPageMode()));
    switch (m_mdiMode) {
    case QextMdi::ToplevelMode:
-      //m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(0), true);
       tplm->setChecked(true);
       break;
    case QextMdi::ChildframeMode:
-      //m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(1), true);
        cfm->setChecked(true);
       break;
    case QextMdi::TabPageMode:
-      //m_pMdiModeMenu->setItemChecked(m_pMdiModeMenu->idAt(2), true);
        tpm->setChecked(true);
       break;
    default:
       break;
    }
-   m_pWindowMenu->addSeparator();
+   lastSeparator = m_pWindowMenu->addSeparator();
    if (!bTabPageMode) {
       QAction* placMenuId = m_pWindowMenu->addMenu(m_pPlacingMenu);
       placMenuId->setText(tr("&Tile..."));
@@ -1659,22 +1657,16 @@ void QextMdiMainFrm::fillWindowMenu()
       QAction* dockUndockId = m_pWindowMenu->addMenu(m_pDockMenu);
       dockUndockId->setText(tr("&Dock/Undock..."));
       m_pDockMenu->clear();
-      m_pWindowMenu->addSeparator();
+      lastSeparator = m_pWindowMenu->addSeparator();
       if (bNoViewOpened) {
          placMenuId->setEnabled(false);
          dockUndockId->setEnabled(false);
       }
    }
-   //int entryCount = m_pWindowMenu->actions().count();
 
    // for all child frame windows: give an ID to every window and connect them in the end with windowMenuItemActivated()
    int i=100;
-   //QextMdiChildView* pView = 0L;
-   //QPtrListIterator<QextMdiChildView> it(*m_pWinList);
    foreach(QextMdiChildView* pView, *m_pWinList){
-   //for( ; it.current(); ++it) {
-
-//      pView = it.current();
       if( pView->isToolView())
          continue;
 
@@ -1691,45 +1683,35 @@ void QextMdiMainFrm::fillWindowMenu()
        }
 
       // insert the window entry sorted in alphabetical order
-
       bool inserted = false;
-//TODO: fix inserting
-/*
-      unsigned int indx;
-      unsigned int windowItemCount = m_pWindowMenu->actions().count() - entryCount;
-
-      QString tmpString;
-      for (indx = 0; indx <= windowItemCount; indx++) {
-         //tmpString = m_pWindowMenu->text( m_pWindowMenu->idAt( indx+entryCount));
-         tmpString = m_pWindowMenu->actions().at(indx+entryCount)->text();
-         if (tmpString.right( tmpString.length()-2) > item.right( item.length()-2)) {
-            QAction *ta=m_pWindowMenu->addAction( item, pView, SLOT(slot_clickedInWindowMenu()));
-            if (pView == m_pCurrentWindow)
-               ta->setChecked(true);
-            pView->setWindowMenuID( i);
-            if (!bTabPageMode) {
-                QAction *ta=m_pDockMenu->addAction( item, pView, SLOT(slot_clickedInDockMenu()));
-               if (pView->isAttached())
-                  ta->setChecked(true);
+      int indx = m_pWindowMenu->actions().indexOf(lastSeparator);
+      if (indx!=-1) {
+         QString tmpString;
+         for (indx++; indx < m_pWindowMenu->actions().count(); indx++) {
+            QAction *ta = m_pWindowMenu->actions().at(indx);
+            tmpString = ta->text();
+            if (tmpString.right(tmpString.length() - 2) > item.right(item.length() - 2)) {
+               QAction *na = m_pWindowMenu->addAction(item, pView, SLOT(slot_clickedInWindowMenu()));
+               m_pWindowMenu->insertAction(ta, na);
+               if (pView == m_pCurrentWindow) ta->setChecked(true);
+               pView->setWindowMenuID(i);
+               if (!bTabPageMode) {
+                  QAction *da = m_pDockMenu->addAction(item, pView, SLOT(slot_clickedInDockMenu()));
+                  if (pView->isAttached()) da->setChecked(true);
+               }
+               inserted = true;
+               break;
             }
-            inserted = true;
-            indx = windowItemCount+1;  // break the loop
          }
       }
-      */
+
       if (!inserted) {  // append it
-         //m_pWindowMenu->insertItem( item, pView, SLOT(slot_clickedInWindowMenu()), 0, -1, windowItemCount+entryCount);
          QAction *ta = m_pWindowMenu->addAction( item, pView, SLOT(slot_clickedInWindowMenu()));
-         if (pView == m_pCurrentWindow)
-            //m_pWindowMenu->setItemChecked( m_pWindowMenu->idAt(windowItemCount+entryCount), true);
-            ta->setChecked(true);
+         if (pView == m_pCurrentWindow) ta->setChecked(true);
          pView->setWindowMenuID( i);
          if (!bTabPageMode) {
-            //m_pDockMenu->insertItem( item, pView, SLOT(slot_clickedInDockMenu()), 0, -1, windowItemCount);
             QAction *ta2 = m_pDockMenu->addAction( item, pView, SLOT(slot_clickedInDockMenu()));
-            if (pView->isAttached())
-               //m_pDockMenu->setItemChecked( m_pDockMenu->idAt(windowItemCount), true);
-               ta2->setChecked(true);
+            if (pView->isAttached()) ta2->setChecked(true);
          }
       }
       i++;
