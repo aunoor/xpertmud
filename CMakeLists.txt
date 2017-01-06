@@ -229,9 +229,9 @@ else()
 endif(MSVC)
 
 if(WIN32)
-    if (CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]")
-	    set(GUI_TYPE WIN32)
-    endif (CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]")
+    if (NOT CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]")
+        set(GUI_TYPE WIN32)
+    endif (NOT CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]")
 elseif(APPLE)
 	set(GUI_TYPE MACOSX_BUNDLE)
 
