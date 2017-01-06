@@ -86,30 +86,30 @@ void Connection::parse(const std::string& str) {
     //   start encoding from there on. This seems rather
     //   impossible, any ideas?
     // so we go for solution 1, which is probably verra slow
-    
+
     // one byte at a time
     QString utfSeq = textDecoder->toUnicode(&(str.c_str())[i], 1);
     if(!utfSeq.isNull()) {
       // looks like one byte can complete a sequence of
       // multiple characters, so the next line is a no-no
       // assert(oneChar.length() == 1);
-      for(unsigned int j=0; j<utfSeq.length(); ++j) {
-	if(charSetParser.add(utfSeq.at(j))) { // charset changed
-	  setInputEncoding(charSetParser.encoding());
-	  /*	  inputEncoding = charSetParser.encoding();
-	    QTextCodec* codec = QTextCodec::codecForName(inputEncoding);
-	    if(codec == NULL) {
-	    inputEncoding = defaultInputEncoding;
-	    codec = QTextCodec::codecForName(inputEncoding);
-	    }
-	    textDecoder = codec->makeDecoder();
-	  */
-	  
-	} else { // charset didnt change
-	  if(charSetParser.isIdle()) {
-	    utf16 += charSetParser.readUntilIdle();
-	  }
-	}
+      for(int j=0; j<utfSeq.length(); ++j) {
+        if(charSetParser.add(utfSeq.at(j))) { // charset changed
+          setInputEncoding(charSetParser.encoding());
+          /*	  inputEncoding = charSetParser.encoding();
+            QTextCodec* codec = QTextCodec::codecForName(inputEncoding);
+            if(codec == NULL) {
+            inputEncoding = defaultInputEncoding;
+            codec = QTextCodec::codecForName(inputEncoding);
+            }
+            textDecoder = codec->makeDecoder();
+          */
+
+        } else { // charset didnt change
+          if(charSetParser.isIdle()) {
+            utf16 += charSetParser.readUntilIdle();
+          }
+        }
       }
     }
   }

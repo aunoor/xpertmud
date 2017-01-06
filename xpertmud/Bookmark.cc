@@ -215,7 +215,7 @@ QVector<int> Bookmark::getAvailableConnections() {
   QVector<int> cids;
 
   QDomNodeList conns=data.elementsByTagName("Connection");
-  for (unsigned int i=0; i<conns.count(); ++i) {
+  for (int i=0; i<conns.count(); ++i) {
     QDomNode n = conns.item(i);
     QDomElement e = n.toElement();
     if (!e.isNull()) {
@@ -415,7 +415,7 @@ void Bookmark::setConnectionScript(int cid, const QString & script) {
 
 QDomElement Bookmark::getNamedElement(const QString & name) {
   QDomNodeList conns=data.elementsByTagName(name);
-  for (unsigned int i=0; i<conns.count(); ++i) {
+  for (int i=0; i<conns.count(); ++i) {
     QDomNode n = conns.item(i);
     QDomElement e = n.toElement();
     if (!e.isNull()) {
@@ -441,7 +441,7 @@ void Bookmark::setNamedTopNode(const QString & name,const QString & value, bool 
     content=data.createTextNode(value);
 
   QDomNodeList conns=data.elementsByTagName(name);
-  for (unsigned int i=0; i<conns.count(); ++i) {
+  for (int i=0; i<conns.count(); ++i) {
     QDomNode n = conns.item(i);
     QDomElement e = n.toElement();
     if (!e.isNull()) {
@@ -463,7 +463,7 @@ void Bookmark::setNamedTopNode(const QString & name,const QString & value, bool 
 
 QDomElement Bookmark::getConnectionElement(int cid) {
   QDomNodeList conns=data.elementsByTagName("Connection");
-  for (unsigned int i=0; i<conns.count(); ++i) {
+  for (int i=0; i<conns.count(); ++i) {
     QDomNode n = conns.item(i);
     QDomElement e = n.toElement();
     if (!e.isNull()) {

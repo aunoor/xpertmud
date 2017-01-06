@@ -646,12 +646,12 @@ int Xpertmud::XM_mdiHeight() {
 }
 
 QextMdiChildView * Xpertmud::getChildWrapper(unsigned int id) {
-  if (id>=childWidgets.size()) return NULL;
+  if (id>=(unsigned int)childWidgets.size()) return NULL;
   return wrapperWidgets[id];
 }
 
 TextBufferViewIface * Xpertmud::getChildTextWidget(unsigned int id) {
-  if (id>=childWidgets.size()) return NULL;
+  if (id>=(unsigned int)childWidgets.size()) return NULL;
   QWidget * qw = childWidgets[id];
   if (!qw) return NULL;
   TextBufferViewIface* ret=NULL;
@@ -667,7 +667,7 @@ TextBufferViewIface * Xpertmud::getChildTextWidget(unsigned int id) {
 }
 
 TextBufferHistoryView * Xpertmud::getChildTextBufferWidget(unsigned int id) {
-  if (id>=childWidgets.size()) return NULL;
+  if (id>=(unsigned int)childWidgets.size()) return NULL;
   QWidget * qw = childWidgets[id];
   if (!qw) return NULL;
   if (qw->inherits("TextBufferHistoryView")) return static_cast<TextBufferHistoryView *>(qw);
@@ -675,12 +675,12 @@ TextBufferHistoryView * Xpertmud::getChildTextBufferWidget(unsigned int id) {
 }
 
 QWidget * Xpertmud::getChildWidget(unsigned int id) {
-  if (id>=childWidgets.size()) return NULL;
+  if (id>=(unsigned int)childWidgets.size()) return NULL;
   return childWidgets[id];
 }
 
 PluginWrapper * Xpertmud::getPluginWrapper(unsigned int id) {
-  if (id>=childWidgets.size()) return NULL;
+  if (id>=(unsigned int)childWidgets.size()) return NULL;
   return pluginWrappers[id];
 }
 
@@ -737,7 +737,7 @@ QString Xpertmud::XM_ansiToColored(const QString& string) {
 int Xpertmud::XM_InputLine_getCursorX(int id) {
   MXInputLine* inputLine = getInputLine(id);
   if(inputLine != NULL) {
-    int para, index;
+    int /*para,*/ index;
     //inputLine->getCursorPosition(&para, &index);
     index = inputLine->textCursor().positionInBlock();
     return index;
@@ -747,9 +747,10 @@ int Xpertmud::XM_InputLine_getCursorX(int id) {
 int Xpertmud::XM_InputLine_getCursorY(int id) {
   MXInputLine* inputLine = getInputLine(id);
   if(inputLine != NULL) {
-    int para, index;
+    int para/*, index*/;
     //inputLine->getCursorPosition(&para, &index);
-    index = inputLine->textCursor().positionInBlock();
+    para = inputLine->textCursor().blockNumber();
+    //index = inputLine->textCursor().positionInBlock();
     return para;
   }
   return 0;
@@ -758,12 +759,11 @@ int Xpertmud::XM_InputLine_getCursorY(int id) {
 void Xpertmud::XM_InputLine_setCursorX(int id, int x) {
   MXInputLine* inputLine = getInputLine(id);
   if(inputLine != NULL) {
-    int para, index;
+    //int para, index;
     //inputLine->getCursorPosition(&para, &index);
-    para = inputLine->textCursor().blockNumber();
+    //para = inputLine->textCursor().blockNumber();
     //index = inputLine->textCursor().positionInBlock();
     //inputLine->setCursorPosition(para, x);
-    //inputLine->setB
     inputLine->textCursor().setPosition(inputLine->textCursor().block().position()+x);
   }
 }
@@ -771,7 +771,7 @@ void Xpertmud::XM_InputLine_setCursorX(int id, int x) {
 void Xpertmud::XM_InputLine_setCursorY(int id, int y) {
   MXInputLine* inputLine = getInputLine(id);
   if(inputLine != NULL) {
-    int para, index;
+    int /*para,*/ index;
     //inputLine->getCursorPosition(&para, &index);
     //inputLine->setCursorPosition(y, index);
     //inputLine->textCursor().setPosition(inputLine->document()->findBlockByNumber(y).position());

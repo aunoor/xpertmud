@@ -260,7 +260,7 @@ void WeaponView::heatDissipationChanged(int nheatDissipation) {
 }
 
 void WeaponView::updateEntries() {
-  for(unsigned int i=0; i<weapons_model->rowCount(QModelIndex()); ++i) {
+  for(int i=0; i<weapons_model->rowCount(QModelIndex()); ++i) {
     slotUpdateEntry(i);
   }
 }

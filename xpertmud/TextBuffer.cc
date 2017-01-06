@@ -104,7 +104,7 @@ void TextBuffer::printRaw(const QString& text) {
   int maxY = -1;
 
   // for every character in our nice text
-  for(unsigned int i=0; i<text.length(); ++i) {
+  for(int i=0; i<text.length(); ++i) {
     insertOneChar(text.at(i), minX, maxX, minY, maxY);
   }
   //  qDebug(QString("Emitting (%1, %2) [%3, %4]")

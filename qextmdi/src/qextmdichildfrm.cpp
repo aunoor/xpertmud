@@ -662,7 +662,6 @@ void QextMdiChildFrm::setClient(QextMdiChildView *w)
    // memorize the focuses in a dictionary because they will get lost during reparenting
    QHash<QString, Qt::FocusPolicy> pFocPolDict;
    QWidgetList list = m_pClient->findChildren<QWidget*>();
-   QObject * obj;
    int i = 1;
    foreach (QWidget *widg, list) {
       if( widg->objectName().isEmpty()) {
@@ -737,10 +736,8 @@ void QextMdiChildFrm::unsetClient( QPoint positionOffset)
    
    // remember the focus policies using the dictionary and reset them
    QWidgetList list = m_pClient->findChildren<QWidget*>();
-   QObject * obj;
    QWidget* firstFocusableChildWidget = 0;
    QWidget* lastFocusableChildWidget = 0;
-   //while ( (obj=it.current()) != 0 ) { // for each found object...
    foreach(QWidget* widg, list) {
       Qt::FocusPolicy pFocPol = pFocPolDict->value( widg->objectName()); // remember the focus policy from before the reparent
       if( pFocPol)

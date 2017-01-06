@@ -7,7 +7,7 @@
 #define ABSTRACT 0
 #endif
 
-#ifdef WIN32
+#if defined(_MSC_VER)
 #pragma warning ( disable:4786 )
 #endif
 

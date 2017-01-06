@@ -37,9 +37,9 @@ MXInputLine::MXInputLine(const QString &/* unused: string*/, QWidget *parent, co
 }
 
 void MXInputLine::keyPressEvent(QKeyEvent *event) {
-  int para, pos;
+  int para/*, pos*/;
   //getCursorPosition(&para, &pos);
-  pos = textCursor().positionInBlock();
+  //pos = textCursor().positionInBlock();
   para = textCursor().blockNumber();
 
   //x? setModified(false);

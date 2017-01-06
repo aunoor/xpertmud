@@ -210,6 +210,8 @@ void QextMdiChildArea::resizeEvent(QResizeEvent* e)
    if(lpC){
       if(lpC->m_state == QextMdiChildFrm::Maximized) {
          int clientw = 0, clienth = 0;
+         Q_UNUSED(clientw);
+         Q_UNUSED(clienth);
          if (lpC->m_pClient != 0L) {
             clientw = lpC->m_pClient->width();
             clienth = lpC->m_pClient->height();

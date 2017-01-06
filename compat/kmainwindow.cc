@@ -33,12 +33,14 @@ void KMainWindow::saveToolBar(KConfig *config, QToolBar *tb) {
   if(tb != NULL) {
     QString name = tb->objectName();
     cout << "saving " << name.toLatin1().data() << endl;
-    Qt::ToolBarArea dock;
-    int index;
-    bool nl;
-    int extraOffset;
+    Qt::ToolBarArea dock; //dockarea which toolbar belongs
+    int index=0; //index of toolbar in this dockarea
+    bool nl=true; //if toolbar start from row start?
+    int extraOffset=0; //position if it stack with other
+    //all values is temp and used for disable compile warnings
      //TODO: reimplement of getLocation
     ////getLocation(tb, dock, index, nl, extraOffset);
+    dock = this->toolBarArea(tb);
     QString s;
     QTextStream str(&s, QIODevice::WriteOnly);
     str << (int)dock << " " << index << " " << (int)nl << " " << extraOffset;
@@ -75,7 +77,7 @@ void KMainWindow::restoreToolBar(KConfig *config, QToolBar *tb) {
       int extraOffset;
       QTextStream str(&s, QIODevice::ReadOnly);
       str >> dock >> index >> nl >> extraOffset;
-#warning TODO: reimplement moveToolBar!
+     //TODO: reimplement moveToolBar!
       //moveToolBar(tb, (ToolBarDock)dock, (bool)nl, index, extraOffset);
     }
     if(config->readNumEntry(name + " Hidden", 0))

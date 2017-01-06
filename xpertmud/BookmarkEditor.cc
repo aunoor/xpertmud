@@ -286,6 +286,7 @@ void BookmarkEditor::loadConnectionData() {
 			                            << host
 			                            << QString::number(port)
 			                            << enc);
+    Q_UNUSED(lw);
   }
 }
 

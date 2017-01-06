@@ -158,7 +158,7 @@ public:
    * @param id the identification number of that desired tab page
    * @return the current text colour of that tab page
    */
-  const QColor& textColor( int id );
+  const QColor textColor( int id );
 
   /**
    * Removes the tab page with that @p id.
@@ -491,12 +491,12 @@ public:
    * 
    * @param w the widget we want to ask for its text colour
    */
-  const QColor& tabTextColor( QWidget* w);
+  const QColor tabTextColor( QWidget* w);
 
   /** This is an overloaded member function, provided for convenience.
    *  It differs from the above function only in what argument(s) it accepts. 
    */
-  const QColor& tabTextColor( int id ){ return tabTextColor( page(id) ); }
+  const QColor tabTextColor( int id ){ return tabTextColor( page(id) ); }
   
   /**
    * Returns if the tab page is enabled (if it can get the focus).

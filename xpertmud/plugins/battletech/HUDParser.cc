@@ -112,7 +112,7 @@ void HUDParser::parse(const QString &sn) {
 void HUDParser::parseGeneralStatus(const QString & line) {
   //QStringList params=QStringList::split(',',line,true);
   QStringList params=line.split(',');
-  for (unsigned int pi=0; pi<params.count(); ++pi) 
+  for (int pi=0; pi<params.count(); ++pi)
     if (params[pi]=="-") 
       params[pi]="";
   if (params.count()>=14) {
@@ -166,7 +166,7 @@ void HUDParser::parseGeneralStatus(const QString & line) {
 void HUDParser::parseStaticGeneralInfo(const QString & line) {
   ///QStringList params=QStringList::split(',',line,true);
   QStringList params=line.split(',');
-  for (unsigned int pi=0; pi<params.count(); ++pi) 
+  for (int pi=0; pi<params.count(); ++pi)
     if (params[pi]=="-") 
       params[pi]="";
   if (params.count()>=9) {
@@ -252,7 +252,7 @@ void HUDParser::parseContacts(const QString & con) {
   } else if (con.startsWith("L#")) { // CONTACT LINE
     //QStringList params=QStringList::split(',',con.mid(3),true);
     QStringList params=con.mid(3).split(',');
-    for (unsigned int pi=0; pi<params.count(); ++pi) 
+    for (int pi=0; pi<params.count(); ++pi)
       if (params[pi]=="-") 
 	params[pi]="";
 
@@ -306,7 +306,7 @@ void HUDParser::parseContacts(const QString & con) {
 void HUDParser::parseTacticalStart(const QString &coords) {
   //QStringList params=QStringList::split(',',coords,true);
   QStringList params = coords.split(',');
-  for (unsigned int pi = 0; pi < params.count(); ++pi)
+  for (int pi = 0; pi < params.count(); ++pi)
     if (params[pi] == "-")
       params[pi] = "";
   if (params.count() >= 4) {
@@ -319,7 +319,7 @@ void HUDParser::parseTacticalStart(const QString &coords) {
 void HUDParser::parseTacticalLine(const QString &line) {
   //QStringList params=QStringList::split(',',line,true);
   QStringList params = line.split(',');
-  for (unsigned int pi = 0; pi < params.count(); ++pi)
+  for (int pi = 0; pi < params.count(); ++pi)
     if (params[pi] == "-")
       params[pi] = "";
   if (params.count() >= 2) {
@@ -373,7 +373,7 @@ c. Weapon List
 void HUDParser::parseWeaponListLine(const QString& line) {
   //QStringList params=QStringList::split(',',line,true);
   QStringList params=line.split(',');
-  for (unsigned int pi=0; pi<params.count(); ++pi) 
+  for (int pi=0; pi<params.count(); ++pi)
     if (params[pi]=="-") 
       params[pi]="";
   if(params.count() >= 13) {
@@ -423,7 +423,7 @@ b. Weapon Status
 void HUDParser::parseWeaponStatusLine(const QString& line) {
   //QStringList params=QStringList::split(',',line,true);
   QStringList params=line.split(',');
-  for (unsigned int pi=0; pi<params.count(); ++pi) 
+  for (int pi=0; pi<params.count(); ++pi)
     if (params[pi]=="-") 
       params[pi]="";
   if(params.count() >= 7) {
@@ -492,7 +492,7 @@ void HUDParser::parseOriginalArmorStatus(const QString & line) {
  
     //QStringList params=QStringList::split(',',line.mid(3),true);
     QStringList params=line.mid(3).split(',');
-    for (unsigned int pi=0; pi<params.count(); ++pi) 
+    for (int pi=0; pi<params.count(); ++pi)
       if (params[pi]=="-") 
         params[pi]="0";
     if(params.count() >= 4) {
@@ -550,7 +550,7 @@ void HUDParser::parseArmorStatus(const QString & line) {
  
     //QStringList params=QStringList::split(',',line.mid(3),true);
     QStringList params=line.mid(3).split(',');
-    for (unsigned int pi=0; pi<params.count(); ++pi) 
+    for (int pi=0; pi<params.count(); ++pi)
       if (params[pi]=="-") 
         params[pi]="0";
     if(params.count() >= 4) {

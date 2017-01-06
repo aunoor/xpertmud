@@ -1363,6 +1363,7 @@ void QextMdiMainFrm::setSysButtonsAtMenuPosition()
    else
       h = 14;
    y = m_pMainMenuBar->height()/2 - h/2;
+   Q_UNUSED(y);
 
    if (frameDecorOfAttachedViews() == QextMdi::KDE2LaptopLook) {
      int w = 27;
@@ -1664,7 +1665,7 @@ void QextMdiMainFrm::fillWindowMenu()
          dockUndockId->setEnabled(false);
       }
    }
-   int entryCount = m_pWindowMenu->actions().count();
+   //int entryCount = m_pWindowMenu->actions().count();
 
    // for all child frame windows: give an ID to every window and connect them in the end with windowMenuItemActivated()
    int i=100;
@@ -1690,11 +1691,13 @@ void QextMdiMainFrm::fillWindowMenu()
        }
 
       // insert the window entry sorted in alphabetical order
-      unsigned int indx;
-      unsigned int windowItemCount = m_pWindowMenu->actions().count() - entryCount;
+
       bool inserted = false;
 //TODO: fix inserting
 /*
+      unsigned int indx;
+      unsigned int windowItemCount = m_pWindowMenu->actions().count() - entryCount;
+
       QString tmpString;
       for (indx = 0; indx <= windowItemCount; indx++) {
          //tmpString = m_pWindowMenu->text( m_pWindowMenu->idAt( indx+entryCount));
@@ -1723,10 +1726,10 @@ void QextMdiMainFrm::fillWindowMenu()
          pView->setWindowMenuID( i);
          if (!bTabPageMode) {
             //m_pDockMenu->insertItem( item, pView, SLOT(slot_clickedInDockMenu()), 0, -1, windowItemCount);
-            QAction *ta = m_pDockMenu->addAction( item, pView, SLOT(slot_clickedInDockMenu()));
+            QAction *ta2 = m_pDockMenu->addAction( item, pView, SLOT(slot_clickedInDockMenu()));
             if (pView->isAttached())
                //m_pDockMenu->setItemChecked( m_pDockMenu->idAt(windowItemCount), true);
-               ta->setChecked(true);
+               ta2->setChecked(true);
          }
       }
       i++;
@@ -1783,10 +1786,8 @@ void QextMdiMainFrm::popupWindowMenu(QPoint p)
 void QextMdiMainFrm::dragEndTimeOut()
 {
    // send drag end to all concerned views.
-   QextMdiChildView* pView;
-   //for (m_pWinList->first(); (pView = m_pWinList->current()) != 0L; m_pWinList->next()) {
    foreach(QextMdiChildView* pView, *m_pWinList) {
-      QextMdiChildFrmDragEndEvent   dragEndEvent(0L);
+      QextMdiChildFrmDragEndEvent dragEndEvent(0L);
       QApplication::sendEvent(pView, &dragEndEvent);
    }
 }
