@@ -159,8 +159,9 @@ void XMPython::textEntered(const QString & text) {
 
   result = PyEval_CallObject(fn, arglist);
   Py_DECREF(arglist);
-  if(result != NULL)
+  if(result != NULL) {
     Py_DECREF(result);
+  }
 }
 
 bool XMPython::keyPressed(const QString & key, const QString & ascii) {
@@ -188,7 +189,7 @@ bool XMPython::keyPressed(const QString & key, const QString & ascii) {
     Py_DECREF(result);
   }
 
-  return ret;
+  return (bool)ret;
 }
 
 void XMPython::textReceived(const QString & line, int id) {
@@ -206,8 +207,9 @@ void XMPython::textReceived(const QString & line, int id) {
 
   result = PyEval_CallObject(fn, arglist);
   Py_DECREF(arglist);
-  if(result != NULL)
+  if(result != NULL) {
     Py_DECREF(result);
+  }
 }
 
 void XMPython::timer() {
@@ -223,8 +225,9 @@ void XMPython::timer() {
 
   PyObject *result;
   result = PyEval_CallObject(fn, NULL);
-  if(result != NULL)
+  if(result != NULL) {
     Py_DECREF(result);
+  }
 }
 
 void XMPython::echo(bool state, int id) {
@@ -238,8 +241,9 @@ void XMPython::echo(bool state, int id) {
   arglist = Py_BuildValue(const_cast<char *>("(ii)"), state, id);
   result = PyEval_CallObject(fn, arglist);
   Py_DECREF(arglist);
-  if(result != NULL)
+  if(result != NULL) {
     Py_DECREF(result);
+  }
 }
 
 void XMPython::connectionEstablished(int id) {
@@ -253,8 +257,9 @@ void XMPython::connectionEstablished(int id) {
   arglist = Py_BuildValue(const_cast<char *>("(i)"), id);
   result = PyEval_CallObject(fn, arglist);
   Py_DECREF(arglist);
-  if(result != NULL)
+  if(result != NULL) {
     Py_DECREF(result);
+  }
 }
 
 void XMPython::connectionDropped(int id) {
@@ -268,8 +273,9 @@ void XMPython::connectionDropped(int id) {
   arglist = Py_BuildValue(const_cast<char *>("(i)"), id);
   result = PyEval_CallObject(fn, arglist);
   Py_DECREF(arglist);
-  if(result != NULL)
+  if(result != NULL) {
     Py_DECREF(result);
+  }
 }
 
 
@@ -285,8 +291,9 @@ void XMPython::mouseDown(int id, int x, int y) {
   result = PyEval_CallObject(fn, arglist);
   Py_DECREF(arglist);
   
-  if(result != NULL)
+  if(result != NULL) {
     Py_DECREF(result);
+  }
 }
 
 void XMPython::mouseDrag(int id, int x, int y) {
@@ -301,8 +308,9 @@ void XMPython::mouseDrag(int id, int x, int y) {
   result = PyEval_CallObject(fn, arglist);
   Py_DECREF(arglist);
   
-  if(result != NULL)
+  if(result != NULL) {
     Py_DECREF(result);
+  }
 }
 
 void XMPython::mouseUp(int id, int x, int y) {
@@ -317,8 +325,9 @@ void XMPython::mouseUp(int id, int x, int y) {
   result = PyEval_CallObject(fn, arglist);
   Py_DECREF(arglist);
   
-  if(result != NULL)
+  if(result != NULL) {
     Py_DECREF(result);
+  }
 }
 
 QVariant XMPython::pluginCall(int id, int function, const QVariant & args) {
@@ -353,7 +362,7 @@ QVariant XMPython::pluginCall(int id, int function, const QVariant & args) {
  
 Py_UNICODE* XMPython::convert(const QString& text) {
   Py_UNICODE* buffer = new Py_UNICODE[text.length()];
-  for(unsigned int i=0; i<text.length(); ++i) {
+  for(int i=0; i<text.length(); ++i) {
     buffer[i] = text.at(i).unicode();
   }
   return buffer;

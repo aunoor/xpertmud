@@ -163,7 +163,7 @@ while line != "":
         elif functionType == "QString":
             functions += """
     Py_UNICODE* retUni = new Py_UNICODE[ret.length()];
-    {for(unsigned int i=0; i<ret.length(); ++i)
+    {for(int i=0; i<ret.length(); ++i)
       retUni[i] = ret.at(i).unicode();
     }
     return Py_BuildValue(const_cast<char *>(\"u#\"),
