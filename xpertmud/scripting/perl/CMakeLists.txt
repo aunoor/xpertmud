@@ -39,8 +39,10 @@ file (GLOB SRCS
 
 find_package(Qt5Widgets REQUIRED)
 
+if ((CMAKE_C_COMPILER_ID MATCHES "Clang") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
 #for perl 3.18 we need this
 add_definitions(-Wno-reserved-user-defined-literal)
+endif((CMAKE_C_COMPILER_ID MATCHES "Clang") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
 
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
