@@ -42,19 +42,19 @@ TextBufferHistoryView(int id, QWidget* parent, const char* name,
 	  this,SLOT(slotScriptingMouseReleaseEvent(int, int, int)));
   connect(mainView,SIGNAL(offsetYChange(int)),
 	  this,SLOT(slotMainOffsetYChange(int)));
-  connect(mainView,SIGNAL(linesCountChange(int)),
-    this,SLOT(slotLinesCountChange(int)));
+//  connect(mainView,SIGNAL(linesCountChange(int)),
+//    this,SLOT(slotLinesCountChange(int)));
 
 
   splitView = new TextBufferView(0, this, "", cmap, font, textBuffer, false);
   splitView->hide();
   splitView->setFollowMode(TextBufferView::EFM_AlwaysFollow);
   connect(splitView,SIGNAL(scriptingMousePressEvent(int, int, int)),
-	  this,SLOT(slotScriptingMousePressEvent(int, int, int )));
+          this,SLOT(slotScriptingMousePressEvent(int, int, int )));
   connect(splitView,SIGNAL(scriptingMouseDragEvent(int, int, int)),
-	  this,SLOT(slotScriptingMouseDragEvent(int, int, int)));
+          this,SLOT(slotScriptingMouseDragEvent(int, int, int)));
   connect(splitView,SIGNAL(scriptingMouseReleaseEvent(int, int, int)),
-	  this,SLOT(slotScriptingMouseReleaseEvent(int, int, int)));
+          this,SLOT(slotScriptingMouseReleaseEvent(int, int, int)));
 
 
   splitSeperator = new QFrame( this );
@@ -71,9 +71,9 @@ TextBufferHistoryView(int id, QWidget* parent, const char* name,
   vscrollBar->setFixedWidth(style()->pixelMetric(QStyle::PM_ScrollBarExtent ));
 
   connect(textBuffer, SIGNAL(scrolledLines(int)),
-	  this, SLOT(slotScrolledLines(int)));
-  connect(vscrollBar, SIGNAL(valueChanged(int)), 
-	  this, SLOT(slotVScroll(int)));
+          this, SLOT(slotScrolledLines(int)));
+  connect(vscrollBar, SIGNAL(valueChanged(int)),
+          this, SLOT(slotVScroll(int)));
 
   QPalette pal = palette();
   pal.setColor(QPalette::Background, QColor(0, 0, 0));
@@ -106,7 +106,7 @@ void TextBufferHistoryView::scrollLines(int delta) {
 }
 
 void TextBufferHistoryView::slotScrolledLines(int) {
-  //  qDebug("slotScrolledLines.");
+    //qDebug("slotScrolledLines.");
   updateVScrollBar();
 }
 
@@ -170,7 +170,7 @@ void TextBufferHistoryView::slotNewDefaultFont(const QFont & newFont) {
 
 void TextBufferHistoryView::slotVScroll(int /*value*/) {
   if(!inUpdate) {
-  //    qDebug("slotVScroll.");
+      //qDebug() << "slotVScroll." << vscrollBar->value() << vscrollBar->maximum();
 #ifdef OWNSCROLL
     if(vscrollBar->maxValue() > 0) {
       unsigned int lineCount =
@@ -189,19 +189,28 @@ void TextBufferHistoryView::slotVScroll(int /*value*/) {
 void TextBufferHistoryView::slotMainOffsetYChange(int) {
   // updateLayout is _slow_, so don't call it if we
   // already know that nothin' changed!
+  bool needScroll = false;
+  int newMax = ((int)textBuffer->getSizeY() - (int)mainView->getLines());
+  if (vscrollBar->maximum()<newMax) {
+    if (vscrollBar->value()==vscrollBar->maximum()) needScroll = true;
+    vscrollBar->setMaximum(newMax);
+  }
+  if (vscrollBar->value()!=mainView->getOffsetY()) {
+    newMax = mainView->getOffsetY();
+    needScroll = true;
+  }
+
+  if (needScroll) vscrollBar->setValue(newMax);
+
   if(scrollSplitEnabled) {
+    //qDebug() << "slotMainOffsetYChange:" << mainView->getOffsetY() << ((int)textBuffer->getSizeY() - (int)mainView->getLines());
+    //qDebug() << "slotMainOffsetYChange(): textBuffer->getSizeY()="<<textBuffer->getSizeY() << "mainView->getLines()="<<mainView->getLines();
     if(mainView->getOffsetY() < ((int)textBuffer->getSizeY() - (int)mainView->getLines())) {
       if(splitView->isHidden()) updateLayout();
     } else {
       if(splitView->isVisible()) updateLayout();
     }
   }
-}
-
-void TextBufferHistoryView::slotLinesCountChange(int) {
-    int value = ((int)textBuffer->getSizeY() - (int)mainView->getLines());
-    if (vscrollBar->maximum()<value)
-        vscrollBar->setMaximum(value);
 }
 
 void TextBufferHistoryView::wheelEvent(QWheelEvent* ev) {
@@ -221,9 +230,7 @@ void TextBufferHistoryView::mousePressEvent(QMouseEvent* ev) {
 void TextBufferHistoryView::mouseMoveEvent(QMouseEvent* ev) {
   if(movingSplit) {
     int linesFromTop = mainView->getLines() -
-      (int)(((double)ev->y()+
-	     ((double)mainView->getLineHeight()/2.0)) /
-	    (double)mainView->getLineHeight());
+            (int)(((double)ev->y()+ ((double)mainView->getLineHeight()/2.0)) / (double)mainView->getLineHeight());
 
     linesFromTop = std::min(linesFromTop,(int) mainView->getLines()-1);
     linesFromTop = std::max(linesFromTop, 0);
@@ -248,9 +255,9 @@ void TextBufferHistoryView::resizeEvent(QResizeEvent*) {
 }
 
 void TextBufferHistoryView::paintEvent(QPaintEvent* /*pe*/) {
+  return;
 #ifndef ATONCE
-  int lineCount =
-    std::max((int)textBuffer->getSizeY() - (int)mainView->getLines(), 0);
+  int lineCount = std::max((int)textBuffer->getSizeY() - (int)mainView->getLines(), 0);
 
   if(vscrollBar->maximum() != lineCount) {
     //    qDebug(QString("Setting maxValue to %1").arg(lineCount));
@@ -285,14 +292,13 @@ bool TextBufferHistoryView::eventFilter( QObject */*o*/, QEvent *e ) {
 }
 
 void TextBufferHistoryView::updateLayout() {
-  if(mainView->width() != width() - vscrollBar->width() ||
-     mainView->height() != height()) {
-    mainView->resize(width()-vscrollBar->width(),
-		     height());
+  if(mainView->width() != width() - vscrollBar->width() || mainView->height() != height()) {
+    mainView->resize(width()-vscrollBar->width(), height());
   }
 
-  if(mainView->getOffsetY() < ((int)textBuffer->getSizeY() - 
-			     (int)mainView->getLines())) {
+  //qDebug() << "updateLayout():" << mainView->getOffsetY() << ((int)textBuffer->getSizeY() - (int)mainView->getLines());
+  //qDebug() << "updateLayout():"<< "getSizeY():" << (int)textBuffer->getSizeY() << "getLines():" <<(int)mainView->getLines();
+  if(mainView->getOffsetY() < ((int)textBuffer->getSizeY() - (int)mainView->getLines())) {
     if(scrollSplitEnabled && splitView->isHidden()) {
       splitView->show();
       //qDebug(QString("SplitView Lines: %1").arg(splitView->getLines()));

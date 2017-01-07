@@ -47,7 +47,7 @@ public:
   void setOffsetY(int offset) { offsetY = offset; update(); }
   int getOffsetX() { return offsetX; }
   int getOffsetY() { return offsetY; }
-  unsigned int getLineHeight() { return fontH; }
+  unsigned int getLineHeight() { return (unsigned int)fontH; }
   int getID() { return winID; }
   //  virtual void setGeometry( int x, int y, int w, int h );
 

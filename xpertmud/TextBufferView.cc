@@ -141,8 +141,7 @@ void TextBufferView::scrollLines(int delta) {
 
 void TextBufferView::slotTextChanged(int column, int line,
 				     unsigned int width, unsigned int height) {
-  //  qDebug(QString("slotTextChanged called! %1 %2 %3 %4")
-  //   .arg(column).arg(line).arg(width).arg(height));
+    //qDebug() << QString("slotTextChanged called! %1 %2 %3 %4").arg(column).arg(line).arg(width).arg(height);
   updateChars(column-offsetX, line-offsetY, width, height);
 
   emit linesCountChange(buffer()->getLines());
@@ -239,6 +238,7 @@ void TextBufferView::calcGeometry() {
 
   columns = width() / fontW;
   lines = height() / fontH;
+
   //qDebug() << QString("CalcGeometry: Height = %1, fontH = %2, lines = %3").arg(height()).arg(fontH).arg(lines);
 
   if(fixTextBuffer) {

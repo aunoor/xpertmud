@@ -2,7 +2,7 @@
 #ifndef TEXTBUFFERHISTORYVIEW_H
 #define TEXTBUFFERHISTORYVIEW_H
 
-#include <qwidget.h>
+#include <QWidget>
 
 #include "TextBufferViewIface.h"
 
@@ -44,7 +44,6 @@ public slots:
 protected slots:
   void slotVScroll(int);
   void slotMainOffsetYChange(int);
-  void slotLinesCountChange(int);
 
 signals:
   void scriptingMousePressEvent(int id, int x, int y);
