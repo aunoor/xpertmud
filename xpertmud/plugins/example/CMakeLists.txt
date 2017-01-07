@@ -37,7 +37,7 @@ if (APPLE)
             DESTINATION ${APP_INSTALL_PATH}/Contents/MacOS/appdata/perl/)
 else (APPLE)
     if (WIN32)
-        install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/dll/plugins/)
+        install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/dll/plugins/)
         install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/XMExample.py
                 DESTINATION ${CMAKE_INSTALL_PREFIX}/appdata/python/)
         install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/XMExample.pm

@@ -73,7 +73,7 @@ if (APPLE)
             FILES_MATCHING PATTERN "*.png" PATTERN "*.def")
 else (APPLE)
     if (WIN32)
-        install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/dll/plugins/)
+        install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/dll/plugins/)
 
         install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
                 DESTINATION ${CMAKE_INSTALL_PREFIX}/appdata/python/
