@@ -37,6 +37,8 @@ class KStandardDirs {
             ret.append("appdata/perl");
         } else if(name == "python") {
             ret.append("appdata/python");
+        } else if (name == "ruby") {
+          ret.append("appdata/ruby");
         }
     }
     return ret;

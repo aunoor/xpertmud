@@ -9,3 +9,8 @@ if(PERL_SUPPORT)
     message(STATUS "Enable Perl support")
     add_subdirectory(perl)
 endif(PERL_SUPPORT)
+
+if(RUBY_SUPPORT)
+    message(STATUS "Enable Ruby support")
+    add_subdirectory(ruby)
+endif(RUBY_SUPPORT)

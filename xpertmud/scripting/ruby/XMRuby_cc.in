@@ -53,24 +53,24 @@ XMRuby::~XMRuby() {
 }
 
 void XMRuby::reportError(const QString &function, int err) {
-  std::cout << "Error in calling " << function << " (" << err << ")" << std::endl;
+  std::cout << "Error in calling " << function.toLatin1().data() << " (" << err << ")" << std::endl;
   VALUE lasterr = rb_gv_get("$!");
   
   // class
   VALUE klass = rb_class_path(CLASS_OF(lasterr));
-  std::cout << "class = " << RSTRING(klass)->ptr << std::endl; 
+  std::cout << "class = " << RSTRING_PTR(RSTRING(klass)) << std::endl;
   
   // message
   VALUE message = rb_obj_as_string(lasterr);
-  std::cout << "message = " << RSTRING(message)->ptr << std::endl;
-  if(!NIL_P(ruby_errinfo)) {
+  std::cout << "message = " << RSTRING_PTR(RSTRING(message)) << std::endl;
+  if(!NIL_P(rb_errinfo())) {
     std::ostringstream o;
-    VALUE ary = rb_funcall(ruby_errinfo, rb_intern("backtrace"), 0);
+    VALUE ary = rb_funcall(rb_errinfo(), rb_intern("backtrace"), 0);
     if (ary) {
       int c;
-      for (c=0; c<RARRAY(ary)->len; c++) {
+      for (c=0; c<RARRAY_LEN(RARRAY(ary)); c++) {
         o << "\tfrom " << 
-   	RSTRING(RARRAY(ary)->ptr[c])->ptr << 
+   	RSTRING_PTR(RSTRING(RARRAY_PTR(RARRAY(ary))[c])) <<
   	"\n";
       }
     }
@@ -80,9 +80,10 @@ void XMRuby::reportError(const QString &function, int err) {
   }
 //  assert(0);
 }
-extern "C" void Init_stack(VALUE *addr);
+//extern "C" void Init_stack(VALUE *addr);
 		 
 void XMRuby::setCallback(GuiScriptingBindings *cB) {
+  qDebug("setting Callback");
   currentCallBack = cB;
   callBack = cB;
   if(!initialized) {
@@ -102,13 +103,12 @@ void XMRuby::setCallback(GuiScriptingBindings *cB) {
     ruby_script(const_cast<char *>("xpertmud-embedded"));
 
     // adjust the script include Paths
-    QStringList incPath=KGlobal::dirs()->findDirs("appdata","ruby");
-    
+    QStringList incPath = KGlobal::dirs()->findDirs("appdata", "ruby");
     VALUE loadPath = rb_gv_get("$:");
-    if(loadPath != Qnil)
-      for (QStringList::Iterator it=incPath.begin();
-	 it!=incPath.end(); ++it) {
-	rb_ary_unshift(loadPath,rb_str_new2((*it).latin1()));
+    if (loadPath != Qnil) {
+      for (QStringList::Iterator it = incPath.begin(); it != incPath.end(); ++it) {
+        rb_ary_unshift(loadPath, rb_str_new2((*it).toLocal8Bit().data()));
+      }
     }
     // Register my stuff
     module = rb_define_module("XM");
@@ -120,14 +120,16 @@ void XMRuby::setCallback(GuiScriptingBindings *cB) {
       ++i;
     }
     // Parse the SYSINIT script
-    evalSysInit();
+    bool ret = evalSysInit();
+
+    qDebug() << (ret?QString("Ruby initialized"):QString("Error on ruby init"));
 
     initialized=true;
   }
 }
 
 static VALUE int_ruby_eval(VALUE rcode) {
-  rb_eval_string(STR2CSTR(rcode));
+  rb_eval_string(StringValuePtr(rcode));
   return Qnil;
 }
 
@@ -162,8 +164,10 @@ bool XMRuby::evalSysInit() {
   //  rb_gc();
   return (ret ? false:true);
 }
+
 VALUE int_call_glob_func(VALUE args) {
-  char *name = STR2CSTR(rb_ary_shift(args));
+  VALUE value = rb_ary_shift(args);
+  char *name = StringValuePtr(value);
 //  std::cout << "trying kernel call: " << name << " " <<  rb_intern(name) << std::endl;
   return rb_apply(module,rb_intern(name),args);
 //  return rb_apply(rb_mKernel,rb_intern(name),args);
@@ -176,8 +180,8 @@ void XMRuby::textEntered(const QString & text) {
 
   VALUE args = rb_ary_new2(2);
   rb_ary_store(args,0,rb_str_new2("wrap_onTextEntered"));
-  QCString ctmp = text.utf8();
-  rb_ary_store(args,1, rb_str_new(ctmp,ctmp.length()));
+  QByteArray ctmp = text.toUtf8();
+  rb_ary_store(args,1, rb_str_new(ctmp.data(),ctmp.length()));
   int err;
   rb_protect(int_call_glob_func,args,&err);
   if(err != 0)
@@ -190,10 +194,10 @@ bool XMRuby::keyPressed(const QString & key, const QString & ascii) {
 
   VALUE args = rb_ary_new2(3);
   rb_ary_store(args,0,rb_str_new2("wrap_onKeyPressed"));
-  QCString ctmp = key.utf8();
-  rb_ary_store(args,1, rb_str_new(ctmp,ctmp.length()));
-  ctmp = ascii.utf8();
-  rb_ary_store(args,2, rb_str_new(ctmp,ctmp.length()));
+  QByteArray ctmp = key.toUtf8();
+  rb_ary_store(args,1, rb_str_new(ctmp.data(), ctmp.length()));
+  ctmp = ascii.toUtf8();
+  rb_ary_store(args,2, rb_str_new(ctmp.data(), ctmp.length()));
   int err;
   bool ret = (rb_protect(int_call_glob_func,args,&err) == Qtrue ? true:false);
   if(err != 0)
@@ -207,8 +211,8 @@ void XMRuby::textReceived(const QString & line, int id) {
 
   VALUE args = rb_ary_new2(3);
   rb_ary_store(args, 0,rb_str_new2("wrap_onTextReceived"));
-  QCString ctmp = line.utf8();
-  rb_ary_store(args, 1, rb_str_new(ctmp,ctmp.length()));
+  QByteArray ctmp = line.toUtf8();
+  rb_ary_store(args, 1, rb_str_new(ctmp.data(),ctmp.length()));
   rb_ary_store(args, 2,INT2NUM(id));
   int err;
   rb_protect(int_call_glob_func,args,&err);
@@ -334,8 +338,8 @@ QVariant XMRuby::pluginCall(int id, int function, const QVariant & vargs) {
   rb_ary_store(args,0,rb_str_new2("wrap_pluginCall"));
   rb_ary_store(args,1,INT2NUM(id));
   rb_ary_store(args,2,INT2NUM(function));
-  QCString ctmp = vargs.toString().utf8();
-  rb_ary_store(args, 1, rb_str_new(ctmp,ctmp.length()));
+  QByteArray ctmp = vargs.toString().toUtf8();
+  rb_ary_store(args, 1, rb_str_new(ctmp.data(), ctmp.length()));
   
   int err;
   VALUE ret = rb_protect(int_call_glob_func,args,&err);
@@ -346,6 +350,6 @@ QVariant XMRuby::pluginCall(int id, int function, const QVariant & vargs) {
   if(err != 0)
     reportError("pluginCall",err);
 
-  return QString::fromUtf8(STR2CSTR(ret));
+  return QString::fromUtf8(StringValuePtr(ret));
 }
 

@@ -64,7 +64,7 @@ STDIN.each { |line|
 	initCode += "  #{name} = NUM2INT(p#{name});\n";
       elsif type == 'char*'
 	initCode += "  if(TYPE(p#{name}) != T_STRING) {\n    std::cout << TYPE(p#{name});\n    rb_raise(rb_eTypeError, \"#{name} has no valid value\");\n    return Qnil;\n  }\n";
-	initCode += "  #{name} = QString::fromUtf8(STR2CSTR(p#{name}));\n";
+	initCode += "  #{name} = QString::fromUtf8(StringValuePtr(p#{name}));\n";
       end
       if(m != nil)
 	initCode += "  }\n";
@@ -85,7 +85,7 @@ STDIN.each { |line|
     elsif functionType == "char"
       $functions += "  return rb_str_new(&ret,1);\n}\n";
     elsif functionType == "QString"
-      $functions += "  QCString ctmp = ret.utf8();\n  return rb_str_new(ctmp,ctmp.length());\n}\n";      
+      $functions += "  QByteArray ctmp = ret.toUtf8();\n  return rb_str_new(ctmp.data(),ctmp.length());\n}\n";
     end
   end
 }
