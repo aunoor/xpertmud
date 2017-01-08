@@ -6,8 +6,6 @@ endif()
 
 project(xmrubyinterpreter)
 
-include(FindRuby)
-
 file (GLOB HDR
         XMRuby.h
         XMRubyFactory.h

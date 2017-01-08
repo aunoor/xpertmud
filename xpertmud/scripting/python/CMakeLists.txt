@@ -6,14 +6,6 @@ endif()
 
 project(xmpythoninterpreter)
 
-#we use Python 2.x
-set(Python_ADDITIONAL_VERSIONS 2.7 2.6 2.5 2.4)
-
-include(FindPythonLibs)
-include(FindPythonInterp)
-
-#for manual link against Python use PYTHON_LIBRARY and PYTHON_INCLUDE_DIR
-
 file (GLOB HDR
         XMPython.h
         XMPythonFactory.h

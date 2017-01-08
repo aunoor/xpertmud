@@ -6,21 +6,6 @@ endif()
 
 project(xmperlinterpreter)
 
-include(FindPerl)
-include(FindPerlLibs)
-
-#for manual link against Perl use PERL_LIBRARY and PERL_INCLUDE_PATH
-
-if (NOT PERL_INCLUDE_PATH)
-    execute_process(COMMAND bash "-c" "${PERL_EXECUTABLE} -MExtUtils::Embed -e perl_inc| ${PERL_EXECUTABLE} -pe 's/-I//g'" OUTPUT_VARIABLE PERL_INCLUDE_PATH)
-    execute_process(COMMAND bash "-c" "${PERL_EXECUTABLE} -MExtUtils::Embed -e ldopts | ${PERL_EXECUTABLE} -ne 'if (m/-L(\\S+)/) {print $1}'" OUTPUT_VARIABLE PERL_LIBRARY_PATH)
-    set(PERL_LIBRARY perl)
-    link_directories(${PERL_LIBRARY_PATH})
-    message(STATUS "Perl incs: " ${PERL_INCLUDE_PATH})
-endif (NOT PERL_INCLUDE_PATH)
-
-
-
 file (GLOB HDR
         PerlInterpret.h
         XMPerl.h
