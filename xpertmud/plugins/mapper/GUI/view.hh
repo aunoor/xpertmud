@@ -1,13 +1,13 @@
 #ifndef XMUD_MAPVIEW_H
 #define XMUD_MAPVIEW_H
-#include <qcanvas.h>
+#include <QGraphicsView>
 
 class QMouseEvent;
 
-class XMMmapView:public QCanvasView {
+class XMMmapView:public QGraphicsView {
   Q_OBJECT
 public:
-  XMMmapView(QWidget *parent, const char *name);
+  XMMmapView(QWidget *parent);
   ~XMMmapView();
 
 signals:

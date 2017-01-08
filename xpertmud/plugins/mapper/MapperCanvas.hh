@@ -2,10 +2,10 @@
 #ifndef XMUD_MAPPERCANVAS_H
 #define XMUD_MAPPERCANVAS_H
 
-#include <qcanvas.h>
+#include <QGraphicsView>
 
 
-class MapperCanvas:public QCanvas {
+class MapperCanvas:public QGraphicsView {
   Q_OBJECT
 public:
   MapperCanvas(QObject *parent, const char *name);

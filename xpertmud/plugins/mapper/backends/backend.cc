@@ -1,8 +1,12 @@
 #include "backend.hh"
 
-XMMbackend::XMMbackend(QObject *parent, const char *name) :
-  QObject(parent, name) {
+XMMbackend::XMMbackend(QObject *parent) :
+  QObject(parent) {
 }
 
 XMMbackend::~XMMbackend() {
+}
+
+void XMMbackend::slotConfig(QWidget *parent) {
+
 }

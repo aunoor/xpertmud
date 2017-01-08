@@ -7,21 +7,28 @@ endif()
 project(xmud_mapper)
 
 file (GLOB HDR
-        MapperCanvas.hh
-        MapperGUI.hh
-        MapperMenu.hh
-        MapperRoom.hh
-        MapperZoneBox.hh
+        GUI/main.hh
+        GUI/menu.hh
+        GUI/view.hh
+        GUI/zonelist.hh
+        core/map.hh
+        core/zone.hh
+        core/zonelist.hh
+        backends/backend.hh
+        backends/backend-dummy.hh
         ${CMAKE_SOURCE_DIR}/compat/klibloader.h
         ${CMAKE_SOURCE_DIR}/compat/kgenericfactory.h
         )
 
 file (GLOB SRCS
-        MapperCanvas.cc
-        MapperGUI.cc
-        MapperMenu.cc
-        MapperRoom.cc
-        MapperZoneBox.cc
+        GUI/main.cc
+        GUI/menu.cc
+        GUI/view.cc
+        GUI/zonelist.cc
+        core/map.cc
+        core/zone.cc
+        backends/backend.cc
+        backends/backend-dummy.cc
         ${CMAKE_SOURCE_DIR}/compat/kglobal.cc
         )
 
@@ -30,6 +37,9 @@ find_package(Qt5Widgets REQUIRED)
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/GUI/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/backends/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/core/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../)
 
 add_library(${PROJECT_NAME} SHARED ${SRCS} ${HDR})

@@ -20,7 +20,9 @@ public:
 signals:
   void callback(int func, const QVariant & args, QVariant & result);
   void emitBackendSelected(XMMbackend *backend);
-  void emitAddZone(QString *zonename);
+  void emitAddZone(QString zonename);
+  void emitDelZone();
+  void emitRenameZone(QString zonename);
 
 public slots:
   void slotFunctionCall(int func, const QVariant & args, QVariant & result);

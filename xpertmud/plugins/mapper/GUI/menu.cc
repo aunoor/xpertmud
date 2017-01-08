@@ -1,36 +1,39 @@
 #include "menu.hh"
 #include "backend.hh"
-#include <qpopupmenu.h>
+#include <QMenu>
 
-XMMmenu::XMMmenu(QWidget *parent = 0, 
-		       const char *name = 0):
-  QMenuBar(parent, name) {
-  files = new QPopupMenu(this, "mapperFilesMenu");
-  CHECK_PTR(files);
-  files->insertItem("&New Map", parent, SLOT(slotNewMap()), 0, 0, 0);
-  files->insertItem("&Open Map", parent, SLOT(slotOpenMap()), 0, 1, 1);
-  files->insertItem("&Save Map", parent, SLOT(slotSaveMap()), 0, 2, 2);
-  files->insertItem("&Close Map", parent, SLOT(slotCloseMap()), 0, 3, 3);
+XMMmenu::XMMmenu(QWidget *parent):
+  QMenuBar(parent) {
+  QAction *ta;
+
+  files = new QMenu("mapperFilesMenu", this);
+  files->setTitle("&Files");
+
+  files->addAction("&New Map", parent, SLOT(slotNewMap()));
+  files->addAction("&Open Map", parent, SLOT(slotOpenMap()));
+  files->addAction("&Save Map", parent, SLOT(slotSaveMap()));
+  files->addAction("&Close Map", parent, SLOT(slotCloseMap()));
   
-  settings = new QPopupMenu(this, "mapperSettingsMenu");
-  CHECK_PTR(settings);
-  settings->insertItem("Select &Backend", this, SLOT(slotSelectBackend()), 0, 0, 0);
-  settings->insertItem("Configure Backend", this, SLOT(slotConfigBackend()), 0, 1, 1);
-  settings->setItemEnabled(1, false);
+  settings = new QMenu("mapperSettingsMenu", this);
+  settings->setTitle("&Settings");
+  settings->addAction("Select &Backend", this, SLOT(slotSelectBackend()));
+  ta=settings->addAction("Configure Backend", this, SLOT(slotConfigBackend()));
+  ta->setProperty("id",1);
+  ta->setEnabled(false);
 
-  zones = new QPopupMenu(this, "mapperZonesMenu");
-  CHECK_PTR(zones);
-  zones->insertItem("&New Zone", parent, SLOT(slotNewZoneDialog()), 0, 0, 0);
-  zones->insertItem("&Delete current zone", parent, SLOT(slotDelZoneDialog()), 0, 1, 1);
-  zones->insertItem("&Rename current zone", parent, SLOT(slotRenameZoneDialog()), 0, 2, 2);
+  zones = new QMenu("mapperZonesMenu", this);
+  zones->setTitle("&Zones");
+  zones->addAction("&New Zone", parent, SLOT(slotNewZoneDialog()));
+  zones->addAction("&Delete current zone", parent, SLOT(slotDelZoneDialog()));
+  zones->addAction("&Rename current zone", parent, SLOT(slotRenameZoneDialog()));
 
-  edit = new QPopupMenu(this, "mapperEditMenu");
-  CHECK_PTR(edit);
-  edit->insertItem("&Zones", zones, 0, 0);
+  edit = new QMenu("mapperEditMenu", this);
+  edit->setTitle("&Edit");
+  edit->addMenu(zones);
 
-  this->insertItem("&Files", files);
-  this->insertItem("&Edit", edit);
-  this->insertItem("&Settings", settings);
+  this->addMenu(files);
+  this->addMenu(edit);
+  this->addMenu(settings);
 }
 
 
@@ -51,5 +54,10 @@ void XMMmenu::slotSelectBackend() {
 
 void XMMmenu::slotBackendSelected(XMMbackend *backend) {
   connect(this, SIGNAL(emitConfigBackend(QWidget *)), backend, SLOT(slotConfig(QWidget *)));
-  settings->setItemEnabled(1, true);
+  foreach(QAction *ta, settings->actions()) {
+      if (ta->property("id").toInt()==1) {
+        ta->setEnabled(true);
+        break;
+      }
+  }
 }

@@ -5,39 +5,37 @@
 #include "map.hh"
 #include "zonelist.hh"
 #include <kgenericfactory.h>
-#include <qlayout.h>
-#include <qvariant.h>
-#include <qcanvas.h>
-#include <qmenubar.h>
-#include <qmessagebox.h>
-#include <qinputdialog.h>
-#include <qlineedit.h>
+#include <QHBoxLayout>
+#include <QMessageBox>
+#include <QInputDialog>
+#include <QLineEdit>
 
 XmudMapper::XmudMapper(QWidget *parent, 
 		       const char *name,
 		       const QStringList & /* unused: args*/):
-  QWidget(parent,name) {
+  QWidget(parent) {
 
   backend = 0;
   map = 0;
 
-  mapview = new XMMmapView (this, "mapperMapView");
-  CHECK_PTR(mapview);
+  mapview = new XMMmapView (this);
+  mapview->setObjectName("mapperMapView");
 
-  zonelist = new XMMzonelist(this, "mapperZonelist");
-  CHECK_PTR(zonelist);
+  zonelist = new XMMzonelist(this);
+  zonelist->setObjectName("mapperZonelist");
 
-  menu = new XMMmenu(this, "mapperMenu");
-  CHECK_PTR(menu);
+  menu = new XMMmenu(this);
+  menu->setObjectName("mapperMenu");
+
   connect(menu, SIGNAL(emitSelectBackend(int)), 
 	  this, SLOT(slotSelectBackend(int)));
   connect(this, SIGNAL(emitBackendSelected(XMMbackend *)), 
 	  menu, SLOT(slotBackendSelected(XMMbackend *)));
 
-  layout = new QHBoxLayout(this, 2);
-  CHECK_PTR(layout);
+  layout = new QHBoxLayout(this);
   layout->addWidget(zonelist);
   layout->addWidget(mapview);
+  setLayout(layout);
 }
 
 XmudMapper::~XmudMapper() {
@@ -66,9 +64,9 @@ void XmudMapper::slotSelectBackend(int backend_id) {
     backend = 0;
   }
   if (backend_id == BACKEND_DUMMY) {
-    newbackend = new XMMbackend_dummy(this, "mapperBackend");
+    newbackend = new XMMbackend_dummy(this);
+    newbackend->setObjectName("mapperBackend");
   }
-  CHECK_PTR(newbackend);
   backend = newbackend;
   emit emitBackendSelected(backend);
 }
@@ -79,9 +77,10 @@ void XmudMapper::slotNewMap() {
     return;
   }
   slotCloseMap();
-  map = new XMMmap(this, "mapperMap", 0);
-  CHECK_PTR(map);
-  mapview->setCanvas(map->canvas());
+  map = new XMMmap(this);
+  map->setObjectName("mapperMap");
+
+//  mapview->setCanvas(map->canvas());
   connect(mapview, SIGNAL(emitAddRoom(int, int)), map, SLOT(slotAddRoom(int, int)));
   connect(this, SIGNAL(emitAddZone(QString *)), map, SLOT(slotAddZone(QString *)));
   connect(map, SIGNAL(emitZoneAdded(QString, int)), zonelist, SLOT(slotAddZone(QString, int)));
@@ -99,7 +98,7 @@ void XmudMapper::slotOpenMap() {
 
 void XmudMapper::slotCloseMap() {
   slotSaveMap();
-  mapview->setCanvas(0);
+//  mapview->setCanvas(0);
 }
 
 void XmudMapper::slotSaveMap() {
@@ -107,9 +106,9 @@ void XmudMapper::slotSaveMap() {
 
 void XmudMapper::slotNewZoneDialog() {
   bool ok = false;
-  QString zonename = QInputDialog::getText("New Zone Name", "Please enter the new zone's name", QLineEdit::Normal, QString::null, &ok, this, 0);
+  QString zonename = QInputDialog::getText(this, "New Zone Name", "Please enter the new zone's name", QLineEdit::Normal, QString::null, &ok);
   if (ok) {
-    emit emitAddZone(&zonename);
+    emit emitAddZone(zonename);
   }
 }
 
@@ -121,14 +120,14 @@ void XmudMapper::slotDelZoneDialog() {
 
 void XmudMapper::slotRenameZoneDialog() {
   bool ok = false;
-  QString zonename = QInputDialog::getText("Zone New Name", "Please enter the current zone's new name", QLineEdit::Normal, QString::null, &ok, this, 0);
+  QString zonename = QInputDialog::getText(this, "Zone New Name", "Please enter the current zone's new name", QLineEdit::Normal, QString::null, &ok);
   if (ok) {
-    emit emitRenameZone(&zonename);
+    emit emitRenameZone(zonename);
   }
 }
 
 void XmudMapper::slotChangeZone(int zoneid) {
-  mapview->setCanvas(map->canvas());
+//  mapview->setCanvas(map->canvas());
   // XXX changer l'item courant dans zonelist
 }
 

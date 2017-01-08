@@ -1,6 +1,8 @@
 #ifndef XMUD_MAPPERBACKEND_H
 #define XMUD_MAPPERBACKEND_H
-#include <qobject.h>
+
+#include <QObject>
+
 class QWidget;
 
 #define BACKEND_DUMMY 0
@@ -8,7 +10,7 @@ class QWidget;
 class XMMbackend:public QObject {
   Q_OBJECT
 public:
-  XMMbackend(QObject *parent, const char *name);
+  XMMbackend(QObject *parent = 0);
   ~XMMbackend() ;
   
 public slots:
@@ -17,4 +19,3 @@ public slots:
 }; 
 
 #endif
-

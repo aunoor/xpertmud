@@ -1,6 +1,7 @@
 #ifndef XMUD_MENU_H
 #define XMUD_MENU_H
-#include <qmenubar.h>
+#include <QMenuBar>
+#include <QMouseEvent>
 
 class XMMbackend;
 class QWidget;
@@ -8,17 +9,17 @@ class QWidget;
 class XMMmenu:public QMenuBar {
   Q_OBJECT
 public:
-  XMMmenu(QWidget *parent, const char *name);
+  XMMmenu(QWidget *parent = 0);
   ~XMMmenu();
 
 public slots:
   void slotBackendSelected(XMMbackend *backend);
 
 protected:
-  QPopupMenu *settings;
-  QPopupMenu *files;
-  QPopupMenu *edit;
-  QPopupMenu *zones;
+  QMenu *settings;
+  QMenu *files;
+  QMenu *edit;
+  QMenu *zones;
 
 protected slots:
   void slotSelectBackend();

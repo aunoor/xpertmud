@@ -11,7 +11,7 @@ class QCanvas;
 class XMMmap:public QObject {
   Q_OBJECT
 public:
-  XMMmap(QObject *parent, const char *name, const char *mapname);
+  XMMmap(QObject *parent = 0, QString mapname=QString());
   ~XMMmap();
   QCanvas *canvas();
 
@@ -21,12 +21,12 @@ signals:
 
 public slots:
   void slotAddRoom(int x, int y);
-  void slotAddZone(QString *zonename);
+  void slotAddZone(QString zonename);
   void slotSelectZone(int zoneid);
 
 protected:
   XMMzone *findZone(int zoneid);
-  QList<XMMzone> zones;
+  QList<XMMzone*> zones;
   XMMzone *zone;
   int next_zone_id;
 }; 

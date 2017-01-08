@@ -1,20 +1,15 @@
 #include "map.hh"
-#include <qcanvas.h>
-#include <qstring.h>
 
-//debug
-#include <qmessagebox.h>
+#include <QMessageBox>
 
-XMMmap::XMMmap(QObject *parent = 0, 
-		     const char *name = 0,
-		     const char *mapname = 0):
-  QObject(parent, name) {
+XMMmap::XMMmap(QObject *parent, QString mapname):
+  QObject(parent) {
   zone = 0;
   next_zone_id = 0;
-  zones.setAutoDelete(true);
 }
 
 XMMmap::~XMMmap() {
+  qDeleteAll(zones);
 }
 
 QCanvas *XMMmap::canvas() {
@@ -25,23 +20,17 @@ QCanvas *XMMmap::canvas() {
 }
 
 XMMzone *XMMmap::findZone(int zoneid) {
-  XMMzone *tmpzone = 0;
-  XMMzone *subzone = 0;
-  tmpzone = zones.first();
-  while (tmpzone) {
-    if (tmpzone->getID() == zoneid)
-      return tmpzone;
-    if ((subzone = tmpzone->findSubZone(zoneid)))
-      return subzone;
-    tmpzone = zones.next();
+  foreach(XMMzone *tmpZone, zones) {
+      if (tmpZone->getID() == zoneid) return tmpZone;
+      XMMzone *subZone = tmpZone->findSubZone(zoneid);
+      if (subZone != NULL) return subZone;
   }
-  return 0;
+  return NULL;
 }
 
 void XMMmap::slotSelectZone(int zoneid) {
   XMMzone *tmpzone;
 
-  CHECK_PTR(zone);
   if (zoneid != zone->getID()) {
     tmpzone = findZone(zoneid);
     if (tmpzone) {
@@ -56,9 +45,8 @@ void XMMmap::slotAddRoom(int x, int y) {
   QMessageBox::information(0, "mapperMap debug", msg.arg(x).arg(y));
 }
 
-void XMMmap::slotAddZone(QString *zonename) {
+void XMMmap::slotAddZone(QString zonename) {
   XMMzone *newzone = new XMMzone(this, zonename, next_zone_id);
-  CHECK_PTR(newzone);
   next_zone_id++;
   zones.append(newzone);
   emit emitZoneAdded(newzone->getName(), newzone->getID());

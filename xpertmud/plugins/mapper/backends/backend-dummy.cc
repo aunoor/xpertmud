@@ -2,8 +2,8 @@
 #include <qwidget.h>
 #include <qmessagebox.h>
 
-XMMbackend_dummy::XMMbackend_dummy(QObject *parent = 0, const char *name = 0):
-  XMMbackend(parent, name) {
+XMMbackend_dummy::XMMbackend_dummy(QObject *parent):
+  XMMbackend(parent) {
 }
 
 XMMbackend_dummy::~XMMbackend_dummy(){
