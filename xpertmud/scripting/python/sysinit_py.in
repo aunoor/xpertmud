@@ -947,7 +947,7 @@ def __compose(match):
     if(re.compile(r'^##$').match(match.string)):
         composeBuffer += "\n"
         print "execing %s" % composeBuffer
-        exec composeBuffer in globals()
+        exec compile(composeBuffer, '<string>', 'exec') in globals()
         composeBuffer = ""
         return ""
     elif(re.compile(r'^##').match(match.string)):
