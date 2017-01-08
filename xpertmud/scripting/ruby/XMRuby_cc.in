@@ -124,7 +124,7 @@ void XMRuby::setCallback(GuiScriptingBindings *cB) {
 
     qDebug() << (ret?QString("Ruby initialized"):QString("Error on ruby init"));
 
-    initialized=true;
+    initialized=ret;
   }
 }
 
@@ -157,7 +157,9 @@ bool XMRuby::evalSysInit() {
   rb_gc_register_address(&tmp);
   int ret;
   rb_protect(int_ruby_eval,tmp,&ret);
+  if (ret) reportError("sysinit.rb",0);
   rb_gc_unregister_address(&tmp);
+  rb_eval_string("include XM");
   delete[] commandString;
   //just be nice and clean up, because we have a huge string
   // which noone will ever need again
