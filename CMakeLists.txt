@@ -118,12 +118,10 @@ source_group("Autogen files" FILES ${UI_GEN})
 
 set(MAIN_PROJ_NAME ${PROJECT_NAME})
 set_property(GLOBAL PROPERTY MCCP_SUPPORT OFF)
-#set_property(GLOBAL PROPERTY PYTHON_SUPPORT ON)
-#set_property(GLOBAL PROPERTY PERL_SUPPORT ON)
 set(MCCP_SUPPORT OFF CACHE BOOL "MCCP protocol support")
 set(PYTHON_SUPPORT ON CACHE  BOOL "Python scripting support")
 set(PERL_SUPPORT ON CACHE  BOOL "Perl scripting support")
-set(RUBY_SUPPORT ON CACHE  BOOL "Ruby scripting support")
+set(RUBY_SUPPORT OFF CACHE  BOOL "Ruby scripting support")
 
 if (MCCP_SUPPORT)
     if(WIN32)

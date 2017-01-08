@@ -1,7 +1,7 @@
 # set encoding to utf-8
 # that stuff is not very complete implemented afaik
 # so uppercase and stuff is crap but regexpes work at least .. I think
-require "weakref"
+require 'weakref'
 
 module XM
   $isEcho = 1
@@ -29,7 +29,7 @@ module XM
   end
 
   def showKeyNames()
-    rex = RegExp.compile('........ X')
+    rex = Regexp.compile('........ X')
     addKeyBinding('#SHOWKEYS', /^(.*)$/,
                   (proc { |m|
                     statusWindow().setFGColor(2)
@@ -539,8 +539,7 @@ module XM
   $helps = {};
 
   def help(helpOn = "", base = $helps, preDesc = "")
-    prs("Sorry, not yet
-");
+    prs("Sorry, not yet");
   end
 
 
