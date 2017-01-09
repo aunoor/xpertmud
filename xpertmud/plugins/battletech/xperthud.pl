@@ -36,9 +36,9 @@ statusWindow->print(ansi("Many more keybindings available, please read the sourc
 # I told you that this is just an example script. so don't complain!
 # But if you don't mind, please let it in, it helps us to get an good guess on the current userbase
 
-addDelayed("Advertisment",3*60,sub {
-             XM::sendText('@force me=@doing %cb%chhttp://xpertmud.sf.net/%cn'."\n");
-           });
+# addDelayed("Advertisment",3*60,sub {
+#              XM::sendText('@force me=@doing %cb%chhttp://xpertmud.sf.net/%cn'."\n");
+#            });
 
 
 
