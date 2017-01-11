@@ -5,6 +5,7 @@
 #include <QDebug>
 
 XMMbackend_TMW::XMMbackend_TMW(QObject *parent) : XMMAbstractBackend(parent) {
+  m_parseState = bpsIdle;
   menu = new QMenu("XmTmwMenu");
   menu->setTitle("Operations");
 
@@ -30,9 +31,13 @@ QString XMMbackend_TMW::getBackendName() {
 }
 
 void XMMbackend_TMW::slotAutoGenerateMap() {
-  if(getParent()) {
-    getParent()->slotAddTrigger();
-  }
+  XmudMapper *mapper = getParent();
+  if(!mapper) return;
+
+  m_parseState = bpsWaitRoom;
+  mapper->slotAddTrigger();
+  mapper->slotSendLine("@search type=room\n");
+
 }
 
 XMBackends XMMbackend_TMW::getId() {
@@ -40,5 +45,38 @@ XMBackends XMMbackend_TMW::getId() {
 }
 
 void XMMbackend_TMW::parseLine(QString line) {
-  qDebug() << "line:" << line;
+
+  if (m_parseState==bpsIdle) return; //just skip
+
+  if(m_parseState==bpsWaitRoom) { //wait for "ROOMS:" - start of rooms list
+    if (line.trimmed()=="ROOMS:") {
+      m_parseState = bpsWaitEnd;
+    }
+    return;
+  }
+
+  if(m_parseState==bpsWaitEnd) { //processing line as room item and wait for list end
+    if (line.contains("Found:  Rooms...")) {
+      //end of rooms list
+      m_parseState = bpsIdle;
+      return;
+    }
+
+    QString rLine = line.trimmed();
+    QRegExp re("\\(#\\d+:.+\\)");
+
+    int idIdx = rLine.indexOf(re);
+    if (idIdx==-1) return; //skip line
+
+    QString rName = rLine.left(idIdx);
+
+    QString rNumber=re.cap(0);
+    rNumber = rNumber.mid(1,rNumber.indexOf(':')-1);
+
+    qDebug() << "Name:" << rName << "number:"<< rNumber;
+
+    return;
+  }
+
+
 }

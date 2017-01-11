@@ -40,6 +40,7 @@ public slots:
   void slotDelZoneDialog();
   void slotAddTrigger();
   void slotDelTrigger();
+  void slotSendLine(QString line);
 
 protected:
   QSplitter *m_splitter;

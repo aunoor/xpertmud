@@ -19,7 +19,14 @@ public:
     void parseLine(QString line) override;
 
 private:
+    enum BPState {
+        bpsIdle = 0,
+        bpsWaitRoom,
+        bpsWaitEnd
+    };
+
     QMenu *menu;
+    BPState m_parseState;
 
 private slots:
     void slotAutoGenerateMap();

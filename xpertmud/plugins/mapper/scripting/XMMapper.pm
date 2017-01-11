@@ -36,9 +36,13 @@ sub function {
         ,0,1);
          return "Trigger enabled";
       }
-    elsif($id==1) {
+  elsif($id==1) {
       XM::deleteTrigger("XMMAPPER_TRIGGER");
       return "Trigger deleted";
     }
+  elsif ($id==2) {
+    XM::sendText($args);
+  }
+
     else {return SUPER::function(@_);}
 }

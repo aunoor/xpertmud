@@ -175,4 +175,9 @@ void XmudMapper::slotDelTrigger() {
   emit callback(1, QVariant(), result);
 }
 
+void XmudMapper::slotSendLine(QString line) {
+  QVariant result;
+  emit callback(2, line, result);
+}
+
 K_EXPORT_COMPONENT_FACTORY( xmud_mapper, KGenericFactory<XmudMapper>( "xmud_mapper" ) );
