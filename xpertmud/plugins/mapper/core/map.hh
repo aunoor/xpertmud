@@ -16,6 +16,8 @@ public:
   ~XMMmap();
   QCanvas *canvas();
   XMZoneModel *getModel();
+  void addNewRoom(XMObject *object);
+
 
 signals:
   void emitZoneAdded(QString zonename, int uniqueid);

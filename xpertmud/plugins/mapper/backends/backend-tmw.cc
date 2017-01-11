@@ -1,8 +1,10 @@
 #include "backend-tmw.h"
 #include "main.hh"
 #include "menu.hh"
+#include "mobject.hh"
 
 #include <QDebug>
+#include <QMessageBox>
 
 XMMbackend_TMW::XMMbackend_TMW(QObject *parent) : XMMAbstractBackend(parent) {
   m_parseState = bpsIdle;
@@ -33,6 +35,11 @@ QString XMMbackend_TMW::getBackendName() {
 void XMMbackend_TMW::slotAutoGenerateMap() {
   XmudMapper *mapper = getParent();
   if(!mapper) return;
+
+  if (mapper->getMap() == NULL) {
+    QMessageBox::information(mapper, "Auto Mapper GUI", "You need to create map first");
+    return;
+  }
 
   m_parseState = bpsWaitRoom;
   mapper->slotAddTrigger();
@@ -72,6 +79,10 @@ void XMMbackend_TMW::parseLine(QString line) {
 
     QString rNumber=re.cap(0);
     rNumber = rNumber.mid(1,rNumber.indexOf(':')-1);
+
+    XMObject *newRoom = new XMObject(rName, XMTRoom, rNumber);
+
+    emit newRoomSignal(newRoom);
 
     qDebug() << "Name:" << rName << "number:"<< rNumber;
 

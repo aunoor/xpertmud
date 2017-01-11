@@ -32,7 +32,7 @@ void XMMmap::slotSelectZone(int zoneid) {
   XMObject *tmpzone;
 
   if (zoneid != zone->getID()) {
-    tmpzone = findZone(zoneid);
+    tmpzone = findObject(zoneid);
     if (tmpzone) {
       zone = tmpzone;
       emit emitChangeZone(zoneid);
@@ -57,4 +57,8 @@ void XMMmap::slotAddZone(QString zonename) {
     emit emitChangeZone(newzone->getID());
   }
 */
+}
+
+void XMMmap::addNewRoom(XMObject *object) {
+  m_zoneModel->addNewRoom(object);
 }

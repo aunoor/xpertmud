@@ -5,8 +5,8 @@ XMZoneModel::XMZoneModel(QObject *parent) : QAbstractItemModel(parent) {
 }
 
 XMZoneModel::~XMZoneModel() {
-  qDeleteAll(m_zones);
-  m_zones.clear();
+  qDeleteAll(m_objects);
+  m_objects.clear();
 }
 
 QVariant XMZoneModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -31,7 +31,7 @@ QVariant XMZoneModel::headerData(int section, Qt::Orientation orientation, int r
 
 QModelIndex XMZoneModel::index(int row, int column, const QModelIndex &parent) const {
   if (!parent.isValid()) {
-    if (row>=m_zones.count()) return QModelIndex();
+    if (row>=m_objects.count()) return QModelIndex();
     if (column>=columnCount(parent)) return QModelIndex();
     return createIndex(row, column);
   }
@@ -43,7 +43,7 @@ QModelIndex XMZoneModel::parent(const QModelIndex &child) const {
 }
 
 int XMZoneModel::rowCount(const QModelIndex &parent) const {
-  if (!parent.isValid()) return m_zones.count();
+  if (!parent.isValid()) return m_objects.count();
   return 0;
 }
 
@@ -53,14 +53,62 @@ int XMZoneModel::columnCount(const QModelIndex &parent) const {
 }
 
 QVariant XMZoneModel::data(const QModelIndex &index, int role) const {
+
+  if (role == Qt::DisplayRole) {
+
+    XMObject *tmpObject;
+
+    if (!index.parent().isValid()) {
+
+      tmpObject = m_objects.at(index.row());
+
+      switch (index.column()) {
+        case 0:
+          return tmpObject->getID();
+        case 1:
+          return tmpObject->getName();
+        default:
+          return QVariant();
+      }
+    }
+  }
+
   return QVariant();
 }
 
-XMObject *XMZoneModel::findZone(int zoneid) {
-          foreach(XMObject *tmpZone, m_zones) {
-      if (tmpZone->getID() == zoneid) return tmpZone;
-      XMObject *subZone = tmpZone->findSubObject(zoneid);
+XMObject *XMZoneModel::findObject(QString id) {
+    foreach(XMObject *tmpObject, m_objects) {
+      if (tmpObject->getID() == id) return tmpObject;
+      XMObject *subZone = tmpObject->findSubObject(id);
       if (subZone != NULL) return subZone;
     }
   return NULL;
+}
+
+XMObject *XMZoneModel::findObject(XMObject *object) {
+    foreach(XMObject *tmpObject, m_objects) {
+      if (tmpObject->getID()==object->getID() && tmpObject->getType()==object->getType())
+        return tmpObject;
+      if (object->getType()!=XMTRoom) {
+        //save some cpu time, because Room always is top level now
+        XMObject *subObject = tmpObject->findSubObject(object);
+        if (subObject != NULL) return subObject;
+      }
+    }
+  return NULL;
+}
+
+
+void XMZoneModel::addNewRoom(XMObject *object) {
+  XMObject * tmpObj = findObject(object->getID());
+  if (tmpObj==NULL) {
+    beginInsertRows(QModelIndex(),m_objects.count(), m_objects.count());
+    m_objects.append(object);
+    endInsertRows();
+  } else {
+    int idx = m_objects.indexOf(tmpObj);
+    m_objects.replace(idx, object);
+    emit dataChanged(index(idx,0,QModelIndex()),index(idx,columnCount(QModelIndex())-1,QModelIndex()));
+    delete tmpObj;
+  }
 }

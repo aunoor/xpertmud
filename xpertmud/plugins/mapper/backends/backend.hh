@@ -6,6 +6,7 @@
 
 class QWidget;
 class XmudMapper;
+class XMObject;
 
 class XMMAbstractBackend:public QObject {
   Q_OBJECT
@@ -27,6 +28,9 @@ private:
 
 public slots:
   void slotConfig(QWidget *parent);
+
+signals:
+  void newRoomSignal(XMObject *object);
 
 }; 
 

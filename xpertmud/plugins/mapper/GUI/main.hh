@@ -9,6 +9,7 @@ class XMMcore;
 class XMMmenu;
 class XMMmapView;
 class XMMmap;
+class XMObject;
 class XMMzonelist;
 class QVBoxLayout;
 class QSplitter;
@@ -19,6 +20,7 @@ public:
   XmudMapper(QWidget *parent, const char *name, const QStringList & args);
   ~XmudMapper();
   XMMmenu *getMenuBar();
+  XMMmap *getMap();
 
 signals:
   void callback(int func, const QVariant & args, QVariant & result);
@@ -41,6 +43,9 @@ public slots:
   void slotAddTrigger();
   void slotDelTrigger();
   void slotSendLine(QString line);
+
+private slots:
+  void slotNewRoom(XMObject *object);
 
 protected:
   QSplitter *m_splitter;

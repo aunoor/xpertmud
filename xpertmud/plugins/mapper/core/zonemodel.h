@@ -22,10 +22,13 @@ public:
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-    XMObject *findZone(int zoneid);
+    XMObject *findObject(QString id);
+    XMObject *findObject(XMObject *object);
+
+    void addNewRoom(XMObject* object);
 
 private:
-    QList<XMObject*> m_zones;
+    QList<XMObject*> m_objects;
 
     int m_next_zone_id;
 

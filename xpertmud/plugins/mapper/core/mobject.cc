@@ -1,7 +1,7 @@
 #include "mobject.hh"
 #include "map.hh"
 
-XMObject::XMObject(XMMmap *parent, QString objectName, XMType objectType, int objectId) {
+XMObject::XMObject(QString objectName, XMType objectType, QString objectId) {
   if (objectName.isEmpty())
     m_name = QString("New object");
   else
@@ -14,15 +14,19 @@ XMObject::~XMObject() {
 
 }
 
-XMObject *XMObject::findSubObject(int zoneid) {
+XMObject *XMObject::findSubObject(QString id) {
   return 0;
+}
+
+XMObject *XMObject::findSubObject(XMObject *object) {
+  return nullptr;
 }
 
 QString XMObject::getName() {
   return m_name;
 }
 
-int XMObject::getID() {
+QString XMObject::getID() {
   return m_id;
 }
 

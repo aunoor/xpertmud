@@ -63,6 +63,10 @@ XMMmenu *XmudMapper::getMenuBar() {
   return m_menu;
 }
 
+XMMmap *XmudMapper::getMap() {
+  return m_map;
+}
+
 void XmudMapper::slotFunctionCall(int func, const QVariant & args, QVariant & result) {
   switch(func) {
     case 0: {
@@ -101,6 +105,7 @@ void XmudMapper::slotSelectBackend(int backend_id) {
   newbackend->setObjectName("mapperBackend");
   m_backend = newbackend;
   emit emitBackendSelected(m_backend);
+  connect(m_backend, SIGNAL(newRoomSignal(XMObject*)), this, SLOT(slotNewRoom(XMObject*)));
 }
 
 void XmudMapper::slotNewMap() {
@@ -178,6 +183,12 @@ void XmudMapper::slotDelTrigger() {
 void XmudMapper::slotSendLine(QString line) {
   QVariant result;
   emit callback(2, line, result);
+}
+
+void XmudMapper::slotNewRoom(XMObject *object) {
+  if (m_map==NULL) return;
+
+  m_map->addNewRoom(object);
 }
 
 K_EXPORT_COMPONENT_FACTORY( xmud_mapper, KGenericFactory<XmudMapper>( "xmud_mapper" ) );

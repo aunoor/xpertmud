@@ -9,17 +9,18 @@ class XMMmap;
 
 class XMObject {
 public:
-  XMObject(XMMmap *parent, QString objectName=QString(), XMType objectType=XMTUnknown, int objectId=-1);
+  XMObject(QString objectName=QString(), XMType objectType=XMTUnknown, QString objectId=QString());
   virtual ~XMObject();
 
   QString getName();
-  int getID();
-  XMObject *findSubObject(int zoneid);
+  QString getID();
+  XMObject *findSubObject(QString id);
+  XMObject *findSubObject(XMObject *object);
 
   XMType getType();
 
 protected:
-  int m_id;
+  QString m_id;
   QString m_name;
   XMType m_type;
   QString m_flags;
