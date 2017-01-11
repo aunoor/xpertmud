@@ -106,14 +106,15 @@ void BookmarkEditor::addScriptingPage() {
   scriptingSelector->setEnabled(startInterp->isChecked());
   scriptingSelector->setEditable(false);
 
-  connect(startInterp,SIGNAL(toggled(bool)),
-	  scriptingSelector, SLOT(setEnabled(bool)));
+  connect(startInterp, &QCheckBox::toggled,
+          [=](bool toggled){scriptingSelector->setEnabled(toggled);
+              if (toggled) this->bookmark.setInterpreter(scriptingSelector->currentText());
+          });
 
   connect(scriptingSelector,SIGNAL(currentTextChanged(const QString &)),
 	  &bookmark,SLOT(setInterpreter(const QString &)));
 
-  QCheckBox * resetInterp = new QCheckBox(i18n("Reset Interpreter if already running?"),
-					  page);
+  QCheckBox * resetInterp = new QCheckBox(i18n("Reset Interpreter if already running?"), page);
   resetInterp->setChecked(bookmark.getResetInterpreter());
   resetInterp->setEnabled(startInterp->isChecked());
 
@@ -135,8 +136,6 @@ void BookmarkEditor::addScriptingPage() {
 
   connect(startInterp,SIGNAL(toggled(bool)),
 	  globalScriptEdit, SLOT(setEnabled(bool)));
-
-  
 }
 
 
