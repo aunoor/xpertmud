@@ -1,22 +1,23 @@
 #include "zonelist.hh"
+#include <QTreeView>
+#include <QVBoxLayout>
 
 XMMzonelist::XMMzonelist(QWidget *parent):
-  QListView(parent) {
-  int sortcol;
-/*
-  sortcol = addColumn("Zone Name");
-  addColumn("Unique Id");
-  setSorting(sortcol, true);
-*/
-  this->show();
+  QWidget(parent) {
+  QVBoxLayout *layout = new QVBoxLayout(this);
+  layout->setContentsMargins(0,0,0,0);
+  m_zonesView = new QTreeView(this);
+  layout->addWidget(m_zonesView);
 }
 
+XMMzonelist::~XMMzonelist() {
+
+}
 
 void XMMzonelist::slotAddZone(QString zonename, int uniqueid) {
-/*
-  QListViewItem *item;
-  QString idlabel = "%1";
-  item = new QListViewItem(this, zonename, idlabel.arg(uniqueid));
-  insertItem(item);
-*/
+
+}
+
+void XMMzonelist::setModel(QAbstractItemModel *model) {
+  m_zonesView->setModel(model);
 }

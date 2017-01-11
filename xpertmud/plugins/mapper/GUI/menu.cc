@@ -1,6 +1,8 @@
 #include "menu.hh"
 #include "backend.hh"
+
 #include <QMenu>
+#include <QDebug>
 
 XMMmenu::XMMmenu(QWidget *parent):
   QMenuBar(parent) {
@@ -13,13 +15,19 @@ XMMmenu::XMMmenu(QWidget *parent):
   files->addAction("&Open Map", parent, SLOT(slotOpenMap()));
   files->addAction("&Save Map", parent, SLOT(slotSaveMap()));
   files->addAction("&Close Map", parent, SLOT(slotCloseMap()));
-  
+
+  backends = new QMenu("backendListMenu", this);
+  backends->setTitle("Select Backend");
+  ta = backends->addAction("None", this, SLOT(slotSelectBackend()));
+  ta->setProperty("id", (int)XMBDummy);
+  ta->setCheckable(true);
+  ta = backends->addAction("TinyMU*  Wizard", this, SLOT(slotSelectBackend()));
+  ta->setProperty("id", (int)XMBTMW);
+  ta->setCheckable(true);
+
   settings = new QMenu("mapperSettingsMenu", this);
   settings->setTitle("&Settings");
-  settings->addAction("Select &Backend", this, SLOT(slotSelectBackend()));
-  ta=settings->addAction("Configure Backend", this, SLOT(slotConfigBackend()));
-  ta->setProperty("id",1);
-  ta->setEnabled(false);
+  settings->addMenu(backends);
 
   zones = new QMenu("mapperZonesMenu", this);
   zones->setTitle("&Zones");
@@ -44,20 +52,20 @@ XMMmenu::~XMMmenu() {
   files = 0;
 }
 
-void XMMmenu::slotConfigBackend() {
-  emit emitConfigBackend(this);
-}
-
 void XMMmenu::slotSelectBackend() {
-  emit emitSelectBackend(BACKEND_DUMMY);
+  QAction *ta = dynamic_cast<QAction*>(sender());
+  if (ta==NULL) return;
+  int id;
+  bool ok;
+  id = ta->property("id").toInt(&ok);
+  if (!ok) return;
+
+  emit emitSelectBackend(id);
 }
 
-void XMMmenu::slotBackendSelected(XMMbackend *backend) {
-  connect(this, SIGNAL(emitConfigBackend(QWidget *)), backend, SLOT(slotConfig(QWidget *)));
-  foreach(QAction *ta, settings->actions()) {
-      if (ta->property("id").toInt()==1) {
-        ta->setEnabled(true);
-        break;
-      }
+void XMMmenu::slotBackendSelected(XMMAbstractBackend *backend) {
+  qDebug() << "backend id="<<backend->getId();
+  foreach(QAction *ta, backends->actions()) {
+      ta->setChecked(ta->property("id").toInt()==backend->getId());
   }
 }

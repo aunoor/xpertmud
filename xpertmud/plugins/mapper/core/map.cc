@@ -4,32 +4,32 @@
 
 XMMmap::XMMmap(QObject *parent, QString mapname):
   QObject(parent) {
-  zone = 0;
-  next_zone_id = 0;
+  //zone = 0;
+  m_zoneModel = new XMZoneModel(this);
 }
 
 XMMmap::~XMMmap() {
-  qDeleteAll(zones);
+  //qDeleteAll(zones);
+}
+
+XMZoneModel *XMMmap::getModel() {
+  return m_zoneModel;
 }
 
 QCanvas *XMMmap::canvas() {
+/*
   if (zone)
     return zone->canvas;
   else
     return 0;
+*/
 }
 
-XMMzone *XMMmap::findZone(int zoneid) {
-  foreach(XMMzone *tmpZone, zones) {
-      if (tmpZone->getID() == zoneid) return tmpZone;
-      XMMzone *subZone = tmpZone->findSubZone(zoneid);
-      if (subZone != NULL) return subZone;
-  }
-  return NULL;
-}
+
 
 void XMMmap::slotSelectZone(int zoneid) {
-  XMMzone *tmpzone;
+/*
+  XMObject *tmpzone;
 
   if (zoneid != zone->getID()) {
     tmpzone = findZone(zoneid);
@@ -38,6 +38,7 @@ void XMMmap::slotSelectZone(int zoneid) {
       emit emitChangeZone(zoneid);
     }
   }
+*/
 }
 
 void XMMmap::slotAddRoom(int x, int y) {
@@ -46,7 +47,8 @@ void XMMmap::slotAddRoom(int x, int y) {
 }
 
 void XMMmap::slotAddZone(QString zonename) {
-  XMMzone *newzone = new XMMzone(this, zonename, next_zone_id);
+/*
+  XMObject *newzone = new XMObject(this, zonename, next_zone_id);
   next_zone_id++;
   zones.append(newzone);
   emit emitZoneAdded(newzone->getName(), newzone->getID());
@@ -54,4 +56,5 @@ void XMMmap::slotAddZone(QString zonename) {
     zone = newzone;
     emit emitChangeZone(newzone->getID());
   }
+*/
 }

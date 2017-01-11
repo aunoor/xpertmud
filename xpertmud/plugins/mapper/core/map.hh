@@ -1,9 +1,10 @@
 #ifndef XMUD_MAPPERMAP_H
 #define XMUD_MAPPERMAP_H
-#include <qobject.h>
-#include "zone.hh"
-#include <qlist.h>
-#include <qstring.h>
+
+#include "mobject.hh"
+#include "zonemodel.h"
+
+#include <QString>
 
 class QCanvas;
 
@@ -14,6 +15,7 @@ public:
   XMMmap(QObject *parent = 0, QString mapname=QString());
   ~XMMmap();
   QCanvas *canvas();
+  XMZoneModel *getModel();
 
 signals:
   void emitZoneAdded(QString zonename, int uniqueid);
@@ -25,10 +27,8 @@ public slots:
   void slotSelectZone(int zoneid);
 
 protected:
-  XMMzone *findZone(int zoneid);
-  QList<XMMzone*> zones;
-  XMMzone *zone;
-  int next_zone_id;
+  XMZoneModel *m_zoneModel;
+
 }; 
 
 

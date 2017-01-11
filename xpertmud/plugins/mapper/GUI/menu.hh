@@ -3,7 +3,7 @@
 #include <QMenuBar>
 #include <QMouseEvent>
 
-class XMMbackend;
+class XMMAbstractBackend;
 class QWidget;
 
 class XMMmenu:public QMenuBar {
@@ -13,17 +13,17 @@ public:
   ~XMMmenu();
 
 public slots:
-  void slotBackendSelected(XMMbackend *backend);
+  void slotBackendSelected(XMMAbstractBackend *backend);
 
 protected:
   QMenu *settings;
   QMenu *files;
   QMenu *edit;
   QMenu *zones;
+  QMenu *backends;
 
 protected slots:
   void slotSelectBackend();
-  void slotConfigBackend();
 
 signals:
   void emitConfigBackend(QWidget *parent);

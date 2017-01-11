@@ -1,18 +1,27 @@
 #ifndef XMUD_MAPPERZONELIST_H
 #define XMUD_MAPPERZONELIST_H
 
-#include <QListView>
+#include <QWidget>
+#include <QtCore/QAbstractItemModel>
 
-class QWidget;
+class QTreeView;
 
-
-class XMMzonelist:public QListView {
+class XMMzonelist:public QWidget {
   Q_OBJECT
 public:
   XMMzonelist(QWidget *parent = 0);
+  virtual ~XMMzonelist();
+
+  void setModel(QAbstractItemModel *model);
+
+private:
+  QTreeView *m_zonesView;
 
 public slots:
   void slotAddZone(QString zonename, int uniqueid);
+
+
+
 };
 
 #endif

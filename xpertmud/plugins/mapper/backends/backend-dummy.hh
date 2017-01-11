@@ -4,14 +4,15 @@
 
 class QWidget;
 
-class XMMbackend_dummy:public XMMbackend {
+class XMMbackend_dummy:public XMMAbstractBackend {
   Q_OBJECT
 public:
   XMMbackend_dummy(QObject *parent = 0);
   ~XMMbackend_dummy();
 
-public slots:
-  void slotConfig(QWidget *parent);
-}; 
+  QString getBackendName() override;
+
+  XMBackends getId() override;
+};
 
 #endif

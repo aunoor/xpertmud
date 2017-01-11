@@ -12,10 +12,12 @@ file (GLOB HDR
         GUI/view.hh
         GUI/zonelist.hh
         core/map.hh
-        core/zone.hh
-        core/zonelist.hh
+        core/mobject.hh
+        core/zonemodel.h
+        core/core_global.h
         backends/backend.hh
         backends/backend-dummy.hh
+        backends/backend-tmw.h
         ${CMAKE_SOURCE_DIR}/compat/klibloader.h
         ${CMAKE_SOURCE_DIR}/compat/kgenericfactory.h
         )
@@ -26,9 +28,11 @@ file (GLOB SRCS
         GUI/view.cc
         GUI/zonelist.cc
         core/map.cc
-        core/zone.cc
+        core/mobject.cc
+        core/zonemodel.cc
         backends/backend.cc
         backends/backend-dummy.cc
+        backends/backend-tmw.cc
         ${CMAKE_SOURCE_DIR}/compat/kglobal.cc
         )
 

@@ -1,25 +1,28 @@
 // -*- c++ -*-
 #ifndef XMUD_MAPPERGUI_H
 #define XMUD_MAPPERGUI_H
-#include <qwidget.h>
-#include <qvariant.h>
-class XMMbackend;
+
+#include <QWidget>
+
+class XMMAbstractBackend;
 class XMMcore;
 class XMMmenu;
 class XMMmapView;
 class XMMmap;
-class QHBoxLayout;
 class XMMzonelist;
+class QVBoxLayout;
+class QSplitter;
 
 class XmudMapper:public QWidget {
   Q_OBJECT
 public:
   XmudMapper(QWidget *parent, const char *name, const QStringList & args);
   ~XmudMapper();
-  
+  XMMmenu *getMenuBar();
+
 signals:
   void callback(int func, const QVariant & args, QVariant & result);
-  void emitBackendSelected(XMMbackend *backend);
+  void emitBackendSelected(XMMAbstractBackend *backend);
   void emitAddZone(QString zonename);
   void emitDelZone();
   void emitRenameZone(QString zonename);
@@ -35,14 +38,17 @@ public slots:
   void slotChangeZone(int zoneid);
   void slotRenameZoneDialog();
   void slotDelZoneDialog();
+  void slotAddTrigger();
+  void slotDelTrigger();
 
 protected:
-  QHBoxLayout *layout;
-  XMMmapView *mapview;
-  XMMmenu *menu;
-  XMMbackend *backend;
-  XMMmap *map;
-  XMMzonelist *zonelist;
+  QSplitter *m_splitter;
+  QVBoxLayout *m_layout;
+  XMMmapView *m_mapview;
+  XMMmenu *m_menu;
+  XMMAbstractBackend *m_backend;
+  XMMmap *m_map;
+  XMMzonelist *m_zonelist;
 };
 
 #endif

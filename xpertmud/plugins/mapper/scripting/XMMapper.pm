@@ -3,6 +3,7 @@ use strict;
 use vars qw/@ISA/;
 use warnings;
 use diagnostics;
+#use Switch;
 
 @ISA=qw(XMPlugin);
 
@@ -18,12 +19,26 @@ sub new {
   return $self;
 }
 
+sub trigger {
+  my ($self,$iline)=@_;
+  $self->call(0, $iline);
+}
+
 sub function {
   my ($self, $id, $args) = @_;
 
-  if ($id == 0) {
-    return "Function no 0";
-  } else {
-    return SUPER::function(@_);
-  }
+  if ($id==0) {
+    XM::addTrigger("XMMAPPER_TRIGGER","^.*\$", sub {
+          my $line = shift;
+          my $sline = XM::ansiToRaw($line);
+          $self->trigger($sline);
+          return $line }
+        ,0,1);
+         return "Trigger enabled";
+      }
+    elsif($id==1) {
+      XM::deleteTrigger("XMMAPPER_TRIGGER");
+      return "Trigger deleted";
+    }
+    else {return SUPER::function(@_);}
 }

@@ -1,11 +1,16 @@
 #include "main.hh"
 #include "menu.hh"
 #include "view.hh"
-#include "backend-dummy.hh"
 #include "map.hh"
 #include "zonelist.hh"
+
+#include "backend-dummy.hh"
+#include "backend-tmw.h"
+
 #include <kgenericfactory.h>
-#include <QHBoxLayout>
+
+#include <QVBoxLayout>
+#include <QSplitter>
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QLineEdit>
@@ -15,81 +20,110 @@ XmudMapper::XmudMapper(QWidget *parent,
 		       const QStringList & /* unused: args*/):
   QWidget(parent) {
 
-  backend = 0;
-  map = 0;
+  m_backend = 0;
+  m_map = 0;
 
-  mapview = new XMMmapView (this);
-  mapview->setObjectName("mapperMapView");
+  m_mapview = new XMMmapView (this);
+  m_mapview->setObjectName("mapperMapView");
 
-  zonelist = new XMMzonelist(this);
-  zonelist->setObjectName("mapperZonelist");
+  m_zonelist = new XMMzonelist(this);
+  m_zonelist->setObjectName("mapperZonelist");
 
-  menu = new XMMmenu(this);
-  menu->setObjectName("mapperMenu");
+  m_menu = new XMMmenu(this);
+  m_menu->setObjectName("mapperMenu");
+  m_menu->setNativeMenuBar(false);
 
-  connect(menu, SIGNAL(emitSelectBackend(int)), 
-	  this, SLOT(slotSelectBackend(int)));
-  connect(this, SIGNAL(emitBackendSelected(XMMbackend *)), 
-	  menu, SLOT(slotBackendSelected(XMMbackend *)));
+  connect(m_menu, SIGNAL(emitSelectBackend(int)),
+	        this, SLOT(slotSelectBackend(int)));
+  connect(this, SIGNAL(emitBackendSelected(XMMAbstractBackend *)),
+          m_menu, SLOT(slotBackendSelected(XMMAbstractBackend *)));
 
-  layout = new QHBoxLayout(this);
-  layout->addWidget(zonelist);
-  layout->addWidget(mapview);
-  setLayout(layout);
+  m_layout = new QVBoxLayout(this);
+  m_layout->setMenuBar(m_menu);
+
+  m_splitter = new QSplitter(this);
+  m_splitter->setOrientation(Qt::Horizontal);
+
+  m_splitter->addWidget(m_zonelist);
+  m_splitter->addWidget(m_mapview);
+
+  m_splitter->setStretchFactor(1, 2);
+  m_layout->addWidget(m_splitter);
+
+  setLayout(m_layout);
 }
 
 XmudMapper::~XmudMapper() {
   slotCloseMap();
-  delete backend;
-  backend = 0;
-  delete menu;
-  menu = 0;
-  delete mapview;
-  mapview = 0;
-  delete layout;
-  layout = 0;
+  delete m_backend;
+  m_backend = 0;
+}
+
+XMMmenu *XmudMapper::getMenuBar() {
+  return m_menu;
 }
 
 void XmudMapper::slotFunctionCall(int func, const QVariant & args, QVariant & result) {
   switch(func) {
+    case 0: {
+      if (m_backend) m_backend->parseLine(args.toString());
+      result = QVariant();
+    }
+
   default:
     result="Unknown function called";
   }
 }
 
 void XmudMapper::slotSelectBackend(int backend_id) {
-  XMMbackend *newbackend = 0;
-  if (backend) {
-    delete backend;
-    backend = 0;
+  XMMAbstractBackend *newbackend = NULL;
+
+  switch (backend_id) {
+    case XMBDummy:
+      newbackend = new XMMbackend_dummy(this);
+      break;
+    case XMBTMW:
+      newbackend = new XMMbackend_TMW(this);
+      break;
+    default:
+      break;
   }
-  if (backend_id == BACKEND_DUMMY) {
-    newbackend = new XMMbackend_dummy(this);
-    newbackend->setObjectName("mapperBackend");
+
+  if (newbackend == NULL) return;
+
+  qDebug() << "Backend selected:"<<newbackend->getBackendName();
+
+  if (m_backend) {
+    delete m_backend;
+    m_backend = 0;
   }
-  backend = newbackend;
-  emit emitBackendSelected(backend);
+
+  newbackend->setObjectName("mapperBackend");
+  m_backend = newbackend;
+  emit emitBackendSelected(m_backend);
 }
 
 void XmudMapper::slotNewMap() {
-  if (!backend) {
+  if (!m_backend) {
     QMessageBox::information(this, "Auto Mapper GUI", "You need to select a backend first");
     return;
   }
   slotCloseMap();
-  map = new XMMmap(this);
-  map->setObjectName("mapperMap");
+  m_map = new XMMmap(this);
+  m_map->setObjectName("mapperMap");
+
+  m_zonelist->setModel(m_map->getModel());
 
 //  mapview->setCanvas(map->canvas());
-  connect(mapview, SIGNAL(emitAddRoom(int, int)), map, SLOT(slotAddRoom(int, int)));
-  connect(this, SIGNAL(emitAddZone(QString *)), map, SLOT(slotAddZone(QString *)));
-  connect(map, SIGNAL(emitZoneAdded(QString, int)), zonelist, SLOT(slotAddZone(QString, int)));
-  connect(map, SIGNAL(emitChangeZone(int)), this, SLOT(slotChangeZone(int)));
+  connect(m_mapview, SIGNAL(emitAddRoom(int, int)), m_map, SLOT(slotAddRoom(int, int)));
+  connect(this, SIGNAL(emitAddZone(QString *)), m_map, SLOT(slotAddZone(QString *)));
+  connect(m_map, SIGNAL(emitZoneAdded(QString, int)), m_zonelist, SLOT(slotAddZone(QString, int)));
+  connect(m_map, SIGNAL(emitChangeZone(int)), this, SLOT(slotChangeZone(int)));
   emit emitAddZone(0);
 }
 
 void XmudMapper::slotOpenMap() {
-  if (!backend) {
+  if (!m_backend) {
     QMessageBox::information(this, "Auto Mapper GUI", "You need to select a backend first");
     return;
   }
@@ -129,6 +163,16 @@ void XmudMapper::slotRenameZoneDialog() {
 void XmudMapper::slotChangeZone(int zoneid) {
 //  mapview->setCanvas(map->canvas());
   // XXX changer l'item courant dans zonelist
+}
+
+void XmudMapper::slotAddTrigger() {
+  QVariant result;
+  emit callback(0, QVariant(), result);
+}
+
+void XmudMapper::slotDelTrigger() {
+  QVariant result;
+  emit callback(1, QVariant(), result);
 }
 
 K_EXPORT_COMPONENT_FACTORY( xmud_mapper, KGenericFactory<XmudMapper>( "xmud_mapper" ) );
