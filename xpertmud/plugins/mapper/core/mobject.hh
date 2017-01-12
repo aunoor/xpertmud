@@ -10,6 +10,7 @@ class XMMmap;
 class XMObject {
 public:
   XMObject(QString objectName=QString(), XMType objectType=XMTUnknown, QString objectId=QString());
+  XMObject(XMObject &object);
   virtual ~XMObject();
 
   QString getName();
@@ -18,6 +19,8 @@ public:
   XMObject *findSubObject(XMObject *object);
 
   XMType getType();
+
+  XMObject& operator=(const XMObject& right);
 
 protected:
   QString m_id;

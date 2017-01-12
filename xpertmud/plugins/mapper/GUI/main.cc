@@ -120,8 +120,8 @@ void XmudMapper::slotNewMap() {
   m_zonelist->setModel(m_map->getModel());
 
 //  mapview->setCanvas(map->canvas());
-  connect(m_mapview, SIGNAL(emitAddRoom(int, int)), m_map, SLOT(slotAddRoom(int, int)));
-  connect(this, SIGNAL(emitAddZone(QString *)), m_map, SLOT(slotAddZone(QString *)));
+///  connect(m_mapview, SIGNAL(emitAddRoom(int, int)), m_map, SLOT(slotAddRoom(int, int)));
+///  connect(this, SIGNAL(emitAddZone(QString *)), m_map, SLOT(slotAddZone(QString *)));
   connect(m_map, SIGNAL(emitZoneAdded(QString, int)), m_zonelist, SLOT(slotAddZone(QString, int)));
   connect(m_map, SIGNAL(emitChangeZone(int)), this, SLOT(slotChangeZone(int)));
   emit emitAddZone(0);

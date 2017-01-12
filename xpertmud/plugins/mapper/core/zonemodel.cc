@@ -103,11 +103,11 @@ void XMZoneModel::addNewRoom(XMObject *object) {
   XMObject * tmpObj = findObject(object->getID());
   if (tmpObj==NULL) {
     beginInsertRows(QModelIndex(),m_objects.count(), m_objects.count());
-    m_objects.append(object);
+    m_objects.append(new XMObject(*object));
     endInsertRows();
   } else {
     int idx = m_objects.indexOf(tmpObj);
-    m_objects.replace(idx, object);
+    m_objects[idx]=object;
     emit dataChanged(index(idx,0,QModelIndex()),index(idx,columnCount(QModelIndex())-1,QModelIndex()));
     delete tmpObj;
   }

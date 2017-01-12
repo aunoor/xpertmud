@@ -19,15 +19,32 @@ public:
     void parseLine(QString line) override;
 
 private:
-    enum BPState {
-        bpsIdle = 0,
-        bpsWaitRoom,
-        bpsWaitEnd
+    enum BPMode {
+        bpmIdle = 0,
+        bpmRoomList,
+        bpmRoomDetail
     };
 
-    QMenu *menu;
-    BPState m_parseState;
+    enum BPLStat {
+        bplIdle=0,
+        bplWaitStartCmd,
+        bplWaitEndCmd
+    };
 
+
+    QMenu *menu;
+
+    BPMode m_parseMode;
+    BPLStat m_waitLineStat;
+
+    QStringList m_lines;
+    int m_curRoomIdx;
+    QList<XMObject*> m_rooms;
+
+    void switchParseMode();
+    void parseRoomList();
+    void parseRoomDetails();
+    void getRoomDetails();
 private slots:
     void slotAutoGenerateMap();
 

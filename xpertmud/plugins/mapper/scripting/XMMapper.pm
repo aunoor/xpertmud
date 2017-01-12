@@ -20,7 +20,7 @@ sub new {
 }
 
 sub trigger {
-  my ($self,$iline)=@_;
+  my ($self, $iline)=@_;
   $self->call(0, $iline);
 }
 
@@ -28,19 +28,20 @@ sub function {
   my ($self, $id, $args) = @_;
 
   if ($id==0) {
-    XM::addTrigger("XMMAPPER_TRIGGER","^.*\$", sub {
+    XM::addTrigger("XMMAPPER_TRIGGER",qr/^.*$/, sub {
           my $line = shift;
           my $sline = XM::ansiToRaw($line);
           $self->trigger($sline);
           return $line }
         ,0,1);
-         return "Trigger enabled";
+         return "Trigger created";
       }
   elsif($id==1) {
-      XM::deleteTrigger("XMMAPPER_TRIGGER");
+      XM::delTrigger("XMMAPPER_TRIGGER");
       return "Trigger deleted";
     }
   elsif ($id==2) {
+    XM::statusWindow()->print($args);
     XM::sendText($args);
   }
 
