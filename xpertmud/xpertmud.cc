@@ -895,10 +895,14 @@ void Xpertmud::readOptions() {
   }
 
   {
-#ifdef WIN32
+#ifdef Q_OS_WIN
     QFont myFont("fixedsys");
     myFont.setFixedPitch(true);
     myFont.setPointSize(9);
+#elif defined Q_OS_OSX
+    QFont myFont("PT Mono");
+    myFont.setFixedPitch(true);
+    myFont.setPointSize(12);
 #else
     QFont myFont("Courier");
     myFont.setFixedPitch(true);

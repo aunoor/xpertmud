@@ -12,13 +12,8 @@ class KConfig{
 public:
 
     KConfig() {
-
       QSettings::Format format;
-#ifdef Q_OS_WIN
       format = QSettings::IniFormat;
-#else
-      format = QSettings::NativeFormat;
-#endif
       settings = new QSettings(format, QSettings::UserScope, "Xpertmud", "xpertmud");
     }
 
