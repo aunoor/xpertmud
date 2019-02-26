@@ -1,10 +1,10 @@
 cmake_minimum_required ( VERSION 3.0.2 )
 
 #we use Python 2.x
-set(Python_ADDITIONAL_VERSIONS 2.7 2.6 2.5 2.4)
+set(Python_ADDITIONAL_VERSIONS 2.7 2.6)
 
-include(FindPythonLibs)
 include(FindPythonInterp)
+include(FindPythonLibs)
 include(FindRuby)
 include(FindPerl)
 include(FindPerlLibs)

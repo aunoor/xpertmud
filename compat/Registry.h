@@ -1,7 +1,7 @@
 #ifndef REGISTRY_H
 #define REGISTRY_H
 
-#include <qstring.h>
+#include <QString>
 #include <windows.h>
 
 #include <iostream>
@@ -24,7 +24,7 @@ class Registry {
  public:
   static void writeEntry(const QString& entry,
 			 const QString& value) {
-    int pos = entry.findRev('/');
+    int pos = entry.lastIndexOf('/');
     QString keyName = entry.left(pos);
     QString entryName = entry.mid(pos+1);
     HKEY key = createKeyEx(keyName);
@@ -34,7 +34,7 @@ class Registry {
 
   static void writeEntry(const QString& entry,
 			 int value) {
-    int pos = entry.findRev('/');
+    int pos = entry.lastIndexOf('/');
     QString keyName = entry.left(pos);
     QString entryName = entry.mid(pos+1);
     HKEY key = createKeyEx(keyName);
@@ -44,7 +44,7 @@ class Registry {
 
   static QString readString(const QString& entry,
 			    const QString& def) {
-    int pos = entry.findRev('/');
+    int pos = entry.lastIndexOf('/');
     QString keyName = entry.left(pos);
     QString entryName = entry.mid(pos+1);
     HKEY key = createKeyEx(keyName);
@@ -54,7 +54,7 @@ class Registry {
   }
 
   static int readInt(const QString& entry, int def) {
-    int pos = entry.findRev('/');
+    int pos = entry.lastIndexOf('/');
     QString keyName = entry.left(pos);
     QString entryName = entry.mid(pos+1);
     HKEY key = createKeyEx(keyName);
@@ -64,7 +64,7 @@ class Registry {
   }
  private:
   static HKEY createKeyEx(const QString& expression) {
-    int pos = expression.find('/');
+    int pos = expression.indexOf('/');
     QString regHead = expression.left(pos);
     QString regTail = expression.mid(pos+1);
     HKEY parent;
@@ -72,12 +72,12 @@ class Registry {
       parent = HKEY_CURRENT_USER;
     else
       throw runtime_error
-	(QString("Unsupported Top Level Key: %1").arg(regHead).latin1());
+	(QString("Unsupported Top Level Key: %1").arg(regHead).toLatin1().data());
 
     return createKeyEx(regTail, parent);
   }
   static HKEY createKeyEx(const QString& expression, HKEY parent) {
-    int pos = expression.find('/');
+    int pos = expression.indexOf('/');
     QString regHead = expression.left(pos);
     QString regTail = expression.mid(pos+1);
 
@@ -87,14 +87,14 @@ class Registry {
 #ifdef UNICODE
       RegCreateKeyEx(parent, (LPCTSTR)(regHead+QChar(0)).unicode(),
 #else
-      RegCreateKeyEx(parent, regHead.latin1(),
+      RegCreateKeyEx(parent, regHead.toLatin1().data(),
 #endif
 		     0, (LPTSTR)"REG_SZ", REG_OPTION_NON_VOLATILE,
 		     KEY_ALL_ACCESS, 0, &keyResult,
 		     &disposition);
     if(result != ERROR_SUCCESS) {
       throw runtime_error
-	(QString("Failure while generating key: %1").arg(regHead).latin1());
+	(QString("Failure while generating key: %1").arg(regHead).toLatin1().data());
     }
     if(pos == -1) 
       return keyResult;
@@ -110,7 +110,7 @@ class Registry {
 #ifdef UNICODE
       RegQueryValueEx(key, (LPCTSTR)(name+QChar(0)).unicode(), 0,
 #else
-      RegQueryValueEx(key, name.latin1(), 0,
+      RegQueryValueEx(key, name.toLatin1().data(), 0,
 #endif
 		      &type, 0, &length);
     if(type != REG_SZ || result != ERROR_SUCCESS || length <= 0)
@@ -121,13 +121,13 @@ class Registry {
 #ifdef UNICODE
       RegQueryValueEx(key, (LPCTSTR)(name+QChar(0)).unicode(), 0,
 #else
-      RegQueryValueEx(key, name.latin1(), 0,
+      RegQueryValueEx(key, name.toLatin1().data(), 0,
 #endif
 		      &type, (unsigned char *)buffer, &length);
     if(result != ERROR_SUCCESS) {
       delete[] buffer;
       throw runtime_error
-	(QString("Failure while reading entry \"%1\"").arg(name).latin1());
+	(QString("Failure while reading entry \"%1\"").arg(name).toLatin1().data());
     }
     QString retVal(buffer);
     delete[] buffer;
@@ -142,7 +142,7 @@ class Registry {
 #ifdef UNICODE
       RegQueryValueEx(key, (LPCTSTR)(name+QChar(0)).unicode(), 0,
 #else
-      RegQueryValueEx(key, name.latin1(), 0,
+      RegQueryValueEx(key, name.toLatin1().data(), 0,
 #endif
 		      &type, 0, &length);
     if(type != REG_DWORD || result != ERROR_SUCCESS || length <= 0)
@@ -152,12 +152,12 @@ class Registry {
 #ifdef UNICODE
       RegQueryValueEx(key, (LPCTSTR)(name+QChar(0)).unicode(), 0,
 #else
-      RegQueryValueEx(key, name.latin1(), 0,
+      RegQueryValueEx(key, name.toLatin1().data(), 0,
 #endif
 		      &type, (unsigned char *)&value, &length);
     if(result != ERROR_SUCCESS) {
       throw runtime_error
-	(QString("Failure while reading entry \"%1\"").arg(name).latin1());
+	(QString("Failure while reading entry \"%1\"").arg(name).toLatin1().data());
     }
     return value;
   }
@@ -165,7 +165,7 @@ class Registry {
   static void setValueEx(HKEY key, 
 			 const QString& name,
 			 const QString& value) {
-    const unsigned char *vp = (const unsigned char *)value.latin1();
+    const unsigned char *vp = (const unsigned char *)value.toLatin1().data();
     int vlen = value.length()+1;
     if(vp == NULL) {
       vp = (const unsigned char*)"";
@@ -175,12 +175,12 @@ class Registry {
 #ifdef UNICODE
       RegSetValueEx(key, (LPCTSTR)(name+QChar(0)).unicode(), 0,
 #else
-      RegSetValueEx(key, name.latin1(), 0,
+      RegSetValueEx(key, name.toLatin1().data(), 0,
 #endif
 		    REG_SZ, vp, vlen);
     if(result != ERROR_SUCCESS) {
       throw runtime_error
-	(QString("Failure while writing entry \"%1\"").arg(name).latin1());
+	(QString("Failure while writing entry \"%1\"").arg(name).toLatin1().data());
     }
   }
 
@@ -191,14 +191,14 @@ class Registry {
 #ifdef UNICODE
       RegSetValueEx(key, (LPCTSTR)(name+QChar(0)).unicode(), 0,
 #else
-      RegSetValueEx(key, name.latin1(), 0,
+      RegSetValueEx(key, name.toLatin1().data(), 0,
 #endif
 		    REG_DWORD, 
 		    (CONST BYTE *)&value, 
 		    sizeof(value));
     if(result != ERROR_SUCCESS) {
       throw runtime_error
-	(QString("Failure while writing entry \"%1\"").arg(name).latin1());
+	(QString("Failure while writing entry \"%1\"").arg(name).toLatin1().data());
     }
   }
 
@@ -207,7 +207,7 @@ class Registry {
       RegCloseKey(key);
     if(result != ERROR_SUCCESS) {
       throw runtime_error
-	(QString("Failure while closing key!").latin1());
+	(QString("Failure while closing key!").toLatin1().data());
     }
   }
 };

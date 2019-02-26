@@ -8,7 +8,7 @@
 #include <qsystemdetection.h>
 
 #define APP_NAME  "Xpertmud"
-#define APP_VERSION  "3.3.0-rolling"
+#define APP_VERSION  "3.3.1-rolling"
 
 
 #ifdef Q_OS_UNIX
@@ -17,8 +17,8 @@
     #define DLL_PATH_PREFIX qApp->applicationDirPath()+QDir::separator()
   #else
     //Linux, *BSD and other unix-like OS
-    #define RESOURCES_PATH_PREFIX "/usr/local/share/xpertmud/"
-    #define DLL_PATH_PREFIX "/usr/local/lib/xpertmud"
+    #define RESOURCES_PATH_PREFIX QString("/usr/local/share/xpertmud/")
+    #define DLL_PATH_PREFIX QString("/usr/local/lib/xpertmud")
   #endif
 #endif
 

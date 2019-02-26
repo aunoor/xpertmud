@@ -181,6 +181,7 @@ include_directories( ${Qt5Concurrent_INCLUDE_DIRS} )
 include_directories( ${Qt5Multimedia_INCLUDE_DIRS} )
 
 SET(CMAKE_AUTOMOC TRUE)
+SET(CMAKE_AUTOMOC_MOC_OPTIONS "-nw")
 #SET(CMAKE_AUTOMOC_RELAXED_MODE TRUE)
 
 if(MSVC)
@@ -190,7 +191,7 @@ if(MSVC)
 	add_definitions( /wd4786 /wd4503 /wd4251 /wd4275 /wd4290 /wd4661 /wd4996 /wd4127 /wd4100)
 elseif(CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_C_COMPILER_ID MATCHES "Clang") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
 	#add_definitions (-Wall -fPIC)
-    add_definitions (-Wall)
+    add_definitions (-Wall -Wno-unknown-pragmas)
 endif(MSVC)
 
 add_definitions(-DQT_DLL)

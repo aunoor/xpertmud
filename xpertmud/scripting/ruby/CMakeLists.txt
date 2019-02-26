@@ -4,6 +4,10 @@ if(POLICY CMP0042)
     cmake_policy(SET CMP0042 NEW)
 endif()
 
+if(POLICY CMP0071)
+    cmake_policy(SET CMP0071 NEW)
+endif()
+
 project(xmrubyinterpreter)
 
 file (GLOB HDR
