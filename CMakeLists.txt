@@ -17,27 +17,27 @@ project(xpertmud)
 # Files
 
 file (GLOB HDR
-        xpertmud/TextBuffer.h
-        xpertmud/TextBufferView.h
-        xpertmud/TextBufferHistoryView.h
-        xpertmud/mxinputline.h
-        xpertmud/xpertmud.h
-        xpertmud/InputAction.h
-        xpertmud/scripting/Scripting.h
-        xpertmud/PluginWrapper.h
-        xpertmud/configdialog.h
-        xpertmud/ColorChar.h
-        xpertmud/Connection.h
-        xpertmud/ConnectionHandler.h
-        xpertmud/IacHandlerCollection.h
-        xpertmud/CtrlParser.h
-        xpertmud/TelnetFilter.h
-        xpertmud/InputStreamHandler.h
-        xpertmud/Bookmark.h
-        xpertmud/BookmarkEditor.h
-        xpertmud/LogToFile.h
-        xpertmud/MCCP.h
-        xpertmud/config.h
+        xpertmud.src/TextBuffer.h
+        xpertmud.src/TextBufferView.h
+        xpertmud.src/TextBufferHistoryView.h
+        xpertmud.src/mxinputline.h
+        xpertmud.src/xpertmud.h
+        xpertmud.src/InputAction.h
+        xpertmud.src/scripting/Scripting.h
+        xpertmud.src/PluginWrapper.h
+        xpertmud.src/configdialog.h
+        xpertmud.src/ColorChar.h
+        xpertmud.src/Connection.h
+        xpertmud.src/ConnectionHandler.h
+        xpertmud.src/IacHandlerCollection.h
+        xpertmud.src/CtrlParser.h
+        xpertmud.src/TelnetFilter.h
+        xpertmud.src/InputStreamHandler.h
+        xpertmud.src/Bookmark.h
+        xpertmud.src/BookmarkEditor.h
+        xpertmud.src/LogToFile.h
+        xpertmud.src/MCCP.h
+        xpertmud.src/config.h
         compat/kaction.h
         compat/kfontdialog.h
         compat/kapplication.h
@@ -87,27 +87,27 @@ file (GLOB SRCS
         qextmdi/src/qextmdichildview.cpp
         qextmdi/src/qextmdimainfrm.cpp
         qextmdi/src/qextmditaskbar.cpp
-        xpertmud/TextBuffer.cc
-        xpertmud/TextBufferView.cc
-        xpertmud/TextBufferHistoryView.cc
-        xpertmud/mxinputline.cc
-        xpertmud/InputAction.cc
-        xpertmud/xpertmud.cc
-        xpertmud/main.cc
-        xpertmud/xpertmud_scripting.cc
-        xpertmud/PluginWrapper.cc
-        xpertmud/Connection.cc
-        xpertmud/ConnectionHandler.cc
-        xpertmud/IacHandlerCollection.cc
-        xpertmud/CtrlParser.cc
-        xpertmud/TelnetFilter.cc
-        xpertmud/InputStreamHandler.cc
-        xpertmud/configdialog.cc
-        xpertmud/LogToFile.cc
-        xpertmud/Bookmark.cc
-        xpertmud/BookmarkEditor.cc
-        xpertmud/MCCP.cc
-        xpertmud/scripting/Scripting.cc
+        xpertmud.src/TextBuffer.cc
+        xpertmud.src/TextBufferView.cc
+        xpertmud.src/TextBufferHistoryView.cc
+        xpertmud.src/mxinputline.cc
+        xpertmud.src/InputAction.cc
+        xpertmud.src/xpertmud.cc
+        xpertmud.src/main.cc
+        xpertmud.src/xpertmud_scripting.cc
+        xpertmud.src/PluginWrapper.cc
+        xpertmud.src/Connection.cc
+        xpertmud.src/ConnectionHandler.cc
+        xpertmud.src/IacHandlerCollection.cc
+        xpertmud.src/CtrlParser.cc
+        xpertmud.src/TelnetFilter.cc
+        xpertmud.src/InputStreamHandler.cc
+        xpertmud.src/configdialog.cc
+        xpertmud.src/LogToFile.cc
+        xpertmud.src/Bookmark.cc
+        xpertmud.src/BookmarkEditor.cc
+        xpertmud.src/MCCP.cc
+        xpertmud.src/scripting/Scripting.cc
         )
 
 #file(GLOB UI_FORMS src/ui/*.ui)
@@ -136,7 +136,7 @@ if (MCCP_SUPPORT AND (NOT ZLIB_FOUND))
     message(WARNING "Disable MCCP support - zlib not found")
 endif (MCCP_SUPPORT AND (NOT ZLIB_FOUND))
 
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/config.h CURRENT_CONFIG)
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud.src/config.h CURRENT_CONFIG)
 string(REGEX MATCH "\#define APP_VERSION[ ]+[\"]?[a-z0-9.-]+[\"]?" APP_VERSION_DEF ${CURRENT_CONFIG})
 string(STRIP ${APP_VERSION_DEF} APP_VERSION_DEF)
 string(REPLACE "\#define APP_VERSION" "" APP_VERSION_DEF ${APP_VERSION_DEF})
@@ -209,7 +209,7 @@ qt5_wrap_ui(INCLUDE_LIST_FORMS ${UI_FORMS})
 qt5_add_resources(MAIN_UI_RC ${MAIN_RES})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/xpertmud)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/xpertmud.src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/compat)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qextmdi/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qextmdi/res)
@@ -367,12 +367,12 @@ else (APPLE)
   else (WIN32)
 #TODO: make Linux install
       install(TARGETS ${PROJECT_NAME} DESTINATION bin)
-      install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi32-app-xpertmud.png
-              ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud/hi16-app-xpertmud.png
+      install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud.src/hi32-app-xpertmud.png
+              ${CMAKE_CURRENT_SOURCE_DIR}/xpertmud.src/hi16-app-xpertmud.png
               DESTINATION ${CMAKE_INSTALL_PREFIX}/share/${MAIN_PROJ_NAME}/icons/)
   endif (WIN32)
 endif (APPLE)
 
-add_subdirectory(xpertmud/scripting)
-add_subdirectory(xpertmud/plugins)
+add_subdirectory(xpertmud.src/scripting)
+add_subdirectory(xpertmud.src/plugins)
 

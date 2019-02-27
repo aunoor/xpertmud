@@ -28,7 +28,7 @@
 #define _QEXTMDICHILDFRM_H_
 
 #include <QList>
-#include <QPixMap>
+#include <QPixmap>
 #include <QMenu>
 #include <QPushButton>
 #include <QToolButton>

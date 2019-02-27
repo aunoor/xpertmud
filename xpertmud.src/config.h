@@ -18,7 +18,7 @@
   #else
     //Linux, *BSD and other unix-like OS
     #define RESOURCES_PATH_PREFIX QString("/usr/local/share/xpertmud/")
-    #define DLL_PATH_PREFIX QString("/usr/local/lib/xpertmud")
+    #define DLL_PATH_PREFIX QString("/usr/local/lib/xpertmud/")
   #endif
 #endif
 
