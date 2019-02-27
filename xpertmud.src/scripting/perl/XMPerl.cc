@@ -40,9 +40,7 @@ void XMPerl::setCallback(GuiScriptingBindings *callBack) {
 
     QStringList incPath=KGlobal::dirs()->findDirs("appdata","perl");
     
-    for (QStringList::Iterator it=incPath.begin();
-	 it!=incPath.end(); ++it) {
-      
+    for (QStringList::Iterator it=incPath.begin(); it!=incPath.end(); ++it) {
       interp->addIncludeDir((*it).toLocal8Bit().data());
     }
   }

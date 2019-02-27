@@ -34,11 +34,11 @@ class KStandardDirs {
     QStringList ret;
     if(type == "appdata") {
         if(name == "perl") {
-            ret.append("appdata/perl");
+            ret.append(RESOURCES_PATH_PREFIX+"appdata/perl");
         } else if(name == "python") {
-            ret.append("appdata/python");
+            ret.append(RESOURCES_PATH_PREFIX+"appdata/python");
         } else if (name == "ruby") {
-          ret.append("appdata/ruby");
+          ret.append(RESOURCES_PATH_PREFIX+"appdata/ruby");
         }
     }
     return ret;

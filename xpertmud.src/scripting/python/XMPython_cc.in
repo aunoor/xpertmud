@@ -128,9 +128,7 @@ void XMPython::setCallback(GuiScriptingBindings *cB) {
   // now search for include paths
   QStringList incPath=KGlobal::dirs()->findDirs("appdata","python");
   
-  for (QStringList::Iterator it=incPath.begin();
-       it!=incPath.end(); ++it) {
-    
+  for (QStringList::Iterator it=incPath.begin(); it!=incPath.end(); ++it) {
     PyObject *obj;
     if((obj = PyRun_String(const_cast<char *>(("sys.path.append(\""+*it+"\")").toLocal8Bit().data()),
 			   Py_file_input, globals, globals))) {
@@ -138,7 +136,6 @@ void XMPython::setCallback(GuiScriptingBindings *cB) {
     } else {
       PyErr_Print();
     }
-  
   }
   
 
